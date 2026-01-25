@@ -1,0 +1,28 @@
+{
+    "name": "plumeletphp/app",
+    "description": "demo framework",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/App/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Paolo Mococci"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "guzzlehttp/psr7": "3.0.x-dev",
+        "httpsoft/http-emitter": "dev-master",
+        "league/route": "6.x-dev",
+        "php-di/php-di": "dev-master",
+        "vlucas/phpdotenv": "^5.6@dev",
+        "filp/whoops": "^2.18",
+        "monolog/monolog": "^3.0@dev",
+        "adhocore/jwt": "dev-main",
+        "league/plates": "^3.6"
+    }
+}
