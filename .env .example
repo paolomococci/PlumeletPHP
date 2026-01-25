@@ -1,0 +1,8 @@
+APP_NAME=PlumeletPHP
+
+APP_ENV=dev
+
+MARIADB_DB_HOST=192.168.XXX.XXX
+MARIADB_DB_PLUMELETPHP=plumeletphp_db
+MARIADB_DB_USER=developer_username
+MARIADB_DB_PASSWORD=developer_password
