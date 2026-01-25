@@ -78,7 +78,7 @@ SELECT * FROM user_update_log_tbl;
 SHOW TABLES;
 ```
 
-## creo la store procedure per la creazione degli utenti
+## I create the stored procedure for user registration
 
 ```sql
 DELIMITER $$
@@ -187,11 +187,11 @@ CALL sp_insert_user_on_users_tbl(
     'John Doe',
     'john.doe@example.local',
     '$2y$12$JJzRd.BfJy6O.NCO9LFpOeb/.ogUo8RvYcACfmD/8BUztsBtS8DGq',
-    @nuovo_id
+    @new_id
 );
 
 -- I verify that the newly inserted data has been correctly registered.
-SELECT @nuovo_id AS user_id;
+SELECT @new_id AS user_id;
 
 -- I check that there have been no problems.
 SHOW WARNINGS;
@@ -200,7 +200,7 @@ SHOW WARNINGS;
 ## I create the stored procedure dedicated to updating user data
 
 ```sql
--- Store procedure for updating the data of already registered users.
+-- stored procedure for updating the data of already registered users.
 DELIMITER $$
 
 CREATE PROCEDURE sp_update_user_on_users_tbl (
@@ -326,7 +326,7 @@ SELECT * FROM user_update_log_tbl;
 
 ## some notes on bcrypt and how I generated the hash from the shell to record it in the `password_hash` field of the `users_tbl` table.
 
-bcrypt has become the de‑facto standard for storing passwords in databases, configuration files and more.
+bcrypt has become the de-facto standard for storing passwords in databases, configuration files and more.
 
 ```shell
 htpasswd --help
