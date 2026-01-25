@@ -125,3 +125,10 @@ Command to connect to the development database:
 ```shell
 mariadb --user=developer_name --password --pager
 ```
+
+## custom class for debugging
+
+```php
+\App\Util\Handlers\VarDebugHandler::varDump($var);
+\App\Util\Handlers\VarDebugHandler::varExport($var);
+```
