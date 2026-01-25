@@ -26,7 +26,7 @@ $environment = $_ENV['APP_ENV'] ?? 'pro';
 $errorsMap = [
     'pro' => ErrorsPro::class, // default
     'dev' => ErrorsDev::class,
-    // possono seguire altri eventuali ambienti
+    // other possible environments may follow
 ];
 
 $errorsClass = $errorsMap[$environment] ?? ErrorsPro::class;
