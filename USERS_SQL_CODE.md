@@ -9,7 +9,7 @@ SHOW TABLES;
 -- Create the Users Table (if it does not exist).
 CREATE TABLE IF NOT EXISTS users_tbl (
     -- `id SERIAL` creates a column named `id` that automatically increments.
-    -- In MySQL, `SERIAL` is an alias for `BIGINT UNSIGNED NOT NULL AUTO_INCREMENT`.
+    -- In MySQL/MariaDB, `SERIAL` is an alias for `BIGINT UNSIGNED NOT NULL AUTO_INCREMENT`.
     -- This column will serve as the primary key for the table.
     id SERIAL,
     -- Convention and power of 2 minus 1: 255 is 2^8−1, a common value for byte-oriented storage/compatibility.
