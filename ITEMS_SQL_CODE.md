@@ -231,3 +231,36 @@ TRUNCATE TABLE items_tbl;
 -- I check that the table is clean.
 SELECT * FROM items_tbl;
 ```
+
+### I create the table dedicated to logs for item registration
+
+```sql
+-- I create a log table that records the creation/registration of items.
+CREATE TABLE IF NOT EXISTS item_registration_log_tbl (
+    id SERIAL,
+    name VARCHAR(255) NOT NULL,
+    feedback VARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- I verify that the log table is also clean.
+SELECT * FROM item_registration_log_tbl;
+```
+
+### I create the table dedicated to logs that track modifications of item data
+
+```sql
+-- I create a log table that tracks the modification/updates of data for already-registered items.
+CREATE TABLE IF NOT EXISTS item_update_log_tbl (
+    id SERIAL,
+    name VARCHAR(255) NOT NULL,
+    feedback VARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- I verify that the log table associated with item data modifications is also clean and functioning.
+SELECT * FROM item_update_log_tbl;
+
+-- I view the tables currently present in the database.
+SHOW TABLES;
+```
