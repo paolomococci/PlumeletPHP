@@ -15,14 +15,14 @@ CREATE TABLE IF NOT EXISTS users_tbl (
     -- Convention and power of 2 minus 1: 255 is 2^8−1, a common value for byte-oriented storage/compatibility.
     -- `name VARCHAR(255)` stores the user's name as a variable‑length string up to 255 characters.
     -- `NOT NULL` ensures that every row must contain a name.
-    name VARCHAR(255) not null,
+    name VARCHAR(255) NOT NULL,
     -- `email VARCHAR(255)` holds the user’s email address.
     -- `NOT NULL` guarantees that every user record has an email.
-    email VARCHAR(255) not null,
+    email VARCHAR(255) NOT NULL,
     -- Password Hash.
     -- `password_hash VARCHAR(255)` stores the hashed password (e.g., using bcrypt, Argon2, etc.).
     -- `NOT NULL` requires that a password hash be present for each user.
-    password_hash VARCHAR(255) not null,
+    password_hash VARCHAR(255) NOT NULL,
     -- Record Creation Timestamp.
     -- `created_at DATETIME` records when the row was first inserted.
     -- `NOT NULL DEFAULT CURRENT_TIMESTAMP` automatically sets the current timestamp at insertion time.
@@ -51,8 +51,8 @@ SELECT * FROM users_tbl;
 -- I create a log table that records the creation/registration of users.
 CREATE TABLE IF NOT EXISTS user_registration_log_tbl (
     id SERIAL,
-    email VARCHAR(255) not null,
-    feedback VARCHAR(255) not null,
+    email VARCHAR(255) NOT NULL,
+    feedback VARCHAR(255) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -66,8 +66,8 @@ SELECT * FROM user_registration_log_tbl;
 -- I create a log table that tracks the modification/updates of data for already‑registered users.
 CREATE TABLE IF NOT EXISTS user_update_log_tbl (
     id SERIAL,
-    email VARCHAR(255) not null,
-    feedback VARCHAR(255) not null,
+    email VARCHAR(255) NOT NULL,
+    feedback VARCHAR(255) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
