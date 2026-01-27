@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS items_tbl (
     -- This column will serve as the primary key for the table.
     id SERIAL,
     -- Convention and power of 2 minus 1: 255 is 2^8−1, a common value for byte-oriented storage/compatibility.
-    -- `name VARCHAR(255)` stores the item's name as a variable‑length string up to 255 characters.
+    -- `name VARCHAR(255)` stores the item's name as a variable-length string up to 255 characters.
     -- `NOT NULL` ensures that every row must contain a name.
     name VARCHAR(255) NOT NULL,
     -- `description VARCHAR(255)` holds the item’s description address.
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS items_tbl (
     -- `DEFAULT 0.0` sets a default value of zero for each item.
     price decimal(10, 2) DEFAULT 0.0,
     -- Currency code (ISO 4217, e.g., USD, GBP, EUR)
-    -- `currency CHAR(3) NOT NULL DEFAULT 'EUR'` stores the three‑letter currency code that applies to the `price`.
+    -- `currency CHAR(3) NOT NULL DEFAULT 'EUR'` stores the three-letter currency code that applies to the `price`.
     currency CHAR(3) NOT NULL DEFAULT 'EUR',
     -- Record Creation Timestamp.
     -- `created_at DATETIME` records when the row was first inserted.
@@ -79,7 +79,7 @@ INSERT INTO items_tbl (name, description, price, currency) VALUES
 ),
 (
     'Fish and Chips',
-    'Golden‑fried cod or haddock served with thick potato chips, tartar sauce, lemon wedges and a side of mushy peas.',
+    'Golden-fried cod or haddock served with thick potato chips, tartar sauce, lemon wedges and a side of mushy peas.',
     9.50,
     'GBP'
 ),
@@ -97,7 +97,7 @@ INSERT INTO items_tbl (name, description, price, currency) VALUES
 ),
 (
     'Corned Beef and Cabbage',
-    'Cured beef brisket simmered with cabbage, carrots, potatoes and a hint of mustard, a popular Irish‑British comfort food.',
+    'Cured beef brisket simmered with cabbage, carrots, potatoes and a hint of mustard, a popular Irish-British comfort food.',
     10.60,
     'GBP'
 ),
@@ -109,7 +109,7 @@ INSERT INTO items_tbl (name, description, price, currency) VALUES
 ),
 (
     'Irish Stew',
-    'A comforting traditional stew of tender lamb shoulder, carrots, onions, potatoes and a fragrant stock, slow‑cooked to melt the flavours together, served hot with crusty bread.',
+    'A comforting traditional stew of tender lamb shoulder, carrots, onions, potatoes and a fragrant stock, slow-cooked to melt the flavours together, served hot with crusty bread.',
     7.50,
     'EUR'
 ),
@@ -127,7 +127,7 @@ INSERT INTO items_tbl (name, description, price, currency) VALUES
 ),
 (
     'Hangi',
-    'A traditional Māori earth‑oven cooked meal where lamb, pork, sweet potatoes, pumpkin and cabbage are wrapped in leaves, buried in hot stones, and slowly roasted to a tender, smoky flavour, served hot straight from the pit.',
+    'A traditional Māori earth-oven cooked meal where lamb, pork, sweet potatoes, pumpkin and cabbage are wrapped in leaves, buried in hot stones, and slowly roasted to a tender, smoky flavour, served hot straight from the pit.',
     9.75,
     'NZD'
 ),
@@ -145,13 +145,13 @@ INSERT INTO items_tbl (name, description, price, currency) VALUES
 ),
 (
     'Sticky Toffee Pudding',
-    'Moist sponge cake made with dates, topped with a luscious toffee sauce, served with vanilla ice‑cream or custard.',
+    'Moist sponge cake made with dates, topped with a luscious toffee sauce, served with vanilla ice-cream or custard.',
     6.75,
     'GBP'
 ),
 (
     'Lancashire Hotpot',
-    'A slow‑cooked casserole of lamb or mutton, onions, carrots and sliced potatoes, baked until golden.',
+    'A slow-cooked casserole of lamb or mutton, onions, carrots and sliced potatoes, baked until golden.',
     9.80,
     'GBP'
 ),
@@ -163,7 +163,7 @@ INSERT INTO items_tbl (name, description, price, currency) VALUES
 ),
 (
     'Scotch Egg',
-    'A hard‑boiled egg wrapped in sausage meat, coated in breadcrumbs and deep‑fried to a crisp golden brown.',
+    'A hard-boiled egg wrapped in sausage meat, coated in breadcrumbs and deep-fried to a crisp golden brown.',
     5.35,
     'GBP'
 ),
@@ -184,6 +184,45 @@ SELECT id, name, MATCH(description) AGAINST ('dessert' IN NATURAL LANGUAGE MODE)
     FROM items_tbl 
     WHERE MATCH(description) AGAINST ('dessert' IN NATURAL LANGUAGE MODE) 
     ORDER BY score DESC;
+SELECT id, name, MATCH(description) AGAINST ('lamb' IN NATURAL LANGUAGE MODE) AS score
+    FROM items_tbl 
+    WHERE MATCH(description) AGAINST ('lamb' IN NATURAL LANGUAGE MODE) 
+    ORDER BY score DESC;
+
+-- Create the procedure p_search_items_from_description
+-- Direct parameters without `PREPARE`.
+DELIMITER $$
+    CREATE PROCEDURE p_search_items_from_description(
+        -- the user-supplied search text
+        IN p_search VARCHAR(255)
+    )
+    -- `proc_end` is a label so that the `LEAVE` statement can jump out of the procedure early.
+    proc_end: BEGIN
+        -- Declaration of the variable `v_search`.
+        DECLARE v_search VARCHAR(255);
+        -- Defensive coding - trim & sanity check
+        -- If the input is NULL or empty, just exit (return no rows)
+        IF p_search IS NULL OR TRIM(p_search) = '' THEN
+            -- Empty result set.
+            SELECT 0 AS id, '' AS name, 0 AS score WHERE FALSE;
+            LEAVE proc_end;
+        END IF;
+        -- Trim the search string to 255 characters (the declared type)
+        SET v_search = SUBSTRING(TRIM(p_search), 1, 255);
+
+        -- Main logic - perform full-text search
+        SELECT id, name, MATCH(description) AGAINST (v_search IN NATURAL LANGUAGE MODE) AS score
+        FROM items_tbl
+        WHERE MATCH(description) AGAINST (v_search IN NATURAL LANGUAGE MODE)
+        ORDER BY score DESC;
+    END$$
+DELIMITER ;
+
+-- I verify the status of the procedures.
+SHOW PROCEDURE STATUS;
+
+-- Call the procedure with a parameter.
+CALL p_search_items_from_description('beef');
 
 -- I clear the table of dummy data used as tests.
 TRUNCATE TABLE items_tbl;
