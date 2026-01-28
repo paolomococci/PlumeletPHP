@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS items_tbl (
     -- `price decimal(10, 2)` stores the unit price value.
     -- `DEFAULT 0.0` sets a default value of zero for each item.
     price decimal(10, 2) DEFAULT 0.0,
-    -- Currency code (ISO 4217, e.g., USD, GBP, EUR)
+    -- Currency code (ISO 4217, e.g., USD, GBP, EUR)
     -- `currency CHAR(3) NOT NULL DEFAULT 'EUR'` stores the three-letter currency code that applies to the `price`.
     currency CHAR(3) NOT NULL DEFAULT 'EUR',
     -- Record Creation Timestamp.
@@ -264,3 +264,138 @@ SELECT * FROM item_update_log_tbl;
 -- I view the tables currently present in the database.
 SHOW TABLES;
 ```
+
+## I create the stored procedure for item registration
+
+```sql
+DELIMITER $$
+  -- Procedure Header
+  -- Defines a stored procedure named `sp_insert_item_on_items_tbl`.
+  CREATE PROCEDURE sp_insert_item_on_items_tbl (
+      -- It accepts four input parameters (`p_name`, `p_description`, `p_price`, `p_currency`) and returns the newly inserted item’s ID via the output parameter `p_new_id`.
+      IN  p_name VARCHAR(255),
+      IN  p_description VARCHAR(1020),
+      IN  p_price DECIMAL(10,2),
+      IN  p_currency CHAR(3),
+      OUT p_new_id BIGINT
+  )
+  BEGIN
+      -- Variable Declarations
+      -- `v_name_exists` tracks whether an name already exists in the table.
+      DECLARE v_name_exists INT DEFAULT 0;
+      -- `v_err_msg` holds a custom error message that can be logged if the procedure encounters an exception.
+      DECLARE v_err_msg VARCHAR(255);
+
+      -- General SQL Exception Handler
+      -- If any SQL error occurs (including `SIGNAL` statements), this handler logs the error to `item_registration_log_tbl` and then re-throws the original exception to the caller.
+      DECLARE EXIT HANDLER FOR SQLEXCEPTION
+      BEGIN
+          INSERT INTO item_registration_log_tbl(name, feedback, created_at)
+          VALUES (p_name, IFNULL(v_err_msg, 'Unknown error'), NOW());
+          RESIGNAL;
+      END;
+
+      -- Data Normalization
+      -- Removes leading/trailing whitespace from all incoming values to avoid accidental validation failures.
+      SET p_name = TRIM(p_name);
+      SET p_description = TRIM(p_description);
+
+      -- Field Validation (Block 1)
+      -- Checks that all required fields are non-empty and meet format requirements.
+      -- Presence Check
+      -- Ensures that none of the parameters are blank, otherwise signals a generic missing fields error.
+      IF p_name = '' OR p_description = '' OR p_price IS NULL THEN
+          SET v_err_msg = 'Missing required field(s)';
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+      END IF;
+
+      -- Name Length Check
+      -- Validates that the name is between 2 and 255 characters.
+      IF LENGTH(p_name) < 2 OR LENGTH(p_name) > 255 THEN
+          SET v_err_msg = 'Invalid name format';
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+      END IF;
+
+      -- Description Check
+      -- The description field can contain up to 1020 characters.
+      IF CHAR_LENGTH(p_description) > 1020 THEN
+        SET v_err_msg = 'Description too long (max 1020 chars)';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+      END IF;
+
+    -- Price Check
+    -- Price value (must be a positive decimal).
+      IF p_price < 0 THEN
+        SET v_err_msg = 'Price must be non-negative';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+      END IF;
+
+      -- Description Uniqueness Check (Block 2)
+      -- Queries the `items_tbl` table to determine if the supplied name is already in use.
+      SELECT COUNT(*) INTO v_name_exists
+        FROM items_tbl
+        WHERE name = p_name;
+
+      -- If a duplicate exists, the procedure signals a “duplicate name” error.
+      IF v_name_exists > 0 THEN
+        SET v_err_msg = 'Name already registered';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+      END IF;
+
+      -- Insert the New User (Block 3)
+      -- Performs the actual insertion once all validations pass.
+      INSERT INTO items_tbl(name, description, price, currency)
+        VALUES (p_name, p_description, p_price, COALESCE(p_currency, 'EUR'));
+
+      -- Success Log
+      -- Records a success entry in the registration log table.
+      INSERT INTO item_registration_log_tbl(name, feedback, created_at)
+        VALUES (p_name, 'SUCCESS', NOW());
+
+      -- Return the New User ID
+      -- Assigns the auto-generated primary key of the newly inserted row to the output parameter `p_new_id`, allowing the caller to retrieve it.
+      SET p_new_id = LAST_INSERT_ID();
+  -- End of Procedure & Cleanup
+  -- Closes the procedure body, restores the default delimiter, and finalizes the definition.
+  END$$
+DELIMITER ;
+
+-- I verify the status of the procedures.
+SHOW PROCEDURE STATUS;
+
+-- I perform an initial check on the newly created stored procedure.
+SHOW CREATE PROCEDURE sp_insert_item_on_items_tbl;
+
+-- I run a test with dummy data.
+-- The following call should return a duplicate error.
+CALL sp_insert_item_on_items_tbl(
+    'Cheddar Cheese Platter',
+    'Assortment of aged cheddar cheeses served with crackers, fresh fruit, honey and chutney.',
+    11.20,
+    'GBP',
+    @new_id
+);
+-- The following two calls should complete successfully.
+CALL sp_insert_item_on_items_tbl(
+    'New Cheddar Cheese Dish',
+    'Assortment of aged cheddar cheeses served with crackers, fresh fruit, honey and chutney.',
+    11.20,
+    'GBP',
+    @new_id
+);
+CALL sp_insert_item_on_items_tbl(
+    'New Dish One',
+    'Short description',
+    3.20,
+    NULL,
+    @new_id
+);
+
+-- I verify that the newly inserted data has been correctly registered.
+SELECT @new_id AS item_id;
+
+-- I check that there have been no problems.
+SHOW WARNINGS;
+
+-- I verify the contents of the `items_tbl` table.
+SELECT id, name, price, currency FROM items_tbl;

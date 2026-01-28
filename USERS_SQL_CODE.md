@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS users_tbl (
     -- This column will serve as the primary key for the table.
     id SERIAL,
     -- Convention and power of 2 minus 1: 255 is 2^8−1, a common value for byte-oriented storage/compatibility.
-    -- `name VARCHAR(255)` stores the user's name as a variable‑length string up to 255 characters.
+    -- `name VARCHAR(255)` stores the user's name as a variable-length string up to 255 characters.
     -- `NOT NULL` ensures that every row must contain a name.
     name VARCHAR(255) NOT NULL,
     -- `email VARCHAR(255)` holds the user’s email address.
@@ -63,7 +63,7 @@ SELECT * FROM user_registration_log_tbl;
 ### I create the table dedicated to logs that track modifications of user data
 
 ```sql
--- I create a log table that tracks the modification/updates of data for already‑registered users.
+-- I create a log table that tracks the modification/updates of data for already-registered users.
 CREATE TABLE IF NOT EXISTS user_update_log_tbl (
     id SERIAL,
     email VARCHAR(255) NOT NULL,
@@ -101,7 +101,7 @@ DELIMITER $$
       DECLARE v_err_msg VARCHAR(255);
 
       -- General SQL Exception Handler
-      -- If any SQL error occurs (including `SIGNAL` statements), this handler logs the error to `user_registration_log_tbl` and then re‑throws the original exception to the caller.
+      -- If any SQL error occurs (including `SIGNAL` statements), this handler logs the error to `user_registration_log_tbl` and then re-throws the original exception to the caller.
       DECLARE EXIT HANDLER FOR SQLEXCEPTION
       BEGIN
           INSERT INTO user_registration_log_tbl(email, feedback, created_at)
@@ -115,8 +115,8 @@ DELIMITER $$
       SET p_email = TRIM(p_email);
       SET p_password_hash = TRIM(p_password_hash);
 
-      -- Field Validation (Block 1)
-      -- Checks that all required fields are non‑empty and meet format requirements.
+      -- Field Validation (Block 1)
+      -- Checks that all required fields are non-empty and meet format requirements.
       -- Presence Check
       -- Ensures that none of the parameters are blank, otherwise signals a generic missing fields error.
       IF p_name = '' OR p_email = '' OR p_password_hash = '' THEN
@@ -132,7 +132,7 @@ DELIMITER $$
       END IF;
 
       -- Email Format Check
-      -- Uses a regular expression to verify that the email follows a standard RFC‑compliant pattern.
+      -- Uses a regular expression to verify that the email follows a standard RFC-compliant pattern.
       IF p_email NOT REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
           SET v_err_msg = 'Invalid email format';
           SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
@@ -147,7 +147,7 @@ DELIMITER $$
           SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
       END IF;
 
-      -- Email Uniqueness Check (Block 2)
+      -- Email Uniqueness Check (Block 2)
       -- Queries the `users_tbl` table to determine if the supplied email is already in use.
       -- If a duplicate exists, the procedure signals a “duplicate email” error.
       SELECT COUNT(*) INTO v_email_exists
@@ -158,7 +158,7 @@ DELIMITER $$
           SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
       END IF;
 
-      -- Insert the New User (Block 3)
+      -- Insert the New User (Block 3)
       -- Performs the actual insertion once all validations pass.
       INSERT INTO users_tbl(name, email, password_hash)
       VALUES (p_name, p_email, p_password_hash);
@@ -169,7 +169,7 @@ DELIMITER $$
       VALUES (p_email, 'SUCCESS', NOW());
 
       -- Return the New User ID
-      -- Assigns the auto‑generated primary key of the newly inserted row to the output parameter `p_new_id`, allowing the caller to retrieve it.
+      -- Assigns the auto-generated primary key of the newly inserted row to the output parameter `p_new_id`, allowing the caller to retrieve it.
       SET p_new_id = LAST_INSERT_ID();
   -- End of Procedure & Cleanup
   -- Closes the procedure body, restores the default delimiter, and finalizes the definition.
@@ -210,7 +210,7 @@ CREATE PROCEDURE sp_update_user_on_users_tbl (
     OUT p_new_id        BIGINT
 )
 BEGIN
-    -- Local variables keep track of whether the e‑mail exists, the hash length, and any error message.
+    -- Local variables keep track of whether the e-mail exists, the hash length, and any error message.
     DECLARE v_email_exists  INT DEFAULT 0;
     DECLARE v_len_hash      INT DEFAULT 0;
     DECLARE v_err_msg       VARCHAR(255);
@@ -220,7 +220,7 @@ BEGIN
     SET p_email         = TRIM(p_email);
     SET p_password_hash = TRIM(p_password_hash);
 
-    -- Validations each business rule (presence, name length, e‑mail format, hash length) is checked.
+    -- Validations each business rule (presence, name length, e-mail format, hash length) is checked.
     -- On failure the error is logged in `user_update_log_tbl` and a `SIGNAL` aborts execution.
     -- Check that no required field is empty.
     IF p_name = '' OR p_email = '' OR p_password_hash = '' THEN
@@ -238,7 +238,7 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
     END IF;
 
-    -- Email must match a standard RFC‑compliant pattern.
+    -- Email must match a standard RFC-compliant pattern.
     IF p_email NOT REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
         SET v_err_msg = 'Invalid email format';
         INSERT INTO user_update_log_tbl(email, feedback)
@@ -255,7 +255,7 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
     END IF;
 
-    -- Verify that the e‑mail exists.
+    -- Verify that the e-mail exists.
     SELECT COUNT(*) INTO v_email_exists
     FROM users_tbl
     WHERE email = p_email
@@ -275,7 +275,7 @@ BEGIN
            password_hash = p_password_hash
      WHERE email = p_email;
 
-    -- ROW_COUNT() should always be > 0 here because we already verified that the e‑mail exists, but this block is a defensive measure.
+    -- ROW_COUNT() should always be > 0 here because we already verified that the e-mail exists, but this block is a defensive measure.
     IF ROW_COUNT() = 0 THEN
         SET v_err_msg = 'Update failed: no rows affected';
         INSERT INTO user_update_log_tbl(email, feedback)
@@ -303,7 +303,7 @@ SET @new_id := 0;
 -- The following call should succeed.
 CALL sp_update_user_on_users_tbl(
     'John Junior Doe',                                                  -- new name
-    'johnjunior.doe@example.local',                                     -- e‑mail (not modifiable)
+    'johnjunior.doe@example.local',                                     -- e-mail (not modifiable)
     '$2y$12$JJzRd.BfJy6O.NCO9LFpOeb/.ogUo8RvYcACfmD/8BUztsBtS8DGq',     -- bcrypt hash of at least 60 characters and no more than 255
     @new_id                                                             -- OUTPUT
 );
@@ -315,7 +315,7 @@ SELECT * FROM users_tbl;
 -- This other call should fail with an error because I attempt to modify the email.
 CALL sp_update_user_on_users_tbl(
     'John Junior Doe',                                                  -- new name
-    'johnjunior.doe@example.local',                                     -- e‑mail (not modifiable)
+    'johnjunior.doe@example.local',                                     -- e-mail (not modifiable)
     '$2y$12$9RfdaLC2ChS733bSbyLznetndBcCxd.12j5aSUKi7pSjkaDeLDybm',     -- bcrypt hash of at least 60 characters and no more than 255
     @new_id                                                             -- OUTPUT
 );
