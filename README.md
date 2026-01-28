@@ -132,3 +132,14 @@ mariadb --user=developer_name --password --pager
 \App\Util\Handlers\VarDebugHandler::varDump($var);
 \App\Util\Handlers\VarDebugHandler::varExport($var);
 ```
+
+## converting an SVG file into a favicon
+
+```shell
+convert -background none plumeletphp_ico.svg -resize 64x64 favicon-64.png && \
+convert -background none plumeletphp_ico.svg -resize 48x48 favicon-48.png && \
+convert -background none plumeletphp_ico.svg -resize 32x32 favicon-32.png && \
+convert -background none plumeletphp_ico.svg -resize 16x16 favicon-16.png && \
+convert favicon-16.png favicon-32.png favicon-48.png favicon-64.png favicon.ico && \
+rm favicon-16.png favicon-32.png favicon-48.png favicon-64.png
+```
