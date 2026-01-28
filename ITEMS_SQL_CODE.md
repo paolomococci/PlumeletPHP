@@ -454,3 +454,190 @@ SHOW WARNINGS;
 -- I inspect the contents of the `items_tbl` table.
 SELECT id, name, price, currency FROM items_tbl;
 ```
+
+## I create the stored procedure dedicated to updating item data
+
+```sql
+-- Stored procedure for updating the data of already registered items.
+DELIMITER $$
+
+CREATE PROCEDURE sp_update_item_on_items_tbl (
+    IN  p_id BIGINT,
+    IN  p_name VARCHAR(255),
+    IN  p_description VARCHAR(1020),
+    IN  p_price DECIMAL(10,2),
+    IN  p_currency CHAR(3)
+)
+BEGIN
+    -- Local variables.
+    -- 1 if the new name is already used by a different row.
+    DECLARE v_name_exists TINYINT(1) DEFAULT 0;
+    -- 1 if the item with p_id exists.
+    DECLARE v_row_exists TINYINT(1) DEFAULT 0;
+    -- Holds a custom error message for logging.
+    DECLARE v_err_msg VARCHAR(255);
+    -- I declare the variables that hold the values already present in the record.
+    DECLARE v_name VARCHAR(255);
+    DECLARE v_description VARCHAR(1020);
+    DECLARE v_price DECIMAL(10,2);
+    DECLARE v_currency CHAR(3);
+
+    -- General SQL Exception Handler
+    -- If any SQL error occurs, we record it in `item_update_log_tbl` 
+    -- and then re-throw the original exception so the caller can see the failure.
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            @sqlstate = RETURNED_SQLSTATE,
+            @errno = MYSQL_ERRNO,
+            @text = MESSAGE_TEXT;
+        INSERT INTO item_update_log_tbl(name, feedback, created_at)
+            VALUES (p_name,
+                    IFNULL(v_err_msg, 
+                        CONCAT(
+                            'SQLEXCEPTION: ', 
+                            COALESCE(@text, 'Generic error'),
+                            ' (SQLSTATE: ', COALESCE(@sqlstate, 'N/A'), 
+                            ', Errno: ', COALESCE(@errno, 'N/A'), 
+                        ')'
+                    )),
+                    NOW());
+        -- Propagate the original error.
+        RESIGNAL;
+    END;
+
+    -- Normalization trim whitespace to avoid accidental validation failures.
+    SET p_name = TRIM(p_name);
+    SET p_description = TRIM(p_description);
+
+    -- Validations each business rule is checked.
+    IF 
+        p_id IS NULL 
+        OR p_name IS NULL 
+        or p_name = '' 
+        OR (p_description IS NOT NULL AND p_description = '') 
+    THEN
+        SET v_err_msg = 'Missing required field(s)';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Name length must be between 2 and 255 characters.
+    -- Skip checking if p_name is `NULL`.
+    IF p_name IS NOT NULL THEN
+        IF CHAR_LENGTH(p_name) < 2 OR CHAR_LENGTH(p_name) > 255 THEN
+            SET v_err_msg = 'Invalid name format';
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+        END IF;
+    END IF;
+
+    -- Description length check.
+    -- Skip checking if p_description is `NULL`.
+    IF p_description IS NOT NULL THEN
+        IF CHAR_LENGTH(p_description) > 1020 THEN
+            SET v_err_msg = 'Description too long (max 1020 chars)';
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+        END IF;
+    END IF;
+
+    -- Price check.
+    -- Skip checking if p_price is `NULL`.
+    IF p_price IS NOT NULL THEN
+        IF p_price < 0 THEN
+            SET v_err_msg = 'Price must be non-negative';
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+        END IF;
+    END IF;
+
+    -- Check that the target row exists.
+    SELECT COUNT(*) INTO v_row_exists
+        FROM items_tbl
+        WHERE id = p_id
+        -- locks the row for the current transaction
+        FOR UPDATE;
+
+    IF v_row_exists = 0 THEN
+        SET v_err_msg = CONCAT('Item with id ', p_id, ' does not exist');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Check for duplicate name in a different row
+    -- Skip checking if p_name is `NULL`.
+    IF p_name IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_name_exists
+            FROM items_tbl
+            WHERE TRIM(LOWER(name)) = TRIM(LOWER(p_name)) AND id <> p_id LIMIT 1;
+    END IF;
+
+    IF v_name_exists > 0 THEN
+        SET v_err_msg = 'Name already registered to another item';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Retrieve the values ​​prior to any modification.
+    SELECT 
+        name,
+        description,
+        price,
+        currency
+        INTO 
+            v_name,
+            v_description,
+            v_price,
+            v_currency
+        FROM items_tbl 
+        WHERE id = p_id LIMIT 1;
+
+    -- Update the item record.
+    UPDATE items_tbl
+    SET name = COALESCE(p_name, v_name),
+        description = COALESCE(p_description, v_description),
+        price = COALESCE(p_price, v_price),
+        currency = COALESCE(p_currency, v_currency, 'EUR')
+    WHERE id = p_id;
+
+    -- Log a successful update.
+    INSERT INTO item_update_log_tbl(name, feedback, created_at)
+        VALUES (p_name, 'SUCCESS', NOW());
+
+END$$
+
+-- note: formatting can accidentally attach the semicolon to the word DELIMITER
+DELIMITER ;
+
+-- I check that there have been no problems.
+SHOW WARNINGS;
+
+-- I verify the status of the procedures.
+SHOW PROCEDURE STATUS;
+
+-- I inspect the contents of the `items_tbl` table.
+SELECT id, name, description, price, currency FROM items_tbl LIMIT 10;
+
+-- I try to edit an item
+CALL sp_update_item_on_items_tbl(
+    22,
+    'New Dish Sample',
+    'Some description of new dish Sample.',
+    1.80,
+    'GBP'
+);
+
+-- I inspect the contents of the `items_tbl` table.
+SELECT * FROM items_tbl WHERE id = 22;
+
+-- The following call is intended to leave everything unchanged.
+CALL sp_update_item_on_items_tbl(
+    22,
+    -- Important: The name field is required and cannot be NULL. Even if you don't want to change it, you must still provide a value.
+    'New Dish Sample',
+    NULL,
+    NULL,
+    NULL
+);
+
+-- I inspect the contents of the `items_tbl` table.
+SELECT * FROM items_tbl WHERE id = 22;
+
+-- Check the log table dedicated to updates.
+SELECT * FROM item_update_log_tbl;
+```
