@@ -204,20 +204,20 @@ SHOW WARNINGS;
 DELIMITER $$
 
 CREATE PROCEDURE sp_update_user_on_users_tbl (
-    IN  p_name          VARCHAR(255),
-    IN  p_email         VARCHAR(255),
+    IN  p_name VARCHAR(255),
+    IN  p_email VARCHAR(255),
     IN  p_password_hash VARCHAR(255),
-    OUT p_new_id        BIGINT
+    OUT p_updated_id BIGINT
 )
 BEGIN
     -- Local variables keep track of whether the e-mail exists, the hash length, and any error message.
-    DECLARE v_email_exists  INT DEFAULT 0;
-    DECLARE v_len_hash      INT DEFAULT 0;
-    DECLARE v_err_msg       VARCHAR(255);
+    DECLARE v_email_exists INT DEFAULT 0;
+    DECLARE v_len_hash INT DEFAULT 0;
+    DECLARE v_err_msg VARCHAR(255);
 
     -- Normalization trim whitespace to avoid accidental validation failures.
-    SET p_name          = TRIM(p_name);
-    SET p_email         = TRIM(p_email);
+    SET p_name = TRIM(p_name);
+    SET p_email = TRIM(p_email);
     SET p_password_hash = TRIM(p_password_hash);
 
     -- Validations each business rule (presence, name length, e-mail format, hash length) is checked.
@@ -288,7 +288,7 @@ BEGIN
         VALUES (p_email, 'SUCCESS');
 
     -- Retrieve the updated user id
-    SELECT id INTO p_new_id
+    SELECT id INTO p_updated_id
       FROM users_tbl
       WHERE email = p_email
       -- not strictly necessary but guarantees a lock
