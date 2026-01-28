@@ -399,3 +399,58 @@ SHOW WARNINGS;
 
 -- I verify the contents of the `items_tbl` table.
 SELECT id, name, price, currency FROM items_tbl;
+
+-- I'm creating a function that calls the stored procedure `sp_insert_item_on_items_tbl` and returns the newly generated ID.
+DELIMITER $$
+  CREATE FUNCTION fn_insert_item_on_items_tbl(
+    p_name VARCHAR(255),
+    p_description VARCHAR(1020),
+    p_price DECIMAL(10,2),
+    -- This parameter is optional, but its presence is required during the function call, even if its value is NULL.
+    p_currency CHAR(3)
+  )
+  RETURNS BIGINT UNSIGNED
+  BEGIN
+    DECLARE new_id BIGINT UNSIGNED;
+    -- Default value for the optional parameter `p_currency`.
+    SET p_currency = COALESCE(p_currency, 'EUR');
+
+    CALL sp_insert_item_on_items_tbl(
+        p_name,
+        p_description,
+        p_price,
+        p_currency,
+        new_id
+    );
+
+    -- Returns the ID.
+    RETURN new_id;
+  END$$
+DELIMITER ;
+
+-- I verify the status of the functions.
+SHOW FUNCTION STATUS;
+
+-- I call the wrapper function `fn_insert_item_on_items_tbl`, setting the optional parameter to NULL.
+-- Important: Be aware that older versions of MySQL/MariaDB lack support for optional parameters.
+SELECT fn_insert_item_on_items_tbl(
+    'New Dish Two',
+    'Short description',
+    4.20,
+    NULL
+) AS new_item_id;
+
+-- Depending on the RDBMS version, a potential issue arises if the wrapper function `fn_insert_item_on_items_tbl`
+-- is called without the optional parameter, which could lead to an error.
+SELECT fn_insert_item_on_items_tbl(
+    'New Dish Three',
+    'Short description',
+    5.20
+) AS new_item_id;
+
+-- I check that there have been no problems.
+SHOW WARNINGS;
+
+-- I inspect the contents of the `items_tbl` table.
+SELECT id, name, price, currency FROM items_tbl;
+```
