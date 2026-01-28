@@ -311,7 +311,7 @@ DELIMITER $$
 
       -- Name Length Check
       -- Validates that the name is between 2 and 255 characters.
-      IF LENGTH(p_name) < 2 OR LENGTH(p_name) > 255 THEN
+      IF CHAR_LENGTH(p_name) < 2 OR CHAR_LENGTH(p_name) > 255 THEN
           SET v_err_msg = 'Invalid name format';
           SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
       END IF;
