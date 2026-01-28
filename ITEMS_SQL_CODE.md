@@ -641,3 +641,22 @@ SELECT * FROM items_tbl WHERE id = 22;
 -- Check the log table dedicated to updates.
 SELECT * FROM item_update_log_tbl;
 ```
+
+### variable assignment testing
+
+```sql
+SELECT 
+    COALESCE(NULL, name),
+    COALESCE(NULL, description),
+    COALESCE(NULL, price),
+    COALESCE(NULL, currency, 'EUR')
+    INTO 
+        @v_name,
+        @v_description,
+        @v_price,
+        @v_currency
+    FROM items_tbl 
+    WHERE id = 22;
+
+SELECT @v_name, @v_description, @v_price, @v_currency;
+```
