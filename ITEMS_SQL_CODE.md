@@ -334,7 +334,7 @@ DELIMITER $$
       -- Queries the `items_tbl` table to determine if the supplied name is already in use.
       SELECT COUNT(*) INTO v_name_exists
         FROM items_tbl
-        WHERE name = p_name;
+        WHERE TRIM(LOWER(name)) = TRIM(LOWER(p_name));
 
       -- If a duplicate exists, the procedure signals a “duplicate name” error.
       IF v_name_exists > 0 THEN
