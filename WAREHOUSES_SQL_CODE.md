@@ -47,3 +47,18 @@ CREATE TABLE IF NOT EXISTS warehouses_tbl (
 -- This query also serves as a quick sanity check that the table was created successfully and is ready for use.
 SELECT * FROM warehouses_tbl;
 ```
+
+### I create the table dedicated to logs for warehouse registration
+
+```sql
+-- I create a log table that records the creation/registration of warehouses.
+CREATE TABLE IF NOT EXISTS warehouse_registration_log_tbl (
+    id SERIAL,
+    email VARCHAR(255) NOT NULL,
+    feedback VARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- I verify that the log table is also clean.
+SELECT * FROM warehouse_registration_log_tbl;
+```
