@@ -242,3 +242,155 @@ SELECT @new_id AS new_warehouse_id;
 SELECT * FROM warehouses_tbl;
 SELECT * FROM warehouse_registration_log_tbl;
 ```
+
+## I create the stored procedure dedicated to updating warehouse data
+
+```sql
+-- I create the stored procedure dedicated to updating warehouse data
+DELIMITER $$
+
+-- Procedure Header
+-- Defines a stored procedure that updates an existing warehouse.
+-- The warehouse is identified by the primary-key value passed in `p_id`
+-- and the new data (`p_name`, `p_address`, `p_email`) are supplied as input parameters.
+CREATE PROCEDURE sp_update_warehouse_on_warehouses_tbl
+(
+    -- ID of the warehouse to update.
+    IN  p_id BIGINT,
+    -- New name.
+    IN  p_name VARCHAR(255),
+    -- New address.
+    IN  p_address VARCHAR(255),
+    -- New e-mail address.
+    IN  p_email VARCHAR(255)
+)
+BEGIN
+    -- Variable Declarations.
+    DECLARE v_id_exists TINYINT(1) DEFAULT 0;
+    DECLARE v_email_exists TINYINT(1) DEFAULT 0;
+    DECLARE v_address_exists TINYINT(1) DEFAULT 0;
+    DECLARE v_err_msg VARCHAR(255);
+
+    -- General SQL Exception Handler
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        INSERT INTO warehouse_update_log_tbl
+            (email, feedback, created_at)
+        VALUES
+            (p_email,
+             IFNULL(v_err_msg, 'Unknown error'),
+             NOW());
+        -- Propagate the original error!
+        RESIGNAL;
+    END;
+
+    -- Data Normalization.
+    SET p_name = TRIM(p_name);
+    SET p_address = TRIM(p_address);
+    SET p_email = TRIM(p_email);
+
+    -- Check missing required fields.
+    IF p_id IS NULL OR p_name = '' OR p_address = '' OR p_email = '' THEN
+        SET v_err_msg = 'Missing required field(s)';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Check Name length.
+    IF CHAR_LENGTH(p_name) < 2 OR CHAR_LENGTH(p_name) > 255 THEN
+        SET v_err_msg = 'Invalid name format';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Check Address length.
+    IF CHAR_LENGTH(p_address) < 5 OR CHAR_LENGTH(p_address) > 255 THEN
+        SET v_err_msg = 'Invalid address length';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Check Email format.
+    IF p_email NOT REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$' THEN
+        SET v_err_msg = 'Invalid email format';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Existence Check: Is the warehouse `id` present?
+    SELECT COUNT(*) INTO v_id_exists
+    FROM warehouses_tbl
+    WHERE id = p_id;
+
+    IF v_id_exists = 0 THEN
+        SET v_err_msg = CONCAT('Warehouse ID ', p_id, ' not found');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Validation Email uniqueness (excluding current row).
+    SELECT COUNT(*) INTO v_email_exists
+    FROM warehouses_tbl
+    WHERE email = p_email AND id <> p_id;
+
+    IF v_email_exists > 0 THEN
+        SET v_err_msg = 'Email already registered';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Validation Address uniqueness (excluding current row).
+    SELECT COUNT(*) INTO v_address_exists
+    FROM warehouses_tbl
+    WHERE address = p_address AND id <> p_id;
+
+    IF v_address_exists > 0 THEN
+        SET v_err_msg = 'Address already registered';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Update the warehouse record.
+    UPDATE warehouses_tbl
+        SET name = p_name,
+           address= p_address,
+           email = p_email
+        WHERE id = p_id;
+
+    -- Log success.
+    -- If no rows were actually changed we still record that the operation was executed (ROW_COUNT() will be 0).
+    IF ROW_COUNT() > 0 THEN
+        INSERT INTO warehouse_update_log_tbl
+            (email, feedback, created_at)
+        VALUES
+            (p_email,
+             CONCAT('SUCCESS: Updated ', ROW_COUNT(), ' row(s).'),
+             NOW());
+    ELSE
+        INSERT INTO warehouse_update_log_tbl
+            (email, feedback, created_at)
+        VALUES
+            (p_email,
+             'SUCCESS: No changes needed (row already up-to-date)',
+             NOW());
+    END IF;
+END$$
+
+DELIMITER ;
+
+-- I verify the status of the procedures.
+SHOW PROCEDURE STATUS LIKE 'sp_update_warehouse%';
+```
+
+Update stored procedure that can be used as follows:
+
+```sql
+SELECT * FROM warehouses_tbl WHERE id = 1;
+
+-- I run a test with dummy data with transaction.
+START TRANSACTION;
+    CALL sp_update_warehouse_on_warehouses_tbl(
+        1,
+        'Fake Red Water Logistics',
+        '3 Mystic Square, Enigma City',
+        'fake-red.archival@warehouse.local'
+    );
+COMMIT;
+
+-- I verify that the updated data has been correctly stored.
+SELECT * FROM warehouses_tbl WHERE id = 1;
+SELECT * FROM warehouse_update_log_tbl;
+```
