@@ -495,3 +495,46 @@ DELIMITER ;
 -- I verify the status of the procedures.
 SHOW PROCEDURE STATUS LIKE 'sp_update_or_insert_warehouse_data_on_warehouses_tbl';
 ```
+
+In the following examples I will test the wrapper procedure I just created:
+
+```sql
+-- Fetching the last record in the table.
+SELECT * FROM warehouses_tbl ORDER BY id DESC LIMIT 1;
+
+-- Trying to update a record that's not found results in a new record being created.
+CALL sp_update_or_insert_warehouse_data_on_warehouses_tbl(
+    5,
+    'Fake Ice Water Logistics',
+    '113 Ice Square, Enigma City',
+    'fake-ice.archival@warehouse.local'
+);
+
+-- Updating the data for an existing record.
+CALL sp_update_or_insert_warehouse_data_on_warehouses_tbl(
+    1,
+    'Fake Green Water Logistics',
+    '23 Mystic Square, Enigma City',
+    'fake-green.archival@warehouse.local'
+);
+
+-- Modifying an existing record by setting all fields to NULL effectively results in no changes.
+CALL sp_update_or_insert_warehouse_data_on_warehouses_tbl(
+    5,
+    NULL,
+    NULL,
+    NULL
+);
+
+-- An error is expected, as I'm trying to update a record that doesn't exist, using all NULL values.
+CALL sp_update_or_insert_warehouse_data_on_warehouses_tbl(
+    6,
+    NULL,
+    NULL,
+    NULL
+);
+
+-- I am confirming the recently made changes.
+SELECT * FROM warehouses_tbl WHERE id = 1;
+SELECT * FROM warehouse_update_log_tbl;
+```
