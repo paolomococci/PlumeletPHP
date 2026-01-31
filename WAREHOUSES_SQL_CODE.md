@@ -394,3 +394,104 @@ COMMIT;
 SELECT * FROM warehouses_tbl WHERE id = 1;
 SELECT * FROM warehouse_update_log_tbl;
 ```
+
+### I create a stored procedure wrapper that can update an existing record or insert a new one
+
+```sql
+-- I'm checking if stored procedures exist for updating data.
+SHOW PROCEDURE STATUS LIKE 'sp_update_%';
+
+-- I create the wrapper stored procedure dedicated to updating or warehouse data registration.
+DELIMITER $$
+
+-- Procedure Header
+-- 1. If a record exists with the indicated ID: 
+--  - update the fields with the provided values; if a value is NULL, keep the current value.
+-- 2. If the record is not found:
+--  - when all required parameters are provided, a new entry is added;
+--  - otherwise, an error will be logged in table `warehouse_update_log_tbl` and an exception will be raised.
+CREATE PROCEDURE sp_update_or_insert_warehouse_data_on_warehouses_tbl
+(
+    -- The ID of the warehouse that needs updating.
+    IN p_id BIGINT,
+    -- New name: If NULL, the current value will be used.
+    IN p_name VARCHAR(255),
+    -- New address: If NULL, the current value will be used.
+    IN p_address VARCHAR(255),
+    -- New e-mail address: If NULL, the current value will be used.
+    IN p_email VARCHAR(255)
+)
+BEGIN
+    -- 1. Confirm the existence of the record.
+    DECLARE v_record_exists TINYINT(1) DEFAULT 0;
+    DECLARE v_current_name VARCHAR(255);
+    DECLARE v_current_address VARCHAR(255);
+    DECLARE v_current_email VARCHAR(255);
+    -- This is used only when a new record needs to be inserted.
+    DECLARE v_new_id BIGINT;
+    -- Error notification message.
+    DECLARE v_error_msg VARCHAR(1024);
+
+    SELECT COUNT(*) INTO v_record_exists
+    FROM warehouses_tbl
+    WHERE id = p_id;
+
+    IF v_record_exists = 1 THEN
+        -- A record was found. Proceed with the update after retrieving the current values.
+        SELECT name, address, email
+          INTO v_current_name, v_current_address, v_current_email
+          FROM warehouses_tbl
+          WHERE id = p_id;
+
+        -- Provide the values. If a value is NULL, the existing data in the record will be preserved.
+        SET @upd_name = COALESCE(p_name, v_current_name);
+        SET @upd_address = COALESCE(p_address, v_current_address);
+        SET @upd_email = COALESCE(p_email, v_current_email);
+
+        -- Call the procedure to update the record.
+        CALL sp_update_warehouse_on_warehouses_tbl(
+            p_id,
+            @upd_name,
+            @upd_address,
+            @upd_email
+        );
+
+    ELSE
+        -- 2. A record does not exist, and all mandatory fields have been supplied.
+        IF p_name IS NOT NULL AND p_address IS NOT NULL AND p_email IS NOT NULL THEN
+            -- It proceeds with the insertion.
+            CALL sp_insert_warehouse_on_warehouses_tbl(
+                p_name,
+                p_address,
+                p_email,
+                v_new_id
+            );
+        ELSE
+            -- Mandatory parameters are missing, logging and raise an error.
+            INSERT INTO warehouse_update_log_tbl (email, feedback, created_at)
+            VALUES (
+                COALESCE(p_email, 'missing'),
+                CONCAT('FAILURE: Insert failed, missing required field(s) for ID ', p_id),
+                NOW()
+            );
+
+            -- Build the error message in a local variable.
+            SET v_error_msg = CONCAT(
+                  'Warehouse ID ', p_id,
+                  ' not found and mandatory parameters are NULL.'
+            );
+
+            -- Raise a compatible error that propagates back to the caller.
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_msg;
+
+        END IF;
+    END IF;
+-- End the procedure.
+END$$
+
+-- Restore the default delimiter.
+DELIMITER ;
+
+-- I verify the status of the procedures.
+SHOW PROCEDURE STATUS LIKE 'sp_update_or_insert_warehouse_data_on_warehouses_tbl';
+```
