@@ -109,3 +109,35 @@ CREATE INDEX idx_wim_fk_item ON user_item_mtm(fk_item);
 -- Drop the user_item_mtm table if it already exists (useful for clean re-creation)
 DROP TABLE IF EXISTS user_item_mtm;
 ```
+
+### the same relation table without the need for subsequent changes for individual indexes
+
+```sql
+--- `user_item_mtm` without requiring subsequent modifications for individual indexes
+CREATE TABLE IF NOT EXISTS user_item_mtm (
+    -- Foreign key referencing the user (BIGINT UNSIGNED to match the id column in users_tbl)
+    fk_user BIGINT UNSIGNED NOT NULL,
+    -- Foreign key referencing the item (BIGINT UNSIGNED to match the id column in items_tbl)
+    fk_item BIGINT UNSIGNED NOT NULL,
+    -- Timestamp for when the row was first created; defaults to the current time
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- Timestamp for when the row was last updated; automatically refreshed on UPDATE
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    -- Composite primary key ensures that each user/item pair is unique
+    PRIMARY KEY (fk_user, fk_item),
+    -- Index to speed up lookups that filter only by user
+    INDEX idx_user_item (fk_user),
+    -- Index to speed up lookups that filter only by item
+    INDEX idx_item_user (fk_item),
+    -- Foreign key constraint linking fk_user to the id column of users_tbl
+    CONSTRAINT us_item_fk_user FOREIGN KEY (fk_user) REFERENCES users_tbl(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    -- Foreign key constraint linking fk_item to the id column of items_tbl
+    CONSTRAINT us_item_fk_item FOREIGN KEY (fk_item) REFERENCES items_tbl(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- List all relational tables in the current database (useful for verifying that user_item_mtm was created)
+SHOW TABLES LIKE '%\_mtm';
+
+-- Display any warnings or errors generated during the execution of the previous statements
+SHOW WARNINGS;
+```
