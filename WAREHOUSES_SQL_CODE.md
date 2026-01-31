@@ -538,3 +538,17 @@ CALL sp_update_or_insert_warehouse_data_on_warehouses_tbl(
 SELECT * FROM warehouses_tbl WHERE id = 1;
 SELECT * FROM warehouse_update_log_tbl;
 ```
+
+### a straightforward verification exercise to initialize some variables
+
+```sql
+SELECT 1, name, address, email
+    INTO
+        @v_record_exists,
+        @v_current_name,
+        @v_current_address,
+        @v_current_email
+    FROM warehouses_tbl WHERE id = 1 LIMIT 1;
+
+SELECT @v_record_exists, @v_current_name, @v_current_address, @v_current_email;
+```
