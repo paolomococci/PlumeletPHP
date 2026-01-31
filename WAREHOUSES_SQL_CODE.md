@@ -62,3 +62,21 @@ CREATE TABLE IF NOT EXISTS warehouse_registration_log_tbl (
 -- I verify that the log table is also clean.
 SELECT * FROM warehouse_registration_log_tbl;
 ```
+
+### I create the table dedicated to logs that track modifications of warehouse data
+
+```sql
+-- I create a log table that tracks the modification/updates of data for already-registered warehouses.
+CREATE TABLE IF NOT EXISTS warehouse_update_log_tbl (
+    id SERIAL,
+    email VARCHAR(255) NOT NULL,
+    feedback VARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- I verify that the log table associated with warehouse data modifications is also clean and functioning.
+SELECT * FROM warehouse_update_log_tbl;
+
+-- I view the tables currently present in the database.
+SHOW TABLES;
+```
