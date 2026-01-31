@@ -80,3 +80,124 @@ SELECT * FROM warehouse_update_log_tbl;
 -- I view the tables currently present in the database.
 SHOW TABLES;
 ```
+
+## I create the stored procedure for warehouse registration
+
+```sql
+-- I create the stored procedure for warehouse registration
+DELIMITER $$
+  -- Procedure Header
+  -- Defines a stored procedure named `sp_insert_warehouse_on_warehouses_tbl`.
+CREATE PROCEDURE sp_insert_warehouse_on_warehouses_tbl
+(
+    -- It accepts three input parameters (`p_name`, `p_address`, `p_email`)
+    -- and returns the newly inserted warehouse’s ID via the output parameter `p_new_id`.
+    IN  p_name VARCHAR(255),
+    IN  p_address VARCHAR(255),
+    IN  p_email VARCHAR(255),
+    OUT p_new_id BIGINT
+)
+BEGIN
+    -- Variable Declarations
+    -- `v_email_exists` tracks whether an email already exists in the table.
+    DECLARE v_email_exists TINYINT(1) DEFAULT 0;
+    -- `v_address_exists` tracks whether an address already exists in the table.
+    DECLARE v_address_exists TINYINT(1) DEFAULT 0;
+    -- `v_err_msg` holds a custom error message that can be logged if the procedure encounters an exception.
+    DECLARE v_err_msg VARCHAR(255);
+
+      -- General SQL Exception Handler
+      -- If any SQL error occurs (including `SIGNAL` statements), this handler logs the error to `warehouse_registration_log_tbl`
+      -- and then re-throws the original exception to the caller.
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        INSERT INTO warehouse_registration_log_tbl
+            (email, feedback, created_at)
+        VALUES
+            (p_email, IFNULL(v_err_msg, 'Unknown error'), NOW());
+        -- Propagate any error so that the application that called the procedure takes note of it.
+        RESIGNAL;
+    END;
+
+
+    -- Data Normalization
+    -- Removes leading/trailing whitespace from all incoming values to avoid accidental validation failures.
+    SET p_name = TRIM(p_name);
+    SET p_address = TRIM(p_address);
+    SET p_email = TRIM(p_email);
+
+    -- Field Validation
+    -- Checks that all required fields are non-empty and meet format requirements.
+    -- Presence Check
+    -- Ensures that none of the parameters are blank, otherwise signals a generic missing fields error.
+    IF p_name = '' OR p_address = '' OR p_email = '' THEN
+        SET v_err_msg = 'Missing required field(s)';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Name Length Check
+    -- Validates that the name is between 2 and 255 characters.
+    IF LENGTH(p_name) < 2 OR LENGTH(p_name) > 255 THEN
+        SET v_err_msg = 'Invalid name format';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Address Length Check
+    -- Validates that the name is between 5 and 255 characters.
+    IF LENGTH(p_address) < 5 OR LENGTH(p_address) > 255 THEN
+        SET v_err_msg = 'Invalid address length';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Address Uniqueness Check
+    -- Queries the `warehouses_tbl` table to determine if the supplied address is already in use.
+    -- If a duplicate exists, the procedure signals a “duplicate address” error.
+    SELECT COUNT(*) INTO v_address_exists
+    FROM warehouses_tbl
+    WHERE address = p_address;
+    IF v_address_exists > 0 THEN
+        SET v_err_msg = 'Address already registered';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Email Uniqueness Check
+    -- Queries the `warehouses_tbl` table to determine if the supplied email is already in use.
+    -- If a duplicate exists, the procedure signals a “duplicate email” error.
+    SELECT COUNT(*) INTO v_email_exists
+    FROM warehouses_tbl
+    WHERE email = p_email;
+    IF v_email_exists > 0 THEN
+        SET v_err_msg = 'Email already registered';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Email Format Check
+    -- Uses a regular expression to verify that the email follows a standard RFC-compliant pattern.
+    IF p_email NOT REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$' THEN
+        SET v_err_msg = 'Invalid email format';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
+    END IF;
+
+    -- Insert the New User
+    -- Performs the actual insertion once all validations pass.
+    INSERT INTO warehouses_tbl (name, address, email)
+        VALUES (p_name, p_address, p_email);
+
+    -- Success Log
+    -- Records a success entry in the registration log table.
+    INSERT INTO warehouse_registration_log_tbl
+        (email, feedback, created_at)
+        VALUES (p_email, 'SUCCESS', NOW());
+
+    -- Return the New User ID
+    -- Assigns the auto-generated primary key of the newly inserted row to the output parameter `p_new_id`, allowing the caller to retrieve it.
+    SET p_new_id = LAST_INSERT_ID();
+-- End of Procedure & Cleanup
+-- Closes the procedure body.
+END$$
+-- Restores the default delimiter, and finalizes the definition.
+DELIMITER ;
+
+-- I verify the status of the procedures.
+SHOW PROCEDURE STATUS LIKE 'sp_insert_warehouse%';
+```
