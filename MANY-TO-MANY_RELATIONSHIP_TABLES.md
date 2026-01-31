@@ -74,3 +74,38 @@ CREATE TABLE IF NOT EXISTS warehouse_item_mtm (
 -- Retrieve all rows from the `warehouse_item_mtm` table to inspect its contents
 SELECT * FROM warehouse_item_mtm;
 ```
+
+## table that establishes a many-to-many relationship between users and items
+
+```sql
+-- Create a table that establishes a many-to-many relationship between users and items
+--  (the pattern is identical to the `warehouse_item_mtm` example above)
+CREATE TABLE IF NOT EXISTS user_item_mtm (
+    -- Foreign key referencing the user (BIGINT UNSIGNED to match the id column in users_tbl)
+    fk_user BIGINT UNSIGNED NOT NULL,
+    -- Foreign key referencing the item (BIGINT UNSIGNED to match the id column in items_tbl)
+    fk_item BIGINT UNSIGNED NOT NULL,
+    -- Timestamp for when the row was first created; defaults to the current time
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- Timestamp for when the row was last updated; automatically refreshed on UPDATE
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    -- Composite primary key ensures that each user/item pair is unique
+    PRIMARY KEY (fk_user, fk_item),
+    -- Index to speed up lookups that filter only by user
+    INDEX idx_user_item (fk_user),
+    -- Foreign key constraint linking `fk_user` to the id column of `users_tbl`
+    CONSTRAINT us_item_fk_user FOREIGN KEY (fk_user) REFERENCES users_tbl (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    -- Foreign key constraint linking `fk_item` to the id column of `items_tbl`
+    CONSTRAINT us_item_fk_item FOREIGN KEY (fk_item) REFERENCES items_tbl (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Retrieve all rows from the user_item_mtm table to inspect its contents
+SELECT * FROM user_item_mtm;
+
+-- Some optimizations to consider ensure that joins are fast:
+CREATE INDEX idx_wim_fk_user ON user_item_mtm(fk_user);
+CREATE INDEX idx_wim_fk_item ON user_item_mtm(fk_item);
+
+-- Drop the user_item_mtm table if it already exists (useful for clean re-creation)
+DROP TABLE IF EXISTS user_item_mtm;
+```
