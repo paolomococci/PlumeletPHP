@@ -201,3 +201,44 @@ DELIMITER ;
 -- I verify the status of the procedures.
 SHOW PROCEDURE STATUS LIKE 'sp_insert_warehouse%';
 ```
+
+I'm testing the procedure I just created with some fictitious data:
+
+```sql
+-- I run a test with dummy data.
+CALL sp_insert_warehouse_on_warehouses_tbl(
+    'Fake Arcane Red Logistics',
+    '1 Mystic Square, Enigma City',
+    'fake-arcane.archival@warehouse.local',
+    @new_id
+);
+
+-- I run a test with data fake.
+CALL sp_insert_warehouse_on_warehouses_tbl(
+    'Fake Delicacies Logistics Center',
+    '5 Iron Way, Oxygen',
+    'fake-delicacies.central@warehouse.local',
+    @new_id
+);
+
+-- I run a test with some imaginative data I invented.
+CALL sp_insert_warehouse_on_warehouses_tbl(
+    'Fake Crimson River Logistics',
+    '7 Red Sandbar, Ember',
+    'fake-crimson.river@warehouse.local',
+    @new_id
+);
+
+-- Another test of dummy data entry.
+CALL sp_insert_warehouse_on_warehouses_tbl(
+    'Fake Aurora Northern Hub',
+    '12 Frostbite Way, Glaciville',
+    'fake-aurora.north@warehouse.local',
+    @new_id
+);
+
+-- I verify that the newly inserted data has been correctly registered.
+SELECT @new_id AS new_warehouse_id;
+SELECT * FROM warehouses_tbl;
+SELECT * FROM warehouse_registration_log_tbl;
+```
