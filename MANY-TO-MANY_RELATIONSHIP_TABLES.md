@@ -4,6 +4,18 @@
 SHOW TABLES LIKE '%\_mtm';
 ```
 
+### why an `ENUM` is often the better choice for a handful of fixed options
+
+**Simplicity**, One column, no extra table or join needed.
+**Schema-level validation**, Built-in MySQL/MariaDB constraint, only listed values are allowed.
+**Performance**, Indexing is trivial, the enum values are stored as tiny integers internally.
+**Readability**, Value is self-contained in the row, you see the unit directly.
+**Maintenance**, Adding a new option means altering the column definition, rare for stable lists.
+**Migration cost**, Simple `ALTER TABLE warehouse_item_mtm MODIFY COLUMN unit_measure ENUM(...);`.
+**Use-case fit**, When the list is short, stable, and unlikely to grow beyond a few items (e.g., 'kilograms', 'liters', 'cubic_meter', 'pieces', 'pallet_spot').
+
+An `ENUM` keeps the schema compact, enforces the constraint natively, and removes the need for an extra join.
+
 ## table that establishes a many-to-many relationship between warehouses and items
 
 ```sql
@@ -17,6 +29,9 @@ CREATE TABLE IF NOT EXISTS warehouse_item_mtm (
     position VARCHAR(255),
     -- Quantity of the item stored in the warehouse (decimal to support fractional units)
     quantity DECIMAL(10, 2),
+    -- Unit of measure for the stored quantity.
+    -- Possible values: 'kilograms', 'liters', 'pieces' and 'pallet_spot'.
+    unit_measure ENUM('kilograms', 'liters', 'pieces', 'pallet_spot') NOT NULL DEFAULT 'pallet_spot',
     -- Timestamp for when the row was first created; defaults to the current time
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     -- Timestamp for when the row was last updated; automatically refreshed on UPDATE
@@ -38,6 +53,12 @@ SELECT * FROM warehouse_item_mtm;
 CREATE INDEX idx_wim_fk_warehouse ON warehouse_item_mtm(fk_warehouse);
 CREATE INDEX idx_wim_fk_item ON warehouse_item_mtm(fk_item);
 
+-- Add the new `cubic_meter` option to the existing ENUM column.
+-- The statement re-defines the column so that MySQL/MariaDB knows the extended list of allowed values.
+ALTER TABLE warehouse_item_mtm 
+    MODIFY COLUMN unit_measure ENUM('kilograms', 'liters', 'cubic_meter', 'pieces', 'pallet_spot') 
+    NOT NULL DEFAULT 'pallet_spot';
+
 -- Drop the `warehouse_item_mtm` table if it already exists (useful for clean re-creation)
 DROP TABLE IF EXISTS warehouse_item_mtm;
 ```
@@ -55,6 +76,9 @@ CREATE TABLE IF NOT EXISTS warehouse_item_mtm (
     position VARCHAR(255),
     -- Quantity of the item stored in the warehouse (decimal to support fractional units)
     quantity DECIMAL(10, 2),
+    -- Unit of measure for the stored quantity.
+    -- Possible values: 'kilograms', 'liters', 'pieces' and 'pallet_spot'.
+    unit_measure ENUM('kilograms', 'liters', 'cubic_meter', 'pieces', 'pallet_spot') NOT NULL DEFAULT 'pallet_spot',
     -- Timestamp for when the row was first created; defaults to the current time
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     -- Timestamp for when the row was last updated; automatically refreshed on UPDATE
