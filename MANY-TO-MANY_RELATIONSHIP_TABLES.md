@@ -59,6 +59,12 @@ ALTER TABLE warehouse_item_mtm
     ADD COLUMN unit_measure ENUM('kilograms', 'liters', 'cubic_meter', 'pieces', 'pallet_spot') 
     NOT NULL DEFAULT 'pallet_spot';
 
+-- Checking the `unit_measure` field.
+-- Benefits include: Query optimization can occur within the database engine.
+ALTER TABLE warehouse_item_mtm 
+    ADD CONSTRAINT chk_warehouse_item_unit_measure 
+    CHECK (unit_measure IN ('kilograms', 'liters', 'cubic_meter', 'pieces', 'pallet_spot'));
+
 -- Drop the `warehouse_item_mtm` table if it already exists (useful for clean re-creation)
 DROP TABLE IF EXISTS warehouse_item_mtm;
 ```
@@ -97,6 +103,12 @@ CREATE TABLE IF NOT EXISTS warehouse_item_mtm (
 
 -- Retrieve all rows from the `warehouse_item_mtm` table to inspect its contents
 SELECT * FROM warehouse_item_mtm;
+
+-- Checking the `unit_measure` field.
+-- Benefits include: Query optimization can occur within the database engine.
+ALTER TABLE warehouse_item_mtm 
+    ADD CONSTRAINT chk_warehouse_item_unit_measure 
+    CHECK (unit_measure IN ('kilograms', 'liters', 'cubic_meter', 'pieces', 'pallet_spot'));
 ```
 
 ## table that establishes a many-to-many relationship between users and items
