@@ -43,6 +43,17 @@ CREATE TABLE IF NOT EXISTS warehouses_tbl (
     UNIQUE KEY ux_address (address)
 );
 
+-- Adding a field to determine the warehouse type.
+-- Advantages: Provides visibility into inventory held in non-owned warehouses, 
+-- and facilitates batch tracking prior to physical handling. 
+-- This allows for the rerouting or splitting of batches before they reach their intended destination.
+ALTER TABLE warehouses_tbl
+    ADD COLUMN type ENUM('owned','supplier','currier') NOT NULL DEFAULT 'owned';
+
+-- Checking the `type` field.
+-- Key benefits include: eliminating the need for validation checks in stored procedures, and enabling query optimization within the database engine.
+ALTER TABLE warehouses_tbl ADD CONSTRAINT chk_warehouse_type CHECK (type IN ('owned','supplier','currier'));
+
 -- Verify Table Contents, check that the table is clean.
 -- This query also serves as a quick sanity check that the table was created successfully and is ready for use.
 SELECT * FROM warehouses_tbl;
