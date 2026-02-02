@@ -302,13 +302,16 @@ CREATE PROCEDURE sp_update_warehouse_on_warehouses_tbl
     -- New address.
     IN  p_address VARCHAR(255),
     -- New e-mail address.
-    IN  p_email VARCHAR(255)
+    IN  p_email VARCHAR(255),
+    -- New type.
+    IN p_type ENUM('owned','supplier','currier')
 )
 BEGIN
     -- Variable Declarations.
     DECLARE v_id_exists TINYINT(1) DEFAULT 0;
     DECLARE v_email_exists TINYINT(1) DEFAULT 0;
     DECLARE v_address_exists TINYINT(1) DEFAULT 0;
+    DECLARE v_type_exists TINYINT(1) DEFAULT 0;
     DECLARE v_err_msg VARCHAR(255);
 
     -- General SQL Exception Handler
@@ -329,8 +332,13 @@ BEGIN
     SET p_address = TRIM(p_address);
     SET p_email = TRIM(p_email);
 
+    -- If the `p_type` parameter is `NULL`, the default value is assigned.
+    IF p_type IS NULL THEN
+        SET p_type = 'owned';
+    END IF;
+
     -- Check missing required fields.
-    IF p_id IS NULL OR p_name = '' OR p_address = '' OR p_email = '' THEN
+    IF p_id IS NULL OR p_name = '' OR p_address = '' OR p_email = '' OR p_type IS NULL THEN
         SET v_err_msg = 'Missing required field(s)';
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;
     END IF;
@@ -387,7 +395,8 @@ BEGIN
     UPDATE warehouses_tbl
         SET name = p_name,
            address= p_address,
-           email = p_email
+           email = p_email,
+           type = p_type
         WHERE id = p_id;
 
     -- Log success.
@@ -426,7 +435,8 @@ START TRANSACTION;
         1,
         'Fake Red Water Logistics',
         '3 Mystic Square, Enigma City',
-        'fake-red.archival@warehouse.local'
+        'fake-red.archival@warehouse.local',
+        'supplier'
     );
 COMMIT;
 
@@ -459,7 +469,9 @@ CREATE PROCEDURE sp_update_or_insert_warehouse_data_on_warehouses_tbl
     -- New address: If NULL, the current value will be used.
     IN p_address VARCHAR(255),
     -- New e-mail address: If NULL, the current value will be used.
-    IN p_email VARCHAR(255)
+    IN p_email VARCHAR(255),
+    -- New type: If NULL, the current value will be used.
+    IN p_type ENUM('owned','supplier','currier')
 )
 BEGIN
     -- 1. Confirm the existence of the record.
@@ -467,6 +479,7 @@ BEGIN
     DECLARE v_current_name VARCHAR(255);
     DECLARE v_current_address VARCHAR(255);
     DECLARE v_current_email VARCHAR(255);
+    DECLARE v_current_type VARCHAR(255);
     -- This is used only when a new record needs to be inserted.
     DECLARE v_new_id BIGINT;
     -- Error notification message.
@@ -478,8 +491,8 @@ BEGIN
 
     IF v_record_exists = 1 THEN
         -- A record was found. Proceed with the update after retrieving the current values.
-        SELECT name, address, email
-          INTO v_current_name, v_current_address, v_current_email
+        SELECT name, address, email, type
+          INTO v_current_name, v_current_address, v_current_email, v_current_type
           FROM warehouses_tbl
           WHERE id = p_id;
 
@@ -487,13 +500,15 @@ BEGIN
         SET @upd_name = COALESCE(p_name, v_current_name);
         SET @upd_address = COALESCE(p_address, v_current_address);
         SET @upd_email = COALESCE(p_email, v_current_email);
+        SET @upd_type = COALESCE(p_type, v_current_type);
 
         -- Call the procedure to update the record.
         CALL sp_update_warehouse_on_warehouses_tbl(
             p_id,
             @upd_name,
             @upd_address,
-            @upd_email
+            @upd_email,
+            @upd_type
         );
 
     ELSE
@@ -504,6 +519,7 @@ BEGIN
                 p_name,
                 p_address,
                 p_email,
+                p_type,
                 v_new_id
             );
         ELSE
@@ -547,7 +563,8 @@ CALL sp_update_or_insert_warehouse_data_on_warehouses_tbl(
     5,
     'Fake Ice Water Logistics',
     '113 Ice Square, Enigma City',
-    'fake-ice.archival@warehouse.local'
+    'fake-ice.archival@warehouse.local',
+    'currier'
 );
 
 -- Updating the data for an existing record.
@@ -555,12 +572,14 @@ CALL sp_update_or_insert_warehouse_data_on_warehouses_tbl(
     1,
     'Fake Green Water Logistics',
     '23 Mystic Square, Enigma City',
-    'fake-green.archival@warehouse.local'
+    'fake-green.archival@warehouse.local',
+    'owned'
 );
 
 -- Modifying an existing record by setting all fields to NULL effectively results in no changes.
 CALL sp_update_or_insert_warehouse_data_on_warehouses_tbl(
     5,
+    NULL,
     NULL,
     NULL,
     NULL
@@ -569,6 +588,7 @@ CALL sp_update_or_insert_warehouse_data_on_warehouses_tbl(
 -- An error is expected, as I'm trying to update a record that doesn't exist, using all NULL values.
 CALL sp_update_or_insert_warehouse_data_on_warehouses_tbl(
     6,
+    NULL,
     NULL,
     NULL,
     NULL
@@ -582,13 +602,16 @@ SELECT * FROM warehouse_update_log_tbl;
 ### a straightforward verification exercise to initialize some variables
 
 ```sql
-SELECT 1, name, address, email
+SELECT 1, name, address, email, type
     INTO
         @v_record_exists,
         @v_current_name,
         @v_current_address,
-        @v_current_email
+        @v_current_email,
+        @v_current_type
     FROM warehouses_tbl WHERE id = 1 LIMIT 1;
 
-SELECT @v_record_exists, @v_current_name, @v_current_address, @v_current_email;
+SELECT @v_record_exists, @v_current_name, @v_current_address, @v_current_email, @v_current_type;
+-- Same query but using aliases:
+SELECT @v_record_exists AS is_record, @v_current_name AS name, @v_current_address AS address, @v_current_email AS e_mail, @v_current_type AS type;
 ```
