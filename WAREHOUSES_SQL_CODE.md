@@ -107,6 +107,7 @@ CREATE PROCEDURE sp_insert_warehouse_on_warehouses_tbl
     IN  p_name VARCHAR(255),
     IN  p_address VARCHAR(255),
     IN  p_email VARCHAR(255),
+    IN  p_type ENUM('owned','supplier','currier'),
     OUT p_new_id BIGINT
 )
 BEGIN
@@ -137,6 +138,11 @@ BEGIN
     SET p_name = TRIM(p_name);
     SET p_address = TRIM(p_address);
     SET p_email = TRIM(p_email);
+
+    -- If the `p_type` parameter is `NULL`, the default value is assigned.
+    IF p_type IS NULL THEN
+        SET p_type = 'owned';
+    END IF;
 
     -- Field Validation
     -- Checks that all required fields are non-empty and meet format requirements.
@@ -192,8 +198,8 @@ BEGIN
 
     -- Insert the New User
     -- Performs the actual insertion once all validations pass.
-    INSERT INTO warehouses_tbl (name, address, email)
-        VALUES (p_name, p_address, p_email);
+    INSERT INTO warehouses_tbl (name, address, email, type)
+        VALUES (p_name, p_address, p_email, p_type);
 
     -- Success Log
     -- Records a success entry in the registration log table.
@@ -222,6 +228,7 @@ CALL sp_insert_warehouse_on_warehouses_tbl(
     'Fake Arcane Red Logistics',
     '1 Mystic Square, Enigma City',
     'fake-arcane.archival@warehouse.local',
+    'owned',
     @new_id
 );
 
@@ -230,6 +237,7 @@ CALL sp_insert_warehouse_on_warehouses_tbl(
     'Fake Delicacies Logistics Center',
     '5 Iron Way, Oxygen',
     'fake-delicacies.central@warehouse.local',
+    'supplier',
     @new_id
 );
 
@@ -238,6 +246,7 @@ CALL sp_insert_warehouse_on_warehouses_tbl(
     'Fake Crimson River Logistics',
     '7 Red Sandbar, Ember',
     'fake-crimson.river@warehouse.local',
+    'currier',
     @new_id
 );
 
@@ -246,6 +255,25 @@ CALL sp_insert_warehouse_on_warehouses_tbl(
     'Fake Aurora Northern Hub',
     '12 Frostbite Way, Glaciville',
     'fake-aurora.north@warehouse.local',
+    'currier',
+    @new_id
+);
+
+--  Dummy data entry.
+CALL sp_insert_warehouse_on_warehouses_tbl(
+    'Fake Harbor Warehouse', 
+    '1 Harbor Road, Inexistent Harbor', 
+    'fake-harbor@example.local', 
+    'supplier',
+    @new_id
+);
+
+--  Inserting fake data by passing NULL to the `p_type` parameter.
+CALL sp_insert_warehouse_on_warehouses_tbl(
+    'Fake Central Warehouse', 
+    '10 Rome Road, Inexistent Cove', 
+    'fake-central@example.local', 
+    NULL, -- use default 'owned' value.
     @new_id
 );
 
