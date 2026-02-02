@@ -55,6 +55,7 @@ CREATE INDEX idx_wim_fk_item ON warehouse_item_mtm(fk_item);
 
 -- Add the new `cubic_meter` option to the existing ENUM column.
 -- The statement re-defines the column so that MySQL/MariaDB knows the extended list of allowed values.
+-- Important: if records already exist in the table, the new field is set to its default value.
 ALTER TABLE warehouse_item_mtm 
     ADD COLUMN unit_measure ENUM('kilograms', 'liters', 'cubic_meter', 'pieces', 'pallet_spot') 
     NOT NULL DEFAULT 'pallet_spot';

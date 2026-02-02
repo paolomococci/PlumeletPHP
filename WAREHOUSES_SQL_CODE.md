@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS warehouses_tbl (
 -- Advantages: Provides visibility into inventory held in non-owned warehouses, 
 -- and facilitates batch tracking prior to physical handling. 
 -- This allows for the rerouting or splitting of batches before they reach their intended destination.
+-- Important: if records already exist in the table, the new field is set to its default value.
 ALTER TABLE warehouses_tbl
     ADD COLUMN type ENUM('owned','supplier','currier') NOT NULL DEFAULT 'owned';
 
