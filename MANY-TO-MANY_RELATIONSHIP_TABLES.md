@@ -66,6 +66,12 @@ ALTER TABLE warehouse_item_mtm
     ADD CONSTRAINT chk_warehouse_item_unit_measure 
     CHECK (unit_measure IN ('kilograms', 'liters', 'cubic_meter', 'pieces', 'pallet_spot'));
 
+-- Foreign key constraint linking `fk_batch` to the id column of `batches_tbl`.
+ALTER TABLE warehouse_item_mtm
+    ADD COLUMN fk_batch BIGINT UNSIGNED NOT NULL,
+    ADD CONSTRAINT wk_fk_batch FOREIGN KEY (fk_batch)
+    REFERENCES batches_tbl(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
 -- Drop the `warehouse_item_mtm` table if it already exists (useful for clean re-creation)
 DROP TABLE IF EXISTS warehouse_item_mtm;
 ```
@@ -110,6 +116,12 @@ SELECT * FROM warehouse_item_mtm;
 ALTER TABLE warehouse_item_mtm 
     ADD CONSTRAINT chk_warehouse_item_unit_measure 
     CHECK (unit_measure IN ('kilograms', 'liters', 'cubic_meter', 'pieces', 'pallet_spot'));
+
+-- Foreign key constraint linking `fk_batch` to the id column of `batches_tbl`.
+ALTER TABLE warehouse_item_mtm
+    ADD COLUMN fk_batch BIGINT UNSIGNED NOT NULL,
+    ADD CONSTRAINT wk_fk_batch FOREIGN KEY (fk_batch)
+    REFERENCES batches_tbl(id) ON DELETE CASCADE ON UPDATE CASCADE;
 ```
 
 ## table that establishes a many-to-many relationship between users and items
