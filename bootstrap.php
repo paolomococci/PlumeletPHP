@@ -10,7 +10,7 @@ declare (strict_types = 1); // Enforce strict type checking
  * 3. Call `run()` to start the application.
  */
 
-require __DIR__ . '/vendor/autoload.php'; // composer‑generated autoloader
+require __DIR__ . '/vendor/autoload.php'; // composer-generated autoloader
 
 use App\Bootstrap;
 use Dotenv\Dotenv;

@@ -8,9 +8,9 @@
 -- `IF EXISTS` prevents an error from being raised if the database does not exist.
 DROP DATABASE IF EXISTS plumeletphp_db;
 -- Create Database (if it does not exist).
--- `IF NOT EXISTS` ensures that the command is a no‑op if the database is already there.
--- `DEFAULT CHARACTER SET utf8mb4` sets the default character encoding to UTF‑8 with support for 4‑byte characters (useful for emojis, certain Asian scripts, etc.).
--- `DEFAULT COLLATE utf8mb4_general_ci` specifies the default collation, which is case‑insensitive (`ci`) and uses the general Unicode ordering.
+-- `IF NOT EXISTS` ensures that the command is a no-op if the database is already there.
+-- `DEFAULT CHARACTER SET utf8mb4` sets the default character encoding to UTF-8 with support for 4-byte characters (useful for emojis, certain Asian scripts, etc.).
+-- `DEFAULT COLLATE utf8mb4_general_ci` specifies the default collation, which is case-insensitive (`ci`) and uses the general Unicode ordering.
 CREATE DATABASE IF NOT EXISTS plumeletphp_db DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_general_ci;
 -- Switch to the Newly Created Database
 -- This means that any tables, indexes, or other objects created afterwards will belong to this database.
