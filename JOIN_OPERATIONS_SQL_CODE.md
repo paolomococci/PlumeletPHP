@@ -32,7 +32,7 @@ WHERE i.name = 'Beef Wellington' -- replace with the desired item name
 ORDER BY w.id;
 
 -- Show the total value of inventory per warehouse.
--- The value is the sum of (quantity × unit price) for 
+-- The value is the sum of (quantity * unit price) for 
 -- every item stored in that warehouse.
 SELECT w.id AS warehouse_id,
     w.name AS warehouse_name,
