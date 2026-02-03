@@ -1,5 +1,9 @@
 # # tier one `views`
 
+**I need to clarify that the item values can be in different currencies, so the following views must be modified to take this detail into account.**
+
+*Therefore, I reiterate that for the time being, queries, views, and other elements can undergo drastic changes.*
+
 ## some examples of views
 
 ```sql
@@ -68,4 +72,23 @@ SELECT *
     ORDER BY warehouse_id;
 -- Or, I'm using it in the following way:
 SELECT * FROM vw_item_positions WHERE item_name = 'Irish Stew' ORDER BY warehouse_id;
+
+-- Show the total value of inventory per warehouse.
+-- The value is the sum of (quantity * unit price) for 
+-- every item stored in that warehouse.
+-- I'm creating the view `vw_warehouse_inventory_value`.
+CREATE VIEW vw_warehouse_inventory_value AS
+SELECT w.id AS warehouse_id,
+    w.name AS warehouse_name,
+    SUM(wim.quantity * i.price) AS inventory_value
+FROM warehouses_tbl w
+    JOIN warehouse_item_mtm wim ON w.id = wim.fk_warehouse
+    JOIN items_tbl i ON i.id = wim.fk_item
+GROUP BY w.id, w.name;
+
+-- I'm using the view `vw_warehouse_inventory_value`.
+SELECT * FROM vw_warehouse_inventory_value ORDER BY inventory_value DESC;
+
+--For example, to see the value of warehouses with an inventory value greater than 10,000:
+SELECT * FROM vw_warehouse_inventory_value WHERE inventory_value > 1000 ORDER BY inventory_value DESC;
 ```

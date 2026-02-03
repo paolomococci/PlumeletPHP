@@ -1,5 +1,9 @@
 # # tier one `join operations`
 
+**I need to clarify that the item values can be in different currencies, so the following join operations must be modified to take this detail into account.**
+
+*Therefore, I reiterate that for the time being, queries, join operations, and other elements can undergo drastic changes.*
+
 ## some examples of joins to retrieve interesting information
 
 ```sql
