@@ -72,6 +72,9 @@ class Bootstrap
         // User
         $userRoutes = new UserRoutes;
         $userRoutes->registerRoutes($this->router);
+        // Warehouse
+        $warehouseRoutes = new WarehouseRoutes;
+        $warehouseRoutes->registerRoutes($this->router);
 
         // ---------  Emitter ---------------
         $this->emitter = new SapiEmitter();

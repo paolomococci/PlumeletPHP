@@ -32,7 +32,7 @@
                     <a href="/users">users</a>
                 </li>
                 <li style="margin-bottom:.75rem;">
-                    <a href="/">warehouses</a>
+                    <a href="/warehouses">warehouses</a>
                 </li>
             </ul>
         </nav>
