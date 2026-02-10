@@ -66,7 +66,7 @@ The PHP interactive shell can be useful in case you want to test some constructs
 php -a
 ```
 
-## git
+## how to create a local Git repository
 
 **Commands to be typed on the development host.**
 
@@ -86,30 +86,41 @@ storage/
 .env
 ```
 
+Then give the following commands:
+
 ```shell
+git --help
 git init
 git branch -m main
 git status
+git config user.email "developer@example.local"
+git config user.name "developer"
 git add .
 git commit -m "initializing the local repository"
 git tag -a v0.0.0 -m "starting version of clean repo"
 git log
 git checkout -b staging
-git merge --no-ff main -m "merge main into staging"
 git checkout -b draft
-git merge --no-ff main -m "merge main into draft"
+git checkout -b wip
+git branch --list | wc -l
+git branch --list
+git checkout draft
+git merge --no-ff wip -m "merge wip into draft"
+git checkout staging
+git merge --no-ff draft -m "merge draft into staging"
+git checkout main
+git merge --no-ff staging -m "merge staging into main"
+git checkout wip
+```
+
+And, after each change, the cycle repeats:
+
+```shell
 git status
 git add .
 git commit -m "further adjustments"
 git tag -a v0.0.1 -m "further adjustments"
 git log
-git branch --list | wc -l
-git branch --list
-git checkout staging
-git merge --no-ff draft -m "merge draft into staging"
-git checkout main
-git merge --no-ff draft -m "merge draft into main"
-git checkout draft
 ```
 
 If something were to go wrong:
