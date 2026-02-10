@@ -104,13 +104,6 @@ git checkout -b draft
 git checkout -b wip
 git branch --list | wc -l
 git branch --list
-git checkout draft
-git merge --no-ff wip -m "merge wip into draft"
-git checkout staging
-git merge --no-ff draft -m "merge draft into staging"
-git checkout main
-git merge --no-ff staging -m "merge staging into main"
-git checkout wip
 ```
 
 And, after each change, the cycle repeats:
@@ -121,6 +114,13 @@ git add .
 git commit -m "further adjustments"
 git tag -a v0.0.1 -m "further adjustments"
 git log
+git checkout draft
+git merge --no-ff wip -m "merge wip into draft"
+git checkout staging
+git merge --no-ff draft -m "merge draft into staging"
+git checkout main
+git merge --no-ff staging -m "merge staging into main"
+git checkout wip
 ```
 
 If something were to go wrong:
