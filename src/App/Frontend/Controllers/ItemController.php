@@ -78,14 +78,14 @@ class ItemController extends Controller implements CrudInterface
             $item       = new Item;
             $item->setName($parameters['name']);
             $item->setPrice((float) $parameters['price']);
-            $item->setUnitMeasure($parameters['currency']);
+            $item->setCurrency($parameters['currency']);
             $item->setDescription($parameters['description']);
             // parametrized SQL for create data to the database
             $statement = $pdo->prepare("INSERT INTO plumeletphp_db.items_tbl (name, price, currency, description) VALUES (:name, :price, :currency, :description)");
             $statement->execute([
                 ':name'        => $item->getName(),
                 ':price'       => $item->getPrice(),
-                ':currency'    => $item->getUnitMeasure(),
+                ':currency'    => $item->getCurrency(),
                 ':description' => $item->getDescription(),
             ]);
             // $id is correctly populated with the last automatically incremented ID of the latest inserted record.
@@ -135,7 +135,7 @@ class ItemController extends Controller implements CrudInterface
                     'id'          => $items[0]->getId(),
                     'name'        => $items[0]->getName(),
                     'price'       => $items[0]->getPrice(),
-                    'currency'    => $items[0]->getUnitMeasure(),
+                    'currency'    => $items[0]->getCurrency(),
                     'description' => $items[0]->getDescription(),
                 ]
             );
@@ -164,7 +164,7 @@ class ItemController extends Controller implements CrudInterface
             }
             $item->setName($parameters['name']);
             $item->setPrice((float) $parameters['price']);
-            $item->setUnitMeasure($parameters['currency']);
+            $item->setCurrency($parameters['currency']);
             $item->setDescription($parameters['description']);
             $statement = $pdo->prepare("UPDATE plumeletphp_db.items_tbl SET name=:name, price=:price, currency=:currency, description=:description WHERE id=:id");
 
@@ -172,7 +172,7 @@ class ItemController extends Controller implements CrudInterface
                 ':id'          => $item->getId(),
                 ':name'        => $item->getName(),
                 ':price'       => $item->getPrice(),
-                ':currency'    => $item->getUnitMeasure(),
+                ':currency'    => $item->getCurrency(),
                 ':description' => $item->getDescription(),
             ]);
 
@@ -197,7 +197,7 @@ class ItemController extends Controller implements CrudInterface
                         'id'          => $items[0]->getId(),
                         'name'        => $items[0]->getName(),
                         'price'       => $items[0]->getPrice(),
-                        'currency'    => $items[0]->getUnitMeasure(),
+                        'currency'    => $items[0]->getCurrency(),
                         'description' => $items[0]->getDescription(),
                     ]
                 );

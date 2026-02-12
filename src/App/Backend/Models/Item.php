@@ -52,11 +52,11 @@ final class Item extends Model implements ModelInterface
     }
 
     /**
-     * getUnitMeasure
+     * getCurrency
      *
      * @return string
      */
-    public function getUnitMeasure(): string
+    public function getCurrency(): string
     {
         return $this->currency ?? '';
     }
@@ -128,12 +128,12 @@ final class Item extends Model implements ModelInterface
     }
 
     /**
-     * setUnitMeasure
+     * setCurrency
      *
      * @param  mixed $name
      * @return void
      */
-    public function setUnitMeasure(string $currency): void
+    public function setCurrency(string $currency): void
     {
         $this->currency = (!is_null($currency) ? self::checkVarchar(text: $currency, length: 255) : '');
     }
