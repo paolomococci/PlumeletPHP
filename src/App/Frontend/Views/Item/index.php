@@ -35,7 +35,7 @@
                             <!-- price of item -->
                             <td><?= $this->e((string) $item->getPrice() ?? '') ?></td>
                             <!-- currency of item -->
-                            <td><?= $this->e((string) $item->getUnitMeasure() ?? '') ?></td>
+                            <td><?= $this->e((string) $item->getCurrency() ?? '') ?></td>
                             <!-- description of item -->
                             <td><?= $this->e($item->getDescription() ?? '') ?></td>
                             <!-- metadata of item -->
