@@ -63,7 +63,7 @@ class ItemRepository implements RepositoryInterface
         $items = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $item = new Item(
-                (String) $row['id'],
+                (string) $row['id'],
                 $row['name'],
                 $row['description'],
                 (float) $row['price'],
@@ -80,7 +80,7 @@ class ItemRepository implements RepositoryInterface
     /**
      * CCreate a new item.
      */
-    public function create(ModelInterface $model): String
+    public function create(ModelInterface $model): string
     {
         if ($model === null) {
             throw new InvalidArgumentException('You must provide a valid model.');
@@ -108,7 +108,7 @@ class ItemRepository implements RepositoryInterface
     /**
      * Get an item by its ID.
      */
-    public function read(String $id): ?ModelInterface
+    public function read(string $id): ?ModelInterface
     {
         if ($id === null || $id === '') {
             throw new InvalidArgumentException('You must provide a valid ID.');
@@ -131,7 +131,7 @@ class ItemRepository implements RepositoryInterface
 
         $data = $stmt->fetchAll()[0];
         $item = new Item(
-            (String) $data['id'],
+            (string) $data['id'],
             $data['name'],
             $data['description'],
             (float) $data['price'],
@@ -190,7 +190,7 @@ class ItemRepository implements RepositoryInterface
     /**
      * Remove an item by its ID.
      */
-    public function delete(String $id): bool
+    public function delete(string $id): bool
     {
         if ($id === null || $id === '') {
             throw new InvalidArgumentException('You must provide a valid ID.');
@@ -211,7 +211,7 @@ class ItemRepository implements RepositoryInterface
     /**
      * Retrieve one or more items based on the field name.
      */
-    public function findByName(String $name): array
+    public function findByName(string $name): array
     {
         if ($name === null || $name === '') {
             throw new InvalidArgumentException('You must provide a valid name.');
@@ -229,7 +229,7 @@ class ItemRepository implements RepositoryInterface
         $items = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $item = new Item(
-                (String) $row['id'],
+                (string) $row['id'],
                 $row['name'],
                 $row['description'],
                 (float) $row['price'],

@@ -8,10 +8,10 @@ use App\Backend\Models\Interfaces\ModelInterface;
 interface ServiceInterface
 {
     public function index(): array;
-    public function create(ModelInterface $model): String;
-    public function read(String $id): ?ModelInterface;
+    public function create(ModelInterface $model): string;
+    public function read(string $id): ?ModelInterface;
     public function update(ModelInterface $model): ?ModelInterface;
-    public function delete(String $id): bool;
-    public function findByName(String $name): array;
+    public function delete(string $id): bool;
+    public function findByName(string $name): array;
     public function count(): int;
 }

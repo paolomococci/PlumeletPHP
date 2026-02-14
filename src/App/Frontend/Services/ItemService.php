@@ -52,9 +52,9 @@ class ItemService implements ServiceInterface
      * create
      *
      * @param  mixed $model
-     * @return String
+     * @return string
      */
-    public function create(ModelInterface $model): String
+    public function create(ModelInterface $model): string
     {
         return $this->itemRepository->create($model);
     }
@@ -65,7 +65,7 @@ class ItemService implements ServiceInterface
      * @param  mixed $id
      * @return ModelInterface
      */
-    public function read(String $id): ?ModelInterface
+    public function read(string $id): ?ModelInterface
     {
         return $this->itemRepository->read($id);
     }
@@ -87,7 +87,7 @@ class ItemService implements ServiceInterface
      * @param  mixed $id
      * @return bool
      */
-    public function delete(String $id): bool
+    public function delete(string $id): bool
     {
         return $this->itemRepository->delete($id);
     }
@@ -98,7 +98,7 @@ class ItemService implements ServiceInterface
      * @param  mixed $name
      * @return array
      */
-    public function findByName(String $name): array
+    public function findByName(string $name): array
     {
         return $this->itemRepository->findByName($name);
     }

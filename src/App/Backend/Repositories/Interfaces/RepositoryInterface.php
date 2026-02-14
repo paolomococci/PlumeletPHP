@@ -18,12 +18,12 @@ interface RepositoryInterface
     /**
      * Create a new item.
      */
-    public function create(ModelInterface $model): String;
+    public function create(ModelInterface $model): string;
 
     /**
      * Get an item by its ID.
      */
-    public function read(String $id): ?ModelInterface;
+    public function read(string $id): ?ModelInterface;
 
     /**
      * Modify an existing item.
@@ -33,12 +33,12 @@ interface RepositoryInterface
     /**
      * Remove an item by its ID.
      */
-    public function delete(String $id): bool;
+    public function delete(string $id): bool;
 
     /**
      * Retrieve items matching the name, including items with names that are similar.
      */
-    public function findByName(String $name): array;
+    public function findByName(string $name): array;
 
     /**
      * Retrieve the total number of items registered in the system.
