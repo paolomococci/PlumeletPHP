@@ -10,13 +10,13 @@ abstract class Repository
     /**
      * cleanQuery
      *
-     * Using the spread operator or also called variadic operator in PHP 8.
+     * Using the spread operator or variadic operator in PHP 8.
      *
      * @param  mixed $query
      * @param  mixed $params
      * @return string
      */
-    protected function cleanQuery(string $query, ...$params): string
+    protected static function cleanQuery(string $query, ...$params): string
     {
         $cleaned = preg_replace('/\s+/', ' ', trim($query));
         return sprintf($cleaned, ...$params);

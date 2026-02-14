@@ -202,7 +202,7 @@ class ItemRepository extends Repository implements RepositoryInterface
 
             // If no rows were affected, `rowCount()` will return 0.
             if ($stmt->rowCount() > 0) {
-                self::read($model->getId());
+                $this->read($model->getId());
             }
         } catch (\PDOException $e) {
             // Log the error before re-throwing.
@@ -296,5 +296,18 @@ class ItemRepository extends Repository implements RepositoryInterface
         $stmt = $this->pdo->prepare($sql);
 
         return (int) $stmt->fetchColumn();
+    }
+    
+    /**
+     * findById
+     * 
+     * Alias ​​for searching by ID.
+     *
+     * @param  mixed $id
+     * @return ModelInterface
+     */
+    public function findById(string $id): ?ModelInterface
+    {
+        return $this->read($id);
     }
 }
