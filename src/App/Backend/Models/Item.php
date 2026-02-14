@@ -4,6 +4,7 @@ declare (strict_types = 1); // Enforce strict type checking
 namespace App\Backend\Models;
 
 use App\Backend\Models\Interfaces\ModelInterface;
+use App\Backend\Models\Model;
 use DateTimeImmutable;
 
 /**
@@ -11,13 +12,15 @@ use DateTimeImmutable;
  */
 final class Item extends Model implements ModelInterface
 {
-    private string $id;
-    private string $name;
-    private string $description;
-    private float $price;
-    private string $currency;
-    private string $created_at;
-    private string $updated_at;
+    public function __construct(
+        private ?string $id,
+        private string $name,
+        private string $description,
+        private float $price,
+        private string $currency,
+        private ?string $created_at,
+        private ?string $updated_at
+    ) {}
 
     /* getters */
 
@@ -135,7 +138,7 @@ final class Item extends Model implements ModelInterface
      */
     public function setCurrency(string $currency): void
     {
-        $this->currency = (!is_null($currency) ? self::checkVarchar(text: $currency, length: 255) : '');
+        $this->currency = (! is_null($currency) ? self::checkVarchar(text : $currency, length: 255): '');
     }
 
     /**

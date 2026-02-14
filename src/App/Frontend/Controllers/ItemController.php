@@ -4,21 +4,25 @@ declare (strict_types = 1); // Enforce strict type checking
 
 namespace App\Frontend\Controllers;
 
-use App\Backend\Connections\PlumeletPhpDb;
 use App\Backend\Models\Item;
-use App\Errors\InternalServerError;
+use App\Frontend\Controllers\Controller;
 use App\Frontend\Controllers\Interfaces\CrudInterface;
+use App\Frontend\Services\ItemService;
 use DateTime;
-use InvalidArgumentException;
 use League\Route\Http\Exception\NotFoundException;
-use PDO;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * ItemController
+ *
+ * According to SOLID principles, the component should only
+ * be responsible for receiving HTTP requests,
+ * delegating the business logic to the service,
+ * and returning the appropriate response.
+ *
  */
-class ItemController extends Controller implements CrudInterface
+final class ItemController extends Controller implements CrudInterface
 {
     /**
      * __construct
@@ -26,7 +30,8 @@ class ItemController extends Controller implements CrudInterface
      * @return void
      */
     public function __construct(
-        private DateTime $datetime
+        private DateTime $datetime,
+        protected ItemService $itemService
     ) {}
 
     /**
@@ -36,20 +41,8 @@ class ItemController extends Controller implements CrudInterface
      */
     public function index(): ResponseInterface
     {
-        $pdo = PlumeletPhpDb::getPdo();
-
-        $statement = $pdo->query('SELECT id, name, price, description, currency, created_at, updated_at FROM plumeletphp_db.items_tbl');
-
-        // When the query fails, $statement will be false.
-        if ($statement === false) {
-            throw new InternalServerError('Unable to fetch items from ItemController::index function.');
-        }
-
-        $statement->setFetchMode(PDO::FETCH_CLASS, Item::class);
-
-        // fetchAll() Always returns an array.
-        $items = $statement->fetchAll() ?? [];
-        // \App\Util\Handlers\VarDebugHandler::varDump($items);
+        // The service class can be used to retrieve the complete list of items.
+        $items = $this->itemService->index();
 
         return $this->render(
             'Item/index',
@@ -58,7 +51,7 @@ class ItemController extends Controller implements CrudInterface
                 'datetime'   => $this->datetime->format('l'),
                 'items'      => $items,
             ]
-        );
+        )->withStatus(200);
     }
 
     /* --------------------------------------------------------------------- */
@@ -73,24 +66,19 @@ class ItemController extends Controller implements CrudInterface
     public function create(ServerRequestInterface $request): ResponseInterface
     {
         if ($request->getMethod() === 'POST') {
-            $pdo        = PlumeletPhpDb::getPDO();
             $parameters = $request->getParsedBody();
-            $item       = new Item;
-            $item->setName($parameters['name']);
-            $item->setPrice((float) $parameters['price']);
-            $item->setCurrency($parameters['currency']);
-            $item->setDescription($parameters['description']);
-            // parametrized SQL for create data to the database
-            $statement = $pdo->prepare("INSERT INTO plumeletphp_db.items_tbl (name, price, currency, description) VALUES (:name, :price, :currency, :description)");
-            $statement->execute([
-                ':name'        => $item->getName(),
-                ':price'       => $item->getPrice(),
-                ':currency'    => $item->getCurrency(),
-                ':description' => $item->getDescription(),
-            ]);
-            // $id is correctly populated with the last automatically incremented ID of the latest inserted record.
-            $id = $pdo->lastInsertId();
-            // \App\Util\Handlers\VarDebugHandler::varDump($id);
+            $item       = new Item(
+                null,
+                $parameters['name'],
+                $parameters['description'],
+                (float) $parameters['price'],
+                $parameters['currency'],
+                null,
+                null
+            );
+            // Save the new item using the service class, which expects an argument compatible with the model interface.
+            $id = $this->itemService->create($item);
+
             return $this->redirect("/item/{$id}");
         }
 
@@ -111,34 +99,22 @@ class ItemController extends Controller implements CrudInterface
      */
     public function read(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        $pdo = PlumeletPhpDb::getPDO();
+        // Retrieve a specific item using the service class.
+        $item = $this->itemService->read($args['id']);
 
-        $statement = $pdo->prepare("SELECT * FROM plumeletphp_db.items_tbl WHERE id = :id LIMIT 1");
-        $statement->execute([':id' => $args['id']]);
-
-        // If the query fails, the value of $statement will be false.
-        if ($statement === false) {
-            throw new InternalServerError('Unable to fetch items from ItemController::read function.');
-        }
-
-        $statement->setFetchMode(PDO::FETCH_CLASS, Item::class);
-
-        // fetchById() Always returns an array as a result.
-        $items = $statement->fetchAll() ?? [];
-
-        if (! empty($items)) {
+        if ($item !== null) {
             return $this->render(
                 'Item/read',
                 [
                     'view_title'  => 'Item details',
                     'datetime'    => $this->datetime->format('l'),
-                    'id'          => $items[0]->getId(),
-                    'name'        => $items[0]->getName(),
-                    'price'       => $items[0]->getPrice(),
-                    'currency'    => $items[0]->getCurrency(),
-                    'description' => $items[0]->getDescription(),
+                    'id'          => $item->getId(),
+                    'name'        => $item->getName(),
+                    'price'       => $item->getPrice(),
+                    'currency'    => $item->getCurrency(),
+                    'description' => $item->getDescription(),
                 ]
-            );
+            )->withStatus(200);
         } else {
             throw new NotFoundException();
         }
@@ -151,54 +127,40 @@ class ItemController extends Controller implements CrudInterface
      */
     public function update(ServerRequestInterface $request, array $args): ResponseInterface
     {
+
         if ($request->getMethod() === 'POST') {
 
-            $pdo = PlumeletPhpDb::getPDO();
-
             $parameters = $request->getParsedBody();
-            $item       = new Item;
-            try {
-                $item->setId($parameters['id']);
-            } catch (InvalidArgumentException $e) {
-                $e->getMessage();
-            }
-            $item->setName($parameters['name']);
-            $item->setPrice((float) $parameters['price']);
-            $item->setCurrency($parameters['currency']);
-            $item->setDescription($parameters['description']);
-            $statement = $pdo->prepare("UPDATE plumeletphp_db.items_tbl SET name=:name, price=:price, currency=:currency, description=:description WHERE id=:id");
+            $item       = new Item(
+                $parameters['id'],
+                $parameters['name'],
+                $parameters['description'],
+                (float) $parameters['price'],
+                $parameters['currency'],
+                $parameters['created_at'] ?? null,
+                $parameters['updated_at'] ?? null
+            );
 
-            $statement->execute([
-                ':id'          => $item->getId(),
-                ':name'        => $item->getName(),
-                ':price'       => $item->getPrice(),
-                ':currency'    => $item->getCurrency(),
-                ':description' => $item->getDescription(),
-            ]);
+            // Apply the changes using the service class.
+            $id = $this->itemService->update($item);
 
             $id = $item->getId();
             return self::read($request, ['id' => $id]);
         } else {
 
-            $pdo = PlumeletPhpDb::getPDO();
+            $item = $this->itemService->read($args['id']);
 
-            $statement = $pdo->prepare("SELECT id, name, price, description FROM plumeletphp_db.items_tbl WHERE id = :id LIMIT 1");
-            $statement->execute([':id' => $args['id']]);
-            $statement->setFetchMode(PDO::FETCH_CLASS, Item::class);
-            $items = $statement->fetchAll();
-            // \App\Util\Handlers\VarDebugHandler::varDump($items);
-
-            if (count($items) > 0) {
+            if ($item !== null) {
                 return $this->render(
                     'Item/update',
                     [
                         'view_title'  => 'Edit item',
                         'datetime'    => $this->datetime->format('l'),
-                        'id'          => $items[0]->getId(),
-                        'name'        => $items[0]->getName(),
-                        'price'       => $items[0]->getPrice(),
-                        'currency'    => $items[0]->getCurrency(),
-                        'description' => $items[0]->getDescription(),
+                        'id'          => $item->getId(),
+                        'name'        => $item->getName(),
+                        'price'       => $item->getPrice(),
+                        'currency'    => $item->getCurrency(),
+                        'description' => $item->getDescription(),
                     ]
                 );
             } else {
@@ -214,10 +176,14 @@ class ItemController extends Controller implements CrudInterface
      */
     public function delete(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        $pdo = PlumeletPhpDb::getPDO();
+        // Delete the item using the service class.
+        $deleted = $this->itemService->delete($args['id']);
 
-        $statement = $pdo->prepare("DELETE FROM plumeletphp_db.items_tbl WHERE id = :id");
-        $statement->execute([':id' => $args['id']]);
-        return self::index();
+        if ($deleted) {
+            return self::index();
+        } else {
+            throw new NotFoundException();
+        }
+
     }
 }
