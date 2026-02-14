@@ -51,14 +51,14 @@ class ItemRepository extends Repository implements RepositoryInterface
     /**
      * index
      *
-     * Retrieve all the items.
+     * Retrieve all items.
      *
      * @return array
      */
     public function index(): array
     {
 
-        $sql = self::cleanQuery(<<<'SQL'
+        $sql = static::cleanQuery(<<<'SQL'
             SELECT
                 id, name, description, price, currency, created_at, updated_at
                 FROM %s
@@ -102,13 +102,12 @@ class ItemRepository extends Repository implements RepositoryInterface
             throw new InvalidArgumentException('You must provide a valid model.');
         }
 
-        $sql = self::cleanQuery(<<<'SQL'
+        $sql = static::cleanQuery(<<<'SQL'
             INSERT INTO %s
                 (name, price, currency, description)
             VALUES
                 (:name, :price, :currency, :description)
         SQL, self::TABLE_NAME);
-        // \App\Util\Handlers\VarDebugHandler::varDump($sql);
 
         // parametrized SQL for create data to the database
         $stmt = $this->pdo->prepare($sql);
@@ -136,7 +135,7 @@ class ItemRepository extends Repository implements RepositoryInterface
             throw new InvalidArgumentException('You must provide a valid ID.');
         }
 
-        $sql = self::cleanQuery(<<<'SQL'
+        $sql = static::cleanQuery(<<<'SQL'
             SELECT * FROM %s
             WHERE id = :id LIMIT 1
         SQL, self::TABLE_NAME);
@@ -181,7 +180,7 @@ class ItemRepository extends Repository implements RepositoryInterface
             throw new InvalidArgumentException('Model must contain a valid ID for update.');
         }
 
-        $sql = self::cleanQuery(<<<'SQL'
+        $sql = static::cleanQuery(<<<'SQL'
             UPDATE %s
             SET name = :name,
                 price = :price,
@@ -227,10 +226,10 @@ class ItemRepository extends Repository implements RepositoryInterface
             throw new InvalidArgumentException('You must provide a valid ID.');
         }
 
-        $sql = self::cleanQuery(<<<'SQL'
-            DELETE FROM %s
-            WHERE id = :id
-        SQL, self::TABLE_NAME);
+        $sql = static::cleanQuery(
+            "DELETE FROM %s WHERE id = :id",
+            self::TABLE_NAME
+        );
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
@@ -253,7 +252,7 @@ class ItemRepository extends Repository implements RepositoryInterface
             throw new InvalidArgumentException('You must provide a valid name.');
         }
 
-        $sql = self::cleanQuery(<<<'SQL'
+        $sql = static::cleanQuery(<<<'SQL'
             SELECT * FROM %s
             WHERE name LIKE CONCAT('%', :name, '%')
         SQL, self::TABLE_NAME);
@@ -289,7 +288,7 @@ class ItemRepository extends Repository implements RepositoryInterface
     public function count(): int
     {
 
-        $sql = self::cleanQuery(<<<'SQL'
+        $sql = static::cleanQuery(<<<'SQL'
             SELECT COUNT(*) FROM %s
         SQL, self::TABLE_NAME);
 
