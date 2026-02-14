@@ -24,40 +24,90 @@ use App\Frontend\Services\Interfaces\ServiceInterface;
  */
 class ItemService implements ServiceInterface
 {
-
+    
+    /**
+     * __construct
+     *
+     * @param  mixed $itemRepository
+     * @return void
+     * 
+     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion, 
+     * which automatically declares and initializes class properties.
+     * 
+     */
     public function __construct(protected ItemRepository $itemRepository)
     {}
-
+    
+    /**
+     * index
+     *
+     * @return array
+     */
     public function index(): array
     {
         return $this->itemRepository->index();
     }
-
+    
+    /**
+     * create
+     *
+     * @param  mixed $model
+     * @return String
+     */
     public function create(ModelInterface $model): String
     {
         return $this->itemRepository->create($model);
     }
-
+    
+    /**
+     * read
+     *
+     * @param  mixed $id
+     * @return ModelInterface
+     */
     public function read(String $id): ?ModelInterface
     {
         return $this->itemRepository->read($id);
     }
-
+    
+    /**
+     * update
+     *
+     * @param  mixed $model
+     * @return ModelInterface
+     */
     public function update(ModelInterface $model): ?ModelInterface
     {
         return $this->itemRepository->update($model);
     }
-
+    
+    /**
+     * delete
+     *
+     * @param  mixed $id
+     * @return bool
+     */
     public function delete(String $id): bool
     {
         return $this->itemRepository->delete($id);
     }
-
+    
+    /**
+     * findByName
+     *
+     * @param  mixed $name
+     * @return array
+     */
     public function findByName(String $name): array
     {
         return $this->itemRepository->findByName($name);
     }
-
+    
+    /**
+     * count
+     *
+     * @return int
+     */
     public function count(): int
     {
         return $this->itemRepository->count();

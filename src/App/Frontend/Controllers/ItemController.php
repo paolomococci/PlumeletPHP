@@ -28,6 +28,10 @@ final class ItemController extends Controller implements CrudInterface
      * __construct
      *
      * @return void
+     * 
+     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion, 
+     * which automatically declares and initializes class properties.
+     * 
      */
     public function __construct(
         private DateTime $datetime,
