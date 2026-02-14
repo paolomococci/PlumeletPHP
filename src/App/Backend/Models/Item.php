@@ -11,7 +11,16 @@ use DateTimeImmutable;
  * Item
  */
 final class Item extends Model implements ModelInterface
-{
+{    
+    /**
+     * __construct
+     *
+     * @return void
+     * 
+     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion, 
+     * which automatically declares and initializes class properties.
+     * 
+     */
     public function __construct(
         private ?string $id,
         private string $name,
