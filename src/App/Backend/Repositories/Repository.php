@@ -10,7 +10,7 @@ abstract class Repository
     /**
      * cleanQuery
      *
-     * Using the spread operator or variadic operator in PHP 8.
+     * Using the spread operator or also called variadic operator in PHP 8.
      *
      * @param  mixed $query
      * @param  mixed $params
