@@ -30,9 +30,10 @@ use PDO;
  * classes tailored to specific RDBMS implementations.
  *
  */
-class ItemRepository implements RepositoryInterface
+class ItemRepository extends Repository implements RepositoryInterface
 {
-    const TABLE = 'plumeletphp_db.items_tbl';
+    // To avoid possible typing errors, the table name should be set in one place.
+    const TABLE_NAME = 'plumeletphp_db.items_tbl';
 
     protected PDO $pdo;
 
@@ -47,11 +48,11 @@ class ItemRepository implements RepositoryInterface
     public function index(): array
     {
 
-        $sql = <<<'SQL'
+        $sql = self::cleanQuery(<<<'SQL'
             SELECT
                 id, name, description, price, currency, created_at, updated_at
-                FROM plumeletphp_db.items_tbl
-        SQL;
+                FROM %s
+        SQL, self::TABLE_NAME);
 
         $stmt = $this->pdo->query($sql);
 
@@ -78,7 +79,7 @@ class ItemRepository implements RepositoryInterface
     }
 
     /**
-     * CCreate a new item.
+     * Create a new item.
      */
     public function create(ModelInterface $model): string
     {
@@ -86,12 +87,13 @@ class ItemRepository implements RepositoryInterface
             throw new InvalidArgumentException('You must provide a valid model.');
         }
 
-        $sql = <<<'SQL'
-            INSERT INTO plumeletphp_db.items_tbl
+        $sql = self::cleanQuery(<<<'SQL'
+            INSERT INTO %s
                 (name, price, currency, description)
             VALUES
                 (:name, :price, :currency, :description)
-        SQL;
+        SQL, self::TABLE_NAME);
+        // \App\Util\Handlers\VarDebugHandler::varDump($sql);
 
         // parametrized SQL for create data to the database
         $stmt = $this->pdo->prepare($sql);
@@ -114,10 +116,10 @@ class ItemRepository implements RepositoryInterface
             throw new InvalidArgumentException('You must provide a valid ID.');
         }
 
-        $sql = <<<'SQL'
-            SELECT * FROM plumeletphp_db.items_tbl
+        $sql = self::cleanQuery(<<<'SQL'
+            SELECT * FROM %s
             WHERE id = :id LIMIT 1
-        SQL;
+        SQL, self::TABLE_NAME);
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
@@ -155,14 +157,14 @@ class ItemRepository implements RepositoryInterface
             throw new InvalidArgumentException('Model must contain a valid ID for update.');
         }
 
-        $sql = <<<'SQL'
-            UPDATE plumeletphp_db.items_tbl
+        $sql = self::cleanQuery(<<<'SQL'
+            UPDATE %s
             SET name = :name,
                 price = :price,
                 currency = :currency,
                 description = :description
             WHERE id = :id
-        SQL;
+        SQL, self::TABLE_NAME);
 
         try {
             $stmt = $this->pdo->prepare($sql);
@@ -196,10 +198,10 @@ class ItemRepository implements RepositoryInterface
             throw new InvalidArgumentException('You must provide a valid ID.');
         }
 
-        $sql = <<<'SQL'
-            DELETE FROM plumeletphp_db.items_tbl
+        $sql = self::cleanQuery(<<<'SQL'
+            DELETE FROM %s
             WHERE id = :id
-        SQL;
+        SQL, self::TABLE_NAME);
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
@@ -217,10 +219,10 @@ class ItemRepository implements RepositoryInterface
             throw new InvalidArgumentException('You must provide a valid name.');
         }
 
-        $sql = <<<'SQL'
-            SELECT * FROM plumeletphp_db.items_tbl
+        $sql = self::cleanQuery(<<<'SQL'
+            SELECT * FROM %s
             WHERE name LIKE CONCAT('%', :name, '%')
-        SQL;
+        SQL, self::TABLE_NAME);
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':name' => $name]);
@@ -249,9 +251,9 @@ class ItemRepository implements RepositoryInterface
     public function count(): int
     {
 
-        $sql = <<<'SQL'
-            SELECT COUNT(*) FROM plumeletphp_db.items_tbl
-        SQL;
+        $sql = self::cleanQuery(<<<'SQL'
+            SELECT COUNT(*) FROM %s
+        SQL, self::TABLE_NAME);
 
         $stmt = $this->pdo->prepare($sql);
 
