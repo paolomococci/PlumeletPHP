@@ -35,15 +35,25 @@ class ItemRepository extends Repository implements RepositoryInterface
     // To avoid possible typing errors, the table name should be set in one place.
     const TABLE_NAME = 'plumeletphp_db.items_tbl';
 
+    /** @var PDO Connection to the DB */
     protected PDO $pdo;
 
+    /**
+     * __construct
+     *
+     * @return void
+     */
     public function __construct()
     {
         $this->pdo = PlumeletPhpDb::getPdo();
     }
 
     /**
+     * index
+     *
      * Retrieve all the items.
+     *
+     * @return array
      */
     public function index(): array
     {
@@ -79,7 +89,12 @@ class ItemRepository extends Repository implements RepositoryInterface
     }
 
     /**
+     * create
+     *
      * Create a new item.
+     *
+     * @param  mixed $model
+     * @return string
      */
     public function create(ModelInterface $model): string
     {
@@ -108,7 +123,12 @@ class ItemRepository extends Repository implements RepositoryInterface
     }
 
     /**
+     * read
+     *
      * Get an item by its ID.
+     *
+     * @param  mixed $id
+     * @return ModelInterface
      */
     public function read(string $id): ?ModelInterface
     {
@@ -142,12 +162,16 @@ class ItemRepository extends Repository implements RepositoryInterface
             $data['updated_at'],
         );
 
-        // fetchById() Always returns an array as a result.
         return $item ?? null;
     }
 
     /**
+     * update
+     *
      * Update an existing item.
+     *
+     * @param  mixed $model
+     * @return ModelInterface
      */
     public function update(ModelInterface $model): ?ModelInterface
     {
@@ -190,7 +214,12 @@ class ItemRepository extends Repository implements RepositoryInterface
     }
 
     /**
+     * delete
+     * 
      * Remove an item by its ID.
+     *
+     * @param  mixed $id
+     * @return bool
      */
     public function delete(string $id): bool
     {
@@ -211,7 +240,12 @@ class ItemRepository extends Repository implements RepositoryInterface
     }
 
     /**
+     * findByName
+     * 
      * Retrieve one or more items based on the field name.
+     *
+     * @param  mixed $name
+     * @return array
      */
     public function findByName(string $name): array
     {
@@ -246,7 +280,11 @@ class ItemRepository extends Repository implements RepositoryInterface
     }
 
     /**
+     * count
+     * 
      * Retrieve the total number of items registered in the system.
+     *
+     * @return int
      */
     public function count(): int
     {
