@@ -24,20 +24,21 @@ use App\Frontend\Services\Interfaces\ServiceInterface;
  */
 class ItemService implements ServiceInterface
 {
-    
+
     /**
      * __construct
      *
      * @param  mixed $itemRepository
+     *
      * @return void
-     * 
-     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion, 
+     *
+     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion,
      * which automatically declares and initializes class properties.
-     * 
+     *
      */
     public function __construct(protected ItemRepository $itemRepository)
     {}
-    
+
     /**
      * index
      *
@@ -47,7 +48,7 @@ class ItemService implements ServiceInterface
     {
         return $this->itemRepository->index();
     }
-    
+
     /**
      * create
      *
@@ -58,7 +59,7 @@ class ItemService implements ServiceInterface
     {
         return $this->itemRepository->create($model);
     }
-    
+
     /**
      * read
      *
@@ -69,7 +70,7 @@ class ItemService implements ServiceInterface
     {
         return $this->itemRepository->read($id);
     }
-    
+
     /**
      * update
      *
@@ -80,7 +81,7 @@ class ItemService implements ServiceInterface
     {
         return $this->itemRepository->update($model);
     }
-    
+
     /**
      * delete
      *
@@ -91,7 +92,7 @@ class ItemService implements ServiceInterface
     {
         return $this->itemRepository->delete($id);
     }
-    
+
     /**
      * findByName
      *
@@ -102,7 +103,7 @@ class ItemService implements ServiceInterface
     {
         return $this->itemRepository->findByName($name);
     }
-    
+
     /**
      * count
      *
