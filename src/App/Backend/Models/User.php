@@ -74,6 +74,16 @@ final class User extends Model implements ModelInterface
     }
 
     /**
+     * getPlainPassword
+     *
+     * @return string
+     */
+    public function isPlainPasswordEmpty(): bool
+    {
+        return empty($this->password_plain);
+    }
+
+    /**
      * getHashedPassword
      *
      * @return string
