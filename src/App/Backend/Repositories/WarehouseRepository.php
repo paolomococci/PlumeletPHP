@@ -10,6 +10,7 @@ use App\Backend\Repositories\Interfaces\RepositoryInterface;
 use App\Errors\InternalServerError;
 use InvalidArgumentException;
 use PDO;
+use RuntimeException;
 
 /**
  * WarehouseRepository
@@ -253,11 +254,11 @@ class WarehouseRepository extends Repository implements RepositoryInterface
     {
         $sql = static::cleanQuery("SELECT COUNT(*) FROM %s", self::TABLE_NAME);
 
-        $stmt = $this->pdo->query($sql);
-        if ($stmt === false) {
-            throw new InternalServerError(
-                'Unable to calculate the number of warehouses from WarehouseRepository::count.'
-            );
+        $stmt = $this->pdo->prepare($sql);
+        if (! $stmt->execute()) {
+            // The following code is designed to handle any potential errors.
+            $error = $stmt->errorInfo();
+            throw new RuntimeException('Error query COUNT: ' . $error[2]);
         }
 
         return (int) ($stmt->fetchColumn() ?? 0);

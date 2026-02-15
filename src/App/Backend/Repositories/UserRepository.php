@@ -10,6 +10,7 @@ use App\Backend\Repositories\Interfaces\RepositoryInterface;
 use App\Errors\InternalServerError;
 use InvalidArgumentException;
 use PDO;
+use RuntimeException;
 
 /**
  * UserRepository
@@ -161,9 +162,9 @@ class UserRepository extends Repository implements RepositoryInterface
      * update TODO: I need to enter the user's old password verification before updating it!
      *
      * Update an existing user.
-     * 
-     * In this case, the number of parameters to pass to 
-     * the query may vary depending on whether or not the 
+     *
+     * In this case, the number of parameters to pass to
+     * the query may vary depending on whether or not the
      * user chooses to change their password.
      *
      * @param  mixed $model
@@ -213,7 +214,7 @@ class UserRepository extends Repository implements RepositoryInterface
             $stmt->execute($params);
             // If the execution succeeds, commit the changes.
             $this->pdo->commit();
-        // If something goes wrong, roll back the transaction and re-raise the exception.
+            // If something goes wrong, roll back the transaction and re-raise the exception.
         } catch (\Throwable $th) {
             $this->pdo->rollBack();
             throw $th;
@@ -294,11 +295,11 @@ class UserRepository extends Repository implements RepositoryInterface
     {
         $sql = static::cleanQuery("SELECT COUNT(*) FROM %s", self::TABLE_NAME);
 
-        $stmt = $this->pdo->query($sql);
-        if ($stmt === false) {
-            throw new InternalServerError(
-                'Unable to count users from UserRepository::count'
-            );
+        $stmt = $this->pdo->prepare($sql);
+        if (! $stmt->execute()) {
+            // The following code is designed to handle any potential errors.
+            $error = $stmt->errorInfo();
+            throw new RuntimeException('Error query COUNT: ' . $error[2]);
         }
 
         return (int) $stmt->fetchColumn();

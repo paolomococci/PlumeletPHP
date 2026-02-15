@@ -10,6 +10,7 @@ use App\Backend\Repositories\Interfaces\RepositoryInterface;
 use App\Errors\InternalServerError;
 use InvalidArgumentException;
 use PDO;
+use RuntimeException;
 
 /**
  * ItemRepository
@@ -214,7 +215,7 @@ class ItemRepository extends Repository implements RepositoryInterface
 
     /**
      * delete
-     * 
+     *
      * Remove an item by its ID.
      *
      * @param  mixed $id
@@ -240,7 +241,7 @@ class ItemRepository extends Repository implements RepositoryInterface
 
     /**
      * findByName
-     * 
+     *
      * Retrieve one or more items based on the field name.
      *
      * @param  mixed $name
@@ -280,7 +281,7 @@ class ItemRepository extends Repository implements RepositoryInterface
 
     /**
      * count
-     * 
+     *
      * Retrieve the total number of items registered in the system.
      *
      * @return int
@@ -291,13 +292,18 @@ class ItemRepository extends Repository implements RepositoryInterface
         $sql = static::cleanQuery("SELECT COUNT(*) FROM %s", self::TABLE_NAME);
 
         $stmt = $this->pdo->prepare($sql);
+        if (! $stmt->execute()) {
+            // The following code is designed to handle any potential errors.
+            $error = $stmt->errorInfo();
+            throw new RuntimeException('Error query COUNT: ' . $error[2]);
+        }
 
         return (int) $stmt->fetchColumn();
     }
-    
+
     /**
      * findById
-     * 
+     *
      * Alias ​​for searching by ID.
      *
      * @param  mixed $id
@@ -306,5 +312,46 @@ class ItemRepository extends Repository implements RepositoryInterface
     public function findById(string $id): ?ModelInterface
     {
         return $this->read($id);
+    }
+
+    /**
+     * findAllPaginated
+     *
+     * @param  mixed $page
+     * @param  mixed $perPage
+     * @return array
+     */
+    public function findAllPaginated(int $page, int $perPage): array
+    {
+        $offset = ($page - 1) * $perPage;
+
+        $sql = static::cleanQuery(<<<SQL
+            SELECT id, name, price, currency, description, created_at, updated_at
+            FROM %s
+            ORDER BY id
+            LIMIT :perPage OFFSET :offset
+        SQL, self::TABLE_NAME);
+        // \App\Util\Handlers\VarDebugHandler::varDump($sql);
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':perPage', $perPage, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        $rows  = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $items = [];
+        foreach ($rows as $row) {
+            $items[] = new Item(
+                (string) $row['id'],
+                $row['name'],
+                $row['description'],
+                (float) $row['price'],
+                $row['currency'],
+                $row['created_at'],
+                $row['updated_at']
+            );
+        }
+
+        return $items;
     }
 }

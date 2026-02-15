@@ -113,4 +113,16 @@ class ItemService implements ServiceInterface
     {
         return $this->itemRepository->count();
     }
+
+    /**
+     * paginate
+     *
+     * @param  mixed $page
+     * @param  mixed $perPage
+     * @return array
+     */
+    public function paginate(int $page, int $perPage): array
+    {
+        return $this->itemRepository->findAllPaginated($page, $perPage);
+    }
 }
