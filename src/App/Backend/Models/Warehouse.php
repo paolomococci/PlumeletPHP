@@ -13,13 +13,25 @@ use InvalidArgumentException;
  */
 final class Warehouse extends Model implements ModelInterface
 {
-    private string $id;
-    private string $name;
-    private string $address;
-    private string $email;
-    private string $type;
-    private string $created_at;
-    private string $updated_at;
+
+    /**
+     * __construct
+     *
+     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion,
+     * which automatically declares and initializes class properties.
+     *
+     *
+     * @return void
+     */
+    public function __construct(
+        private ?string $id,
+        private string $name,
+        private string $address,
+        private string $email,
+        private string $type,
+        private ?string $created_at,
+        private ?string $updated_at
+    ) {}
 
     /* getters */
 
@@ -80,7 +92,7 @@ final class Warehouse extends Model implements ModelInterface
      */
     public function getCreatedAt(): DateTimeImmutable
     {
-        return self::toDateTimeImmutable($this->created_at);
+        return static::toDateTimeImmutable($this->created_at);
     }
 
     /**
@@ -90,22 +102,22 @@ final class Warehouse extends Model implements ModelInterface
      */
     public function getUpdatedAt(): DateTimeImmutable
     {
-        return self::toDateTimeImmutable($this->updated_at);
+        return static::toDateTimeImmutable($this->updated_at);
     }
 
     /* setters */
 
     /**
      * setId
-     *
-     * @param  mixed $id
+     *<<<<<<< HEAD
+     * @param  mixed $name
      * @return void
      */
-    public function setId(mixed $id): void
+    public function setId(string $id): void
     {
-        $this->id = self::checkSerial($id);
+        $this->id = static::checkSerial(serial: $id);
     }
-    
+
     /**
      * setName
      *
@@ -114,9 +126,9 @@ final class Warehouse extends Model implements ModelInterface
      */
     public function setName(string $name): void
     {
-        $this->name = self::checkVarchar(text: $name, length: 255);
+        $this->name = static::checkVarchar(text: $name, length: 255);
     }
-    
+
     /**
      * setAddress
      *
@@ -125,9 +137,9 @@ final class Warehouse extends Model implements ModelInterface
      */
     public function setAddress(string $address): void
     {
-        $this->address = self::checkVarchar(text: $address, length: 255);
+        $this->address = static::checkVarchar(text: $address, length: 255);
     }
-    
+
     /**
      * setEmail
      *
@@ -137,12 +149,12 @@ final class Warehouse extends Model implements ModelInterface
     public function setEmail(string $email): void
     {
         try {
-            $this->email = self::checkEmail(email: $email, length: 255);
+            $this->email = static::checkEmail(email: $email, length: 255);
         } catch (InvalidArgumentException $iae) {
             echo $iae->getMessage();
         }
     }
-    
+
     /**
      * setType
      *

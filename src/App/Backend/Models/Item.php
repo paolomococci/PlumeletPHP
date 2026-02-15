@@ -11,15 +11,15 @@ use DateTimeImmutable;
  * Item
  */
 final class Item extends Model implements ModelInterface
-{    
+{
     /**
      * __construct
      *
      * @return void
-     * 
-     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion, 
+     *
+     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion,
      * which automatically declares and initializes class properties.
-     * 
+     *
      */
     public function __construct(
         private ?string $id,
@@ -80,7 +80,7 @@ final class Item extends Model implements ModelInterface
      */
     public function getPrice(): float
     {
-        return self::checkPrice(price: $this->price, digits: 2);
+        return static::checkPrice(price: $this->price, digits: 2);
     }
 
     /**
@@ -90,7 +90,7 @@ final class Item extends Model implements ModelInterface
      */
     public function getCreatedAt(): DateTimeImmutable
     {
-        return self::toDateTimeImmutable($this->created_at);
+        return static::toDateTimeImmutable($this->created_at);
     }
 
     /**
@@ -100,7 +100,7 @@ final class Item extends Model implements ModelInterface
      */
     public function getUpdatedAt(): DateTimeImmutable
     {
-        return self::toDateTimeImmutable($this->updated_at);
+        return static::toDateTimeImmutable($this->updated_at);
     }
 
     /* setters */
@@ -113,7 +113,7 @@ final class Item extends Model implements ModelInterface
      */
     public function setId(string $id): void
     {
-        $this->id = self::checkSerial(serial: $id);
+        $this->id = static::checkSerial(serial: $id);
     }
 
     /**
@@ -124,7 +124,7 @@ final class Item extends Model implements ModelInterface
      */
     public function setName(string $name): void
     {
-        $this->name = self::checkVarchar(text: $name, length: 255);
+        $this->name = static::checkVarchar(text: $name, length: 255);
     }
 
     /**
@@ -136,7 +136,7 @@ final class Item extends Model implements ModelInterface
     public function setDescription(string $description): void
     {
 
-        $this->description = self::checkVarchar(text: $description, length: 1020);
+        $this->description = static::checkVarchar(text: $description, length: 1020);
     }
 
     /**
@@ -147,7 +147,7 @@ final class Item extends Model implements ModelInterface
      */
     public function setCurrency(string $currency): void
     {
-        $this->currency = (! is_null($currency) ? self::checkVarchar(text : $currency, length: 255): '');
+        $this->currency = (! is_null($currency) ? static::checkVarchar(text : $currency, length: 255): '');
     }
 
     /**
@@ -158,6 +158,6 @@ final class Item extends Model implements ModelInterface
      */
     public function setPrice(float $price): void
     {
-        $this->price = self::checkPrice(price: $price, digits: 2);
+        $this->price = static::checkPrice(price: $price, digits: 2);
     }
 }

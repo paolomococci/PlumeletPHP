@@ -12,13 +12,24 @@ use InvalidArgumentException;
  */
 final class User extends Model implements ModelInterface
 {
-    private string $id;
-    private string $name;
-    private string $email;
-    private string $password_plain;
-    private string $password_hash;
-    private string $created_at;
-    private string $updated_at;
+    /**
+     * __construct
+     *
+     * @return void
+     *
+     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion,
+     * which automatically declares and initializes class properties.
+     *
+     */
+    public function __construct(
+        private ?string $id,
+        private string $name,
+        private string $email,
+        private ?string $password_plain,
+        private ?string $password_hash,
+        private ?string $created_at,
+        private ?string $updated_at
+    ) {}
 
     /* getters */
 
@@ -53,6 +64,16 @@ final class User extends Model implements ModelInterface
     }
 
     /**
+     * getPlainPassword
+     *
+     * @return string
+     */
+    public function getPlainPassword(): string
+    {
+        return $this->password_plain ?? '';
+    }
+
+    /**
      * getHashedPassword
      *
      * @return string
@@ -69,7 +90,7 @@ final class User extends Model implements ModelInterface
      */
     public function getCreatedAt(): DateTimeImmutable
     {
-        return self::toDateTimeImmutable($this->created_at);
+        return static::toDateTimeImmutable($this->created_at);
     }
 
     /**
@@ -79,7 +100,7 @@ final class User extends Model implements ModelInterface
      */
     public function getUpdatedAt(): DateTimeImmutable
     {
-        return self::toDateTimeImmutable($this->updated_at);
+        return static::toDateTimeImmutable($this->updated_at);
     }
 
     /* setters */
@@ -92,7 +113,7 @@ final class User extends Model implements ModelInterface
      */
     public function setId(mixed $id): void
     {
-        $this->id = self::checkSerial($id);
+        $this->id = static::checkSerial($id);
     }
 
     /**
@@ -103,7 +124,7 @@ final class User extends Model implements ModelInterface
      */
     public function setName(string $name): void
     {
-        $this->name = self::checkVarchar(text: $name, length: 255);
+        $this->name = static::checkVarchar(text: $name, length: 255);
     }
 
     /**
@@ -115,7 +136,7 @@ final class User extends Model implements ModelInterface
     public function setEmail(string $email): void
     {
         try {
-            $this->email = self::checkEmail(email: $email, length: 255);
+            $this->email = static::checkEmail(email: $email, length: 255);
         } catch (InvalidArgumentException $iae) {
             echo $iae->getMessage();
         }
@@ -140,7 +161,7 @@ final class User extends Model implements ModelInterface
      */
     public function setHashedPassword(string $plainPassword): void
     {
-        $this->password_hash = self::passwordHashWrapper($plainPassword);
+        $this->password_hash = static::passwordHashWrapper($plainPassword);
     }
 
     /**
@@ -165,13 +186,17 @@ final class User extends Model implements ModelInterface
     {
         return new self(
             id: $this->id,
-            email: $this->email,
             name: $name,
-            createdAt: $this->created_at,
+            email: $this->email,
+            password_plain: '',
+            password_hash: '',
+            created_at: $this->created_at,
+            updated_at: ''
         );
     }
 
-    private function passwordHashWrapper(string $plainPassword): string {
+    private function passwordHashWrapper(string $plainPassword): string
+    {
         return password_hash($plainPassword, PASSWORD_BCRYPT);
     }
 }

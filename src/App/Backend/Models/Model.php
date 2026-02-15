@@ -36,7 +36,7 @@ abstract class Model
      *
      * @throws InvalidArgumentException If the value is empty, too long, or out of range.
      */
-    protected function checkSerial(string $serial): string
+    protected static function checkSerial(string $serial): string
     {
         /* 1. Sanitization: Removes spaces, tabs, commas, etc. */
         $serial = trim($serial);                        // Removes leading/trailing spaces.
@@ -92,7 +92,7 @@ abstract class Model
      *
      * @throws InvalidArgumentException If the value is empty, too long, or out of range.
      */
-    protected function checkSerialBcMath(string $serial): string
+    protected static function checkSerialBcMath(string $serial): string
     {
         /* 1. Removes spaces, tabs, commas, etc., and leaves only numbers. */
         $serial = trim($serial);                        // Outer spaces
@@ -138,10 +138,10 @@ abstract class Model
      * @param  mixed $length
      * @return string
      */
-    protected function checkVarchar(string $text, int $length): string
+    protected static function checkVarchar(string $text, int $length): string
     {
         // Sanitizes and limits the length to the specified value of $length.
-        $text = self::sanitize($text, ['max_length' => $length]);
+        $text = static::sanitize($text, ['max_length' => $length]);
 
         // Validation: Must be non-empty, with a maximum length of ($length).
         if ($text === '') {
@@ -162,7 +162,7 @@ abstract class Model
      * @param  mixed $digits
      * @return float
      */
-    protected function checkPrice(float $price, int $digits): float
+    protected static function checkPrice(float $price, int $digits): float
     {
         // Validation: Value must be non-negative and have reasonable precision.
         if (! is_finite($price) || $price < 0.0) {
@@ -183,7 +183,7 @@ abstract class Model
      *
      * @throws InvalidArgumentException If the address is null, too long, or invalid.
      */
-    protected function checkEmail(string $email, int $length = 255): string
+    protected static function checkEmail(string $email, int $length = 255): string
     {
         /* 1. Removes unwanted spaces and extraneous characters. */
         $email = trim($email);
@@ -221,7 +221,7 @@ abstract class Model
      * @param  mixed $text
      * @return string
      */
-    protected function normalize(string $text): string
+    protected static function normalize(string $text): string
     {
         // Trimming leading/trailing spaces.
         $text = trim($text);
@@ -252,7 +252,7 @@ abstract class Model
      * @param  mixed $options
      * @return string
      */
-    protected function sanitize(string $text, array $options = []): string
+    protected static function sanitize(string $text, array $options = []): string
     {
         // Default options.
         $opts = array_merge([
@@ -262,15 +262,15 @@ abstract class Model
             'use_whitelist'      => false,                          // If true, it keeps only characters in $whitelist_chars.
             'whitelist_chars'    => "[:print:]\u00A0\u00C0-\u024F", // Example: printable characters + Latin extended characters.
             'blacklist_patterns' => [                               // Removes these classes/symbols.
-                '/[\p{Cc}\p{Cf}]/u',                                // Control characters + formatting characters.
-                '/[\x{202E}\x{202D}\x{202A}-\x{202E}]/u',           // Direction overrides.
-                '/[<>]/',                                           // Smaller/Greater.
-                '/[`~^|\\\\]/',                                     // Backtick, tilde, caret, pipe, backslash characters.
+                '/[\p{Cc}\p{Cf}]/u',                                    // Control characters + formatting characters.
+                '/[\x{202E}\x{202D}\x{202A}-\x{202E}]/u',               // Direction overrides.
+                '/[<>]/',                                               // Smaller/Greater.
+                '/[`~^|\\\\]/',                                         // Backtick, tilde, caret, pipe, backslash characters.
             ],
         ], $options);
 
         // Trim and normalize whitespace and punctuation (using the previous function).
-        $text = self::normalize($text);
+        $text = static::normalize($text);
 
         // Removes unwanted control characters/formatting characters.
         foreach ($opts['blacklist_patterns'] as $pat) {
@@ -309,7 +309,7 @@ abstract class Model
      * @param  mixed $tz
      * @return DateTimeImmutable
      */
-    protected function toDateTimeImmutable(
+    public static function toDateTimeImmutable(
         string $value,
         DateTimeZone $tz = new DateTimeZone('UTC')
     ): DateTimeImmutable {
