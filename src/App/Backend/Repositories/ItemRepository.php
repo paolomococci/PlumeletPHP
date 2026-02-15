@@ -288,9 +288,7 @@ class ItemRepository extends Repository implements RepositoryInterface
     public function count(): int
     {
 
-        $sql = static::cleanQuery(<<<'SQL'
-            SELECT COUNT(*) FROM %s
-        SQL, self::TABLE_NAME);
+        $sql = static::cleanQuery("SELECT COUNT(*) FROM %s", self::TABLE_NAME);
 
         $stmt = $this->pdo->prepare($sql);
 
