@@ -17,6 +17,10 @@
                 <label for="email">Email</label>
                 <input type="email" name="email" id="email" value="<?= isset($email) ? $this->e($email) : 'unset' ?>">
             </div>
+            <div>
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password">
+            </div>
             <button type="submit">Update</button>
         </form>
         <h5>today is: <?= $datetime ?></h5>
