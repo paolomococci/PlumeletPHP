@@ -113,4 +113,16 @@ class WarehouseService implements ServiceInterface
     {
         return $this->warehouseRepository->count();
     }
+
+    /**
+     * paginate
+     *
+     * @param  mixed $page
+     * @param  mixed $perPage
+     * @return array
+     */
+    public function paginate(int $page, int $perPage): array
+    {
+        return $this->warehouseRepository->findAllPaginated($page, $perPage);
+    }
 }

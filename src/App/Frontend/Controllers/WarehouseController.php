@@ -58,6 +58,59 @@ final class WarehouseController extends Controller implements CrudInterface
         )->withStatus(200);
     }
 
+    /**
+     * paginate
+     *
+     * @param  mixed $request
+     * @return ResponseInterface
+     */
+    public function paginate(ServerRequestInterface $request): ResponseInterface
+    {
+        // Grab the page query-string, defaults to 1
+        $page = (int) ($request->getQueryParams()['page'] ?? 1);
+        if ($page < 1) {$page = 1;}
+
+        $perPage    = 5; // configurable
+        $warehouses = $this->warehouseService->paginate($page, $perPage);
+
+        // Get total count (used for navigation)
+        $total = $this->warehouseService->count();
+
+        // Build the view data
+        $viewData = [
+            'view_title' => 'List of warehouses',
+            'datetime'   => $this->datetime->format('l'),
+            'warehouses' => $warehouses,
+            'pagination' => static::pagination($page, $perPage, $total),
+        ];
+
+        return $this->render('Warehouse/paginate', $viewData)->withStatus(200);
+    }
+
+    /**
+     * pagination
+     *
+     * Helper to build pagination data.
+     *
+     * @param  mixed $page
+     * @param  mixed $perPage
+     * @param  mixed $total
+     * @return array
+     */
+    private static function pagination(int $page, int $perPage, int $total): array
+    {
+        $pages = (int) ceil($total / $perPage);
+
+        return [
+            'current' => $page,
+            'perPage' => $perPage,
+            'total'   => $total,
+            'pages'   => $pages,
+            'prev'    => $page > 1 ? $page - 1 : null,
+            'next'    => $page < $pages ? $page + 1 : null,
+        ];
+    }
+
     /* --------------------------------------------------------------------- */
     /*  CRUD methods ------------------------------------------------------- */
     /* --------------------------------------------------------------------- */

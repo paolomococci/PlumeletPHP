@@ -331,7 +331,6 @@ class ItemRepository extends Repository implements RepositoryInterface
             ORDER BY id
             LIMIT :perPage OFFSET :offset
         SQL, self::TABLE_NAME);
-        // \App\Util\Handlers\VarDebugHandler::varDump($sql);
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':perPage', $perPage, \PDO::PARAM_INT);

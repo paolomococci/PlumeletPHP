@@ -113,4 +113,16 @@ class UserService implements ServiceInterface
     {
         return $this->userRepository->count();
     }
+
+    /**
+     * paginate
+     *
+     * @param  mixed $page
+     * @param  mixed $perPage
+     * @return array
+     */
+    public function paginate(int $page, int $perPage): array
+    {
+        return $this->userRepository->findAllPaginated($page, $perPage);
+    }
 }

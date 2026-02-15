@@ -317,4 +317,44 @@ class UserRepository extends Repository implements RepositoryInterface
     {
         return $this->read($id);
     }
+
+    /**
+     * findAllPaginated
+     *
+     * @param  mixed $page
+     * @param  mixed $perPage
+     * @return array
+     */
+    public function findAllPaginated(int $page, int $perPage): array
+    {
+        $offset = ($page - 1) * $perPage;
+
+        $sql = static::cleanQuery(<<<SQL
+            SELECT id, name, email, created_at, updated_at
+            FROM %s
+            ORDER BY id
+            LIMIT :perPage OFFSET :offset
+        SQL, self::TABLE_NAME);
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':perPage', $perPage, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        $rows  = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $users = [];
+        foreach ($rows as $row) {
+            $users[] = new User(
+                (string) $row['id'],
+                $row['name'],
+                $row['email'],
+                null,
+                null,
+                $row['created_at'],
+                $row['updated_at']
+            );
+        }
+
+        return $users;
+    }
 }
