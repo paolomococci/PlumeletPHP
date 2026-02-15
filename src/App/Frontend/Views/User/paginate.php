@@ -7,6 +7,17 @@
         <hr>
         <table>
             <!-- table header -->
+             <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Registered</th>
+                    <th>Updated</th>
+                    <th colspan="2"></th>
+                </tr>
+            </thead>
+            <!-- table body -->
             <tbody>
             <?php foreach ($users as $user): ?>
                 <tr>

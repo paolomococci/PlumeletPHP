@@ -7,6 +7,19 @@
         <hr>
         <table>
             <!-- table header -->
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Email</th>
+                    <th>Type</th>
+                    <th>Registered</th>
+                    <th>Updated</th>
+                    <th colspan="2"></th>
+                </tr>
+            </thead>
+            <!-- table body -->
             <tbody>
             <?php foreach ($warehouses as $warehouse): ?>
                 <tr>
