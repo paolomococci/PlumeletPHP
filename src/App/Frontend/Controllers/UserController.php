@@ -4,29 +4,38 @@ declare (strict_types = 1); // Enforce strict type checking
 
 namespace App\Frontend\Controllers;
 
-use App\Backend\Connections\PlumeletPhpDb;
 use App\Backend\Models\User;
-use App\Errors\InternalServerError;
+use App\Frontend\Controllers\Controller;
 use App\Frontend\Controllers\Interfaces\CrudInterface;
+use App\Frontend\Services\UserService;
 use DateTime;
-use InvalidArgumentException;
 use League\Route\Http\Exception\NotFoundException;
-use PDO;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * UserController
+ *
+ * According to SOLID principles, the component should only
+ * be responsible for receiving HTTP requests,
+ * delegating the business logic to the service,
+ * and returning the appropriate response.
+ *
  */
-class UserController extends Controller implements CrudInterface
+final class UserController extends Controller implements CrudInterface
 {
     /**
      * __construct
      *
      * @return void
+     *
+     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion,
+     * which automatically declares and initializes class properties.
+     *
      */
     public function __construct(
-        private DateTime $datetime
+        private DateTime $datetime,
+        protected UserService $userService
     ) {}
 
     /**
@@ -36,20 +45,8 @@ class UserController extends Controller implements CrudInterface
      */
     public function index(): ResponseInterface
     {
-        $pdo = PlumeletPhpDb::getPdo();
-
-        $statement = $pdo->query('select  id, name, email, created_at, updated_at from plumeletphp_db.users_tbl');
-
-        // When the query fails, $statement will be false.
-        if ($statement === false) {
-            throw new InternalServerError('Unable to fetch users from UserController::index function.');
-        }
-
-        $statement->setFetchMode(PDO::FETCH_CLASS, User::class);
-
-        // fetchAll() Always returns an array.
-        $users = $statement->fetchAll() ?? [];
-        // \App\Util\Handlers\VarDebugHandler::varDump($users);
+        // The service class can be used to retrieve the complete list of users.
+        $users = $this->userService->index();
 
         return $this->render(
             'User/index',
@@ -73,24 +70,19 @@ class UserController extends Controller implements CrudInterface
     public function create(ServerRequestInterface $request): ResponseInterface
     {
         if ($request->getMethod() === 'POST') {
-            $pdo        = PlumeletPhpDb::getPDO();
             $parameters = $request->getParsedBody();
-            $user       = new User;
-            $user->setName($parameters['name']);
-            $user->setEmail($parameters['email']);
-            // $user->setPlainPassword($parameters['password']);
-            $user->setHashedPassword($parameters['password']);
-            // \App\Util\Handlers\VarDebugHandler::varDump($user);
-            // parametrized SQL for create data to the database
-            $statement = $pdo->prepare("insert into plumeletphp_db.users_tbl (name, email, password_hash) values (:name, :email, :password_hash)");
-            $statement->execute([
-                ':name'  => $user->getName(),
-                ':email' => $user->getEmail(),
-                ':password_hash' => $user->getHashedPassword(),
-            ]);
-            // $id is correctly populated with the last automatically incremented ID of the latest inserted record.
-            $id = $pdo->lastInsertId();
-            // \App\Util\Handlers\VarDebugHandler::varDump($id);
+            $user       = new User(
+                null,
+                $parameters['name'],
+                $parameters['email'],
+                $parameters['password'],
+                null,
+                null,
+                null
+            );
+            // Save the new user using the service class, which expects an argument compatible with the model interface.
+            $id = $this->userService->create($user);
+
             return $this->redirect("/user/{$id}");
         }
 
@@ -101,7 +93,7 @@ class UserController extends Controller implements CrudInterface
                 'view_title' => 'New user',
                 'datetime'   => $this->datetime->format('l'),
             ]
-        )->withStatus(201);
+        );
     }
 
     /**
@@ -111,30 +103,18 @@ class UserController extends Controller implements CrudInterface
      */
     public function read(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        $pdo = PlumeletPhpDb::getPDO();
+        // Retrieve a specific user using the service class.
+        $user = $this->userService->read($args['id']);
 
-        $statement = $pdo->prepare("select * from plumeletphp_db.users_tbl where id = :id limit 1");
-        $statement->execute([':id' => $args['id']]);
-
-        // If the query fails, the value of $statement will be false.
-        if ($statement === false) {
-            throw new InternalServerError('Unable to fetch users from UserController::read function.');
-        }
-
-        $statement->setFetchMode(PDO::FETCH_CLASS, User::class);
-
-        // fetchById() Always returns an array as a result.
-        $users = $statement->fetchAll() ?? [];
-
-        if (! empty($users)) {
+        if ($user !== null) {
             return $this->render(
                 'User/read',
                 [
                     'view_title' => 'User details',
                     'datetime'   => $this->datetime->format('l'),
-                    'id'         => $users[0]->getId(),
-                    'name'       => $users[0]->getName(),
-                    'email'      => $users[0]->getEmail(),
+                    'id'         => $user->getId(),
+                    'name'       => $user->getName(),
+                    'email'      => $user->getEmail(),
                 ]
             )->withStatus(200);
         } else {
@@ -151,46 +131,35 @@ class UserController extends Controller implements CrudInterface
     {
         if ($request->getMethod() === 'POST') {
 
-            $pdo = PlumeletPhpDb::getPDO();
-
             $parameters = $request->getParsedBody();
-            $user       = new User;
-            try {
-                $user->setId($parameters['id']);
-            } catch (InvalidArgumentException $e) {
-                $e->getMessage();
-            }
-            $user->setName($parameters['name']);
-            $user->setEmail($parameters['email']);
-            $statement = $pdo->prepare("update plumeletphp_db.users_tbl set name=:name, email=:email where id=:id");
+            $user       = new User(
+                $parameters['id'],
+                $parameters['name'],
+                $parameters['email'],
+                $parameters['password'],
+                null,
+                null,
+                null
+            );
 
-            $statement->execute([
-                ':id'    => $user->getId(),
-                ':name'  => $user->getName(),
-                ':email' => $user->getEmail(),
-            ]);
+            // Apply the changes using the service class.
+            $id = $this->userService->update($user);
 
             $id = $user->getId();
-            return self::read($request, ['id' => $id]);
+            return $this->read($request, ['id' => $id]);
         } else {
 
-            $pdo = PlumeletPhpDb::getPDO();
+            $user = $this->userService->read($args['id']);
 
-            $statement = $pdo->prepare("select id, name, email from plumeletphp_db.users_tbl where id = :id limit 1");
-            $statement->execute([':id' => $args['id']]);
-            $statement->setFetchMode(PDO::FETCH_CLASS, User::class);
-            $users = $statement->fetchAll();
-            // \App\Util\Handlers\VarDebugHandler::varDump($users);
-
-            if (count($users) > 0) {
+            if ($user !== null) {
                 return $this->render(
                     'User/update',
                     [
                         'view_title' => 'Edit user',
                         'datetime'   => $this->datetime->format('l'),
-                        'id'         => $users[0]->getId(),
-                        'name'       => $users[0]->getName(),
-                        'email'      => $users[0]->getEmail(),
+                        'id'         => $user->getId(),
+                        'name'       => $user->getName(),
+                        'email'      => $user->getEmail(),
                     ]
                 );
             } else {
@@ -206,10 +175,14 @@ class UserController extends Controller implements CrudInterface
      */
     public function delete(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        $pdo = PlumeletPhpDb::getPDO();
+        // Delete the user using the service class.
+        $deleted = $this->userService->delete($args['id']);
 
-        $statement = $pdo->prepare("delete from plumeletphp_db.users_tbl where id = :id");
-        $statement->execute([':id' => $args['id']]);
-        return self::index();
+        if ($deleted) {
+            return $this->index();
+        } else {
+            throw new NotFoundException();
+        }
+
     }
 }

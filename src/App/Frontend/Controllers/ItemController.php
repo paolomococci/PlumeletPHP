@@ -28,10 +28,10 @@ final class ItemController extends Controller implements CrudInterface
      * __construct
      *
      * @return void
-     * 
-     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion, 
+     *
+     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion,
      * which automatically declares and initializes class properties.
-     * 
+     *
      */
     public function __construct(
         private DateTime $datetime,
@@ -149,7 +149,7 @@ final class ItemController extends Controller implements CrudInterface
             $id = $this->itemService->update($item);
 
             $id = $item->getId();
-            return self::read($request, ['id' => $id]);
+            return $this->read($request, ['id' => $id]);
         } else {
 
             $item = $this->itemService->read($args['id']);
@@ -184,7 +184,7 @@ final class ItemController extends Controller implements CrudInterface
         $deleted = $this->itemService->delete($args['id']);
 
         if ($deleted) {
-            return self::index();
+            return $this->index();
         } else {
             throw new NotFoundException();
         }

@@ -4,30 +4,38 @@ declare (strict_types = 1); // Enforce strict type checking
 
 namespace App\Frontend\Controllers;
 
-use App\Backend\Connections\PlumeletPhpDb;
-use App\Backend\Models\Enums\WarehouseType;
 use App\Backend\Models\Warehouse;
-use App\Errors\InternalServerError;
+use App\Frontend\Controllers\Controller;
 use App\Frontend\Controllers\Interfaces\CrudInterface;
+use App\Frontend\Services\WarehouseService;
 use DateTime;
-use InvalidArgumentException;
 use League\Route\Http\Exception\NotFoundException;
-use PDO;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * WarehouseController
+ *
+ * According to SOLID principles, the component should only
+ * be responsible for receiving HTTP requests,
+ * delegating the business logic to the service,
+ * and returning the appropriate response.
+ *
  */
-class WarehouseController extends Controller implements CrudInterface
+final class WarehouseController extends Controller implements CrudInterface
 {
     /**
      * __construct
      *
      * @return void
+     *
+     * A concise constructor syntax is achieved by using PHP 8.0+ property promotion,
+     * which automatically declares and initializes class properties.
+     *
      */
     public function __construct(
-        private DateTime $datetime
+        private DateTime $datetime,
+        protected WarehouseService $warehouseService
     ) {}
 
     /**
@@ -37,20 +45,8 @@ class WarehouseController extends Controller implements CrudInterface
      */
     public function index(): ResponseInterface
     {
-        $pdo = PlumeletPhpDb::getPdo();
-
-        $statement = $pdo->query('select id, name, address, email, type, created_at, updated_at from plumeletphp_db.warehouses_tbl');
-
-        // If the query fails.
-        if ($statement === false) {
-            throw new InternalServerError('Unable to fetch warehouses from WarehouseController::index function.');
-        }
-
-        $statement->setFetchMode(PDO::FETCH_CLASS, Warehouse::class);
-
-        // fetchAll() always returns a result in the form of an array.
-        $warehouses = $statement->fetchAll() ?? [];
-        // \App\Util\Handlers\VarDebugHandler::varDump($warehouses);
+        // The service class can be used to retrieve the complete list of warehouses.
+        $warehouses = $this->warehouseService->index();
 
         return $this->render(
             'Warehouse/index',
@@ -74,46 +70,19 @@ class WarehouseController extends Controller implements CrudInterface
     public function create(ServerRequestInterface $request): ResponseInterface
     {
         if ($request->getMethod() === 'POST') {
-            $pdo        = PlumeletPhpDb::getPDO();
             $parameters = $request->getParsedBody();
+            $warehouse  = new Warehouse(
+                null,
+                $parameters['name'],
+                $parameters['address'],
+                $parameters['email'],
+                $parameters['warehouseType'],
+                null,
+                null
+            );
+            // Save the new warehouse using the service class, which expects an argument compatible with the model interface.
+            $id = $this->warehouseService->create($warehouse);
 
-            // Validate enum
-            // PHP >= 8.1: `tryFrom` is a built‑in static method that PHP automatically generates for every backed enum.
-            // When the engine compiles this enum it creates the following magic methods:
-            // WarehouseType::cases(): array<WarehouseType>, returns an array with all defined cases.
-            // WarehouseType::from(string $value): WarehouseType, throws `ValueError` if `$value` is not one of the case values.
-            // WarehouseType::tryFrom(string $value): ?WarehouseType, returns the matching enum case or **`null`** if the value is invalid.
-            $type = WarehouseType::tryFrom($parameters['warehouseType'])->value;
-            if ($type === null) {
-                // If the value is invalid, can I render the page with an error message, 
-                // or should I return a 400 HTTP error Bad Request.
-                return $this->render('Warehouse/create', [
-                    'view_title' => 'New warehouse',
-                    'datetime'   => $this->datetime->format('l'),
-                    // To fill the form again.
-                    'parameters' => $parameters,
-                    // 'error'      => 'The specified warehouse type is invalid.',
-                ]);
-            }
-
-            $warehouse = new Warehouse;
-            $warehouse->setName($parameters['name']);
-            $warehouse->setAddress($parameters['address']);
-            $warehouse->setEmail($parameters['email']);
-            $warehouse->setType($type);
-
-            // \App\Util\Handlers\VarDebugHandler::varDump($warehouse);
-            // parametrized SQL for create data to the database
-            $statement = $pdo->prepare("insert into plumeletphp_db.warehouses_tbl (name, address, email, type) values (:name, :address, :email, :type)");
-            $statement->execute([
-                ':name'    => $warehouse->getName(),
-                ':address' => $warehouse->getAddress(),
-                ':email'   => $warehouse->getEmail(),
-                ':type'    => $warehouse->getType(),
-            ]);
-            // $id is correctly populated with the last automatically incremented ID of the latest inserted record.
-            $id = $pdo->lastInsertId();
-            // \App\Util\Handlers\VarDebugHandler::varDump($id);
             return $this->redirect("/warehouse/{$id}");
         }
 
@@ -124,7 +93,7 @@ class WarehouseController extends Controller implements CrudInterface
                 'view_title' => 'New warehouse',
                 'datetime'   => $this->datetime->format('l'),
             ]
-        )->withStatus(201);
+        );
     }
 
     /**
@@ -134,32 +103,20 @@ class WarehouseController extends Controller implements CrudInterface
      */
     public function read(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        $pdo = PlumeletPhpDb::getPDO();
+        // Retrieve a specific warehouse using the service class.
+        $warehouse = $this->warehouseService->read($args['id']);
 
-        $statement = $pdo->prepare("select * from plumeletphp_db.warehouses_tbl where id = :id limit 1");
-        $statement->execute([':id' => $args['id']]);
-
-        // If the query fails, the value of $statement will be false.
-        if ($statement === false) {
-            throw new InternalServerError('Unable to fetch warehouses from WarehouseController::read function.');
-        }
-
-        $statement->setFetchMode(PDO::FETCH_CLASS, Warehouse::class);
-
-        // fetchById() Always returns an array as a result.
-        $warehouses = $statement->fetchAll() ?? [];
-
-        if (! empty($warehouses)) {
+        if ($warehouse !== null) {
             return $this->render(
                 'Warehouse/read',
                 [
                     'view_title' => 'Warehouse details',
                     'datetime'   => $this->datetime->format('l'),
-                    'id'         => $warehouses[0]->getId(),
-                    'name'       => $warehouses[0]->getName(),
-                    'address'    => $warehouses[0]->getAddress(),
-                    'email'      => $warehouses[0]->getEmail(),
-                    'type'       => $warehouses[0]->getType(),
+                    'id'         => $warehouse->getId(),
+                    'name'       => $warehouse->getName(),
+                    'address'    => $warehouse->getAddress(),
+                    'email'      => $warehouse->getEmail(),
+                    'type'       => $warehouse->getType(),
                 ]
             )->withStatus(200);
         } else {
@@ -174,54 +131,40 @@ class WarehouseController extends Controller implements CrudInterface
      */
     public function update(ServerRequestInterface $request, array $args): ResponseInterface
     {
+
         if ($request->getMethod() === 'POST') {
 
-            $pdo = PlumeletPhpDb::getPDO();
-
             $parameters = $request->getParsedBody();
-            $warehouse  = new Warehouse;
-            try {
-                $warehouse->setId($parameters['id']);
-            } catch (InvalidArgumentException $e) {
-                $e->getMessage();
-            }
-            $warehouse->setName($parameters['name']);
-            $warehouse->setAddress($parameters['address']);
-            $warehouse->setEmail($parameters['email']);
-            $warehouse->setType($parameters['warehouseType']);
-            $statement = $pdo->prepare("update plumeletphp_db.warehouses_tbl set name=:name, address=:address, email=:email, type=:type where id=:id");
+            $warehouse  = new Warehouse(
+                $parameters['id'],
+                $parameters['name'],
+                $parameters['address'],
+                $parameters['email'],
+                $parameters['warehouseType'],
+                $parameters['created_at'] ?? null,
+                $parameters['updated_at'] ?? null
+            );
 
-            $statement->execute([
-                ':id'      => $warehouse->getId(),
-                ':name'    => $warehouse->getName(),
-                ':address' => $warehouse->getAddress(),
-                ':email'   => $warehouse->getEmail(),
-                ':type'    => $warehouse->getType(),
-            ]);
+            // Apply the changes using the service class.
+            $id = $this->warehouseService->update($warehouse);
 
             $id = $warehouse->getId();
-            return self::read($request, ['id' => $id]);
+            return $this->read($request, ['id' => $id]);
         } else {
 
-            $pdo = PlumeletPhpDb::getPDO();
+            $warehouse = $this->warehouseService->read($args['id']);
 
-            $statement = $pdo->prepare("select id, name, address, email, type from plumeletphp_db.warehouses_tbl where id = :id limit 1");
-            $statement->execute([':id' => $args['id']]);
-            $statement->setFetchMode(PDO::FETCH_CLASS, Warehouse::class);
-            $warehouses = $statement->fetchAll();
-            // \App\Util\Handlers\VarDebugHandler::varDump($warehouses);
-
-            if (count($warehouses) > 0) {
+            if ($warehouse !== null) {
                 return $this->render(
                     'Warehouse/update',
                     [
                         'view_title' => 'Edit warehouse',
                         'datetime'   => $this->datetime->format('l'),
-                        'id'         => $warehouses[0]->getId(),
-                        'name'       => $warehouses[0]->getName(),
-                        'address'    => $warehouses[0]->getAddress(),
-                        'email'      => $warehouses[0]->getEmail(),
-                        'type'       => $warehouses[0]->getType(),
+                        'id'         => $warehouse->getId(),
+                        'name'       => $warehouse->getName(),
+                        'address'    => $warehouse->getAddress(),
+                        'email'      => $warehouse->getEmail(),
+                        'type'       => $warehouse->getType(),
                     ]
                 );
             } else {
@@ -237,10 +180,14 @@ class WarehouseController extends Controller implements CrudInterface
      */
     public function delete(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        $pdo = PlumeletPhpDb::getPDO();
+        // Delete the warehouse using the service class.
+        $deleted = $this->warehouseService->delete($args['id']);
 
-        $statement = $pdo->prepare("delete from plumeletphp_db.warehouses_tbl where id = :id");
-        $statement->execute([':id' => $args['id']]);
-        return self::index();
+        if ($deleted) {
+            return $this->index();
+        } else {
+            throw new NotFoundException();
+        }
+
     }
 }
