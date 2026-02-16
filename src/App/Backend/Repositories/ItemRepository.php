@@ -33,8 +33,8 @@ use RuntimeException;
  */
 class ItemRepository extends Repository implements RepositoryInterface
 {
-    // To avoid possible typing errors, the table name should be set in one place.
-    const TABLE_NAME = 'plumeletphp_db.items_tbl';
+    // To avoid possible typing errors, the table name should be set in one place in this class.
+    const TABLE_NAME = Item::TABLE_NAME;
 
     /** @var PDO Connection to the DB */
     protected PDO $pdo;
