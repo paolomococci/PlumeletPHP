@@ -4,8 +4,10 @@ declare (strict_types = 1); // Enforce strict type checking
 namespace App\Frontend\Services;
 
 use App\Backend\Models\Interfaces\ModelInterface;
+use App\Backend\Models\Item;
 use App\Backend\Repositories\ItemRepository;
 use App\Frontend\Services\Interfaces\ServiceInterface;
+use App\Util\Search;
 
 /**
  * ItemService
@@ -36,8 +38,10 @@ class ItemService implements ServiceInterface
      * which automatically declares and initializes class properties.
      *
      */
-    public function __construct(protected ItemRepository $itemRepository)
-    {}
+    public function __construct(
+        protected ItemRepository $itemRepository,
+        protected Search $search
+    ) {}
 
     /**
      * index
@@ -124,5 +128,28 @@ class ItemService implements ServiceInterface
     public function paginate(int $page, int $perPage): array
     {
         return $this->itemRepository->findAllPaginated($page, $perPage);
+    }
+
+    /**
+     * searchByName
+     *
+     * @param  mixed $name
+     * @param  mixed $page
+     * @param  mixed $perPage
+     * @return array
+     */
+    public function searchByName(string $name, int $page = 1, int $perPage = 5): array
+    {
+        return $this->search->byName(Item::class, $name, $page, $perPage);
+    }
+
+    /**
+     * countByName
+     *
+     * @return int
+     */
+    public function countByName(string $name): int
+    {
+        return $this->search->countByName(Item::class, $name);
     }
 }

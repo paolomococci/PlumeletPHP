@@ -38,16 +38,24 @@ final class ItemController extends Controller implements CrudInterface
         protected ItemService $itemService
     ) {}
 
+    /* --------------------------------------------------------------------- */
+    /*  INDEX  ------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+
     /**
      * index
      *
      * @return ResponseInterface
+     *
+     * Handles a GET request for the root resource (e.g. /items).
+     * Delegates data retrieval to the service and renders the list view.
      */
     public function index(): ResponseInterface
     {
-        // The service class can be used to retrieve the complete list of items.
+        // Retrieve the full list of items via the service layer.
         $items = $this->itemService->index();
 
+        // Render the template and pass necessary data.
         return $this->render(
             'Item/index',
             [
@@ -55,11 +63,18 @@ final class ItemController extends Controller implements CrudInterface
                 'datetime'   => $this->datetime->format('l'),
                 'items'      => $items,
             ]
+            // HTTP 200 OK
         )->withStatus(200);
     }
 
+    /* --------------------------------------------------------------------- */
+    /*  PAGINATION  -------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+
     /**
      * paginate
+     *
+     * Handles a request that requires pagination.
      *
      * @param  mixed $request
      * @return ResponseInterface
@@ -70,7 +85,8 @@ final class ItemController extends Controller implements CrudInterface
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
         if ($page < 1) {$page = 1;}
 
-        $perPage = 5; // configurable
+        // Configurable items per page.
+        $perPage = 5;
         $items   = $this->itemService->paginate($page, $perPage);
 
         // Get total count (used for navigation)
@@ -92,6 +108,8 @@ final class ItemController extends Controller implements CrudInterface
      *
      * Helper to build pagination data.
      *
+     * Computes next/previous page values and overall navigation data.
+     *
      * @param  mixed $page
      * @param  mixed $perPage
      * @param  mixed $total
@@ -99,6 +117,7 @@ final class ItemController extends Controller implements CrudInterface
      */
     private static function pagination(int $page, int $perPage, int $total): array
     {
+        // Total number of pages.
         $pages = (int) ceil($total / $perPage);
 
         return [
@@ -112,19 +131,74 @@ final class ItemController extends Controller implements CrudInterface
     }
 
     /* --------------------------------------------------------------------- */
+    /*  SEARCH  ------------------------------------------------------------ */
+    /* --------------------------------------------------------------------- */
+
+    /**
+     * search
+     *
+     * Handles search queries on items.
+     *
+     * @param  mixed $request
+     * @return ResponseInterface
+     */
+    public function search(ServerRequestInterface $request): ResponseInterface
+    {
+        $params = $request->getQueryParams();
+
+        // If there are no search parameters, fall back to regular pagination.
+        if (empty($params) and ! array_key_exists('search', $params)) {
+            return $this->paginate($request);
+        }
+
+        // Sanitize and extract the name search field text.
+        $name = Item::sanitize($params['name'] ?? '', ['max_length' => 32]);
+
+        // If nothing was provided, redirect back to the pagination page.
+        if (strlen($name) < 1) {
+            return $this->paginate($request);
+        }
+
+        // Resolve pagination for the search results.
+        $page    = (int) (array_key_exists('page', $params) ? $params['page'] : 1);
+        $perPage = (int) (array_key_exists('perPage', $params) ? $params['perPage'] : 5);
+
+        // Delegate the search to the service layer.
+        $items = $this->itemService->searchByName($name, $page, $perPage);
+
+        // Get the number of matching items for navigation.
+        $total = $this->itemService->countByName($name);
+
+        // Build the view data to be passed to the template.
+        $viewData = [
+            'view_title' => 'List of items',
+            'datetime'   => $this->datetime->format('l'),
+            'items'      => $items,
+            'pagination' => static::pagination($page, $perPage, $total),
+        ];
+
+        return $this->render('Item/paginate', $viewData)->withStatus(200);
+    }
+
+    /* --------------------------------------------------------------------- */
     /*  CRUD methods ------------------------------------------------------- */
     /* --------------------------------------------------------------------- */
 
     /**
      * create
      *
+     * Handles GET for showing the create form and POST for actually creating.
+     *
      * @return ResponseInterface
      */
     public function create(ServerRequestInterface $request): ResponseInterface
     {
+        // POST request indicates form submission.
         if ($request->getMethod() === 'POST') {
             $parameters = $request->getParsedBody();
-            $item       = new Item(
+
+            // Build a new Item instance from submitted data.
+            $item = new Item(
                 null,
                 $parameters['name'],
                 $parameters['description'],
@@ -133,13 +207,15 @@ final class ItemController extends Controller implements CrudInterface
                 null,
                 null
             );
-            // Save the new item using the service class, which expects an argument compatible with the model interface.
+
+            // Persist the new item via the service; returns the new id.
             $id = $this->itemService->create($item);
 
+            // Redirect to the newly created item’s detail page.
             return $this->redirect("/item/{$id}");
         }
 
-        // Returns the content of the body as a string.
+        // Render the form for creating a new item.
         return $this->render(
             'Item/create',
             [
@@ -152,13 +228,16 @@ final class ItemController extends Controller implements CrudInterface
     /**
      * read
      *
+     * Displays the details of a single item.
+     *
      * @return ResponseInterface
      */
     public function read(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        // Retrieve a specific item using the service class.
+        // Retrieve the specific item using its id.
         $item = $this->itemService->read($args['id']);
 
+        // If found, render the detail view; otherwise throw 404.
         if ($item !== null) {
             return $this->render(
                 'Item/read',
@@ -173,6 +252,7 @@ final class ItemController extends Controller implements CrudInterface
                 ]
             )->withStatus(200);
         } else {
+            // 404
             throw new NotFoundException();
         }
     }
@@ -180,15 +260,19 @@ final class ItemController extends Controller implements CrudInterface
     /**
      * update
      *
+     * Handles GET to display the edit form and POST to apply changes.
+     *
      * @return ResponseInterface
      */
     public function update(ServerRequestInterface $request, array $args): ResponseInterface
     {
-
+        // POST indicates form submission for updating.
         if ($request->getMethod() === 'POST') {
 
             $parameters = $request->getParsedBody();
-            $item       = new Item(
+
+            // Build an Item instance with the updated values.
+            $item = new Item(
                 $parameters['id'],
                 $parameters['name'],
                 $parameters['description'],
@@ -198,13 +282,14 @@ final class ItemController extends Controller implements CrudInterface
                 $parameters['updated_at'] ?? null
             );
 
-            // Apply the changes using the service class.
+            // Persist changes via the service.
             $id = $this->itemService->update($item);
 
+            // After updating, display the updated item.
             $id = $item->getId();
             return $this->read($request, ['id' => $id]);
         } else {
-
+            // For GET request, fetch current data to pre-populate the form.
             $item = $this->itemService->read($args['id']);
 
             if ($item !== null) {
@@ -221,6 +306,7 @@ final class ItemController extends Controller implements CrudInterface
                     ]
                 );
             } else {
+                // 404
                 throw new NotFoundException();
             }
         }
@@ -229,16 +315,20 @@ final class ItemController extends Controller implements CrudInterface
     /**
      * delete
      *
+     * Handles deletion of an item identified by id.
+     *
      * @return ResponseInterface
      */
     public function delete(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        // Delete the item using the service class.
+        // Delegate deletion to the service layer.
         $deleted = $this->itemService->delete($args['id']);
 
         if ($deleted) {
+            // After deletion, show the index page.
             return $this->index();
         } else {
+            // Item not found - 404
             throw new NotFoundException();
         }
 

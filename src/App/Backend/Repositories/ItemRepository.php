@@ -353,4 +353,27 @@ class ItemRepository extends Repository implements RepositoryInterface
 
         return $items;
     }
+
+    /**
+     * countByName
+     *
+     * Returns the number of items with a certain text in the name.
+     *
+     * @return int
+     */
+    public function countByName(string $name): int
+    {
+
+        $sql = static::cleanQuery("SELECT COUNT(*) FROM %s WHERE name LIKE :name", self::TABLE_NAME);
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':name', "%%{$name}%%", \PDO::PARAM_STR);
+        if (! $stmt->execute()) {
+            // The following code is designed to handle any potential errors.
+            $error = $stmt->errorInfo();
+            throw new RuntimeException('Error query COUNT: ' . $error[2]);
+        }
+
+        return (int) $stmt->fetchColumn();
+    }
 }

@@ -39,7 +39,8 @@ final class Item extends Model implements ModelInterface
      *
      * @return string
      */
-    public static function getTableName(): string {
+    public static function getTableName(): string
+    {
         return self::TABLE_NAME;
     }
 

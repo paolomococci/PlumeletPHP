@@ -7,6 +7,7 @@ namespace App\Backend\Models;
 use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
+use ReflectionClass;
 
 /**
  * Model
@@ -252,7 +253,7 @@ abstract class Model
      * @param  mixed $options
      * @return string
      */
-    protected static function sanitize(string $text, array $options = []): string
+    public static function sanitize(string $text, array $options = []): string
     {
         // Default options.
         $opts = array_merge([
@@ -323,5 +324,50 @@ abstract class Model
         }
 
         return $dt;
+    }
+
+    /**
+     * fetchFromData
+     *
+     * Generic method to map data from database to object.
+     *
+     * @param  mixed $data Data fetched from the database.
+     * @return static Instance of the mapped entity.
+     */
+    public static function fetchFromData(array $data): static
+    {
+        $reflection        = new ReflectionClass(static::class);
+        $constructorParams = $reflection->getConstructor()->getParameters();
+
+        $mappedParams = [];
+        foreach ($constructorParams as $param) {
+            $paramName = $param->getName();
+            $paramType = $param->getType();
+
+            $value = $data[$paramName] ?? null;
+
+            $value = $paramType && $value !== null
+                /**
+                 * Match Benefits:
+                 * - more Concise;
+                 * - more performing than switches;
+                 * - returns a value directly;
+                 * - type-safe.
+                 * 
+                 */
+                ? match ($paramType->getName()) {
+                'int'    => is_numeric($value) ? (int) $value : null,
+                'float'  => is_numeric($value) ? (float) $value : null,
+                'bool'   => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+                'string' => (string) $value,
+                'array'  => is_array($value) ? $value : null,
+                default  => $value
+            }
+                : $value;
+
+            $mappedParams[$paramName] = $value;
+        }
+
+        return new static(...$mappedParams);
     }
 }
