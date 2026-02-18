@@ -37,7 +37,7 @@
         <div class="input-group">
             <input type="text"
                 name="name"
-                placeholder="Cerca per nome…"
+                placeholder="Search by name…"
                 value="<?= $this->e($search ?? '') ?>">
             <button type="submit">Search</button>
             <button type="reset">Reset</button>
