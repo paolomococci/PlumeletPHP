@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1); // Enforce strict type checking
+declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Backend\Models;
 
@@ -60,10 +60,11 @@ abstract class Model
         }
 
         /* 5. Comparison with the maximum value: 18446744073709551615. */
-        $maxSerial = '18446744073709551615'; // 2^64 – 1
+        $maxSerial = '18446744073709551615'; // 2^64 - 1
 
         // If the string is longer than $maxSerial or the same length but greater than $maxSerial.
-        if (strlen($serial) > strlen($maxSerial) ||
+        if (
+            strlen($serial) > strlen($maxSerial) ||
             (strlen($serial) === strlen($maxSerial) && $serial > $maxSerial)
         ) {
             throw new InvalidArgumentException(
@@ -116,7 +117,7 @@ abstract class Model
         }
 
         /* 5. Compare with the maximum value using bccomp. */
-        $maxSerial = '18446744073709551615'; // 2^64 – 1
+        $maxSerial = '18446744073709551615'; // 2^64 - 1
 
         // bccomp return:
         //  -1  if $serial <  $maxSerial
@@ -356,18 +357,49 @@ abstract class Model
                  * 
                  */
                 ? match ($paramType->getName()) {
-                'int'    => is_numeric($value) ? (int) $value : null,
-                'float'  => is_numeric($value) ? (float) $value : null,
-                'bool'   => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
-                'string' => (string) $value,
-                'array'  => is_array($value) ? $value : null,
-                default  => $value
-            }
+                    'int'    => is_numeric($value) ? (int) $value : null,
+                    'float'  => is_numeric($value) ? (float) $value : null,
+                    'bool'   => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+                    'string' => (string) $value,
+                    'array'  => is_array($value) ? $value : null,
+                    default  => $value
+                }
                 : $value;
 
             $mappedParams[$paramName] = $value;
         }
 
         return new static(...$mappedParams);
+    }
+
+    /**
+     * ellipsisPreserveWords (UTF-8 safe)
+     * 
+     * If the string is longer than $limit, an ellipsis (…) is appended.
+     *
+     * @param  string $description
+     * @param  int    $limit
+     * @return string
+     */
+    public static function ellipsisPreserveWords(string $description, int $limit = 24): string
+    {
+        // Check if the description length is within the limit.
+        // If it is, return the original string unchanged.
+        if (mb_strlen($description) <= $limit) return $description;
+
+        // Take a substring of the description up to the specified limit.
+        $substr = mb_substr($description, 0, $limit);
+
+        // Find the position of the last space character within that substring.
+        // This helps us avoid cutting a word in half.
+        $lastSpace = mb_strrpos($substr, ' ');
+
+        // If a space was found, trim the substring at that position so it ends at a word boundary.
+        if ($lastSpace !== false) {
+            $substr = mb_substr($substr, 0, $lastSpace);
+        }
+
+        // Remove any trailing whitespace and append an ellipsis character.
+        return rtrim($substr) . '…';
     }
 }

@@ -15,6 +15,10 @@ You can visit the official MIT License website at the following link: <https://o
 
 By visiting these websites and reading the information provided, you can gain a better understanding of the MIT License and how to use it effectively.
 
+## example of screenshot
+
+![](./images/PlumeletPHP_mobile_view.png)
+
 ## scaffolding
 
 Here's a series of useful shell commands for scaffolding the project:
