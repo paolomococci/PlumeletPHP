@@ -109,7 +109,7 @@ final class Warehouse extends Model implements ModelInterface
 
     /**
      * setId
-     *<<<<<<< HEAD
+     *
      * @param  mixed $name
      * @return void
      */
