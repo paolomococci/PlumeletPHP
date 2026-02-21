@@ -17,6 +17,8 @@ By visiting these websites and reading the information provided, you can gain a 
 
 ## screenshots
 
+**To avoid any misunderstanding, the names and places appearing in the following screenshots are completely imaginary, invented for demonstration purposes and do not refer to anything or anyone!**
+
 ![](./images/items_mobile_view.png)
 
 ![](./images/users_mobile_view.png)
