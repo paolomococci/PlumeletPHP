@@ -12,6 +12,7 @@ final class UserRoutes implements RoutesInterface
     public function registerRoutes(Router $router): void
     {
         $router->get('/users', [UserController::class, 'paginate']);
+        $router->get('/user/search', [UserController::class, 'search']);
         $router->map(['GET', 'POST'], '/user/new', [UserController::class, 'create']);
         $router->get('/user/{id:number}', [UserController::class, 'read']);
         $router->map(['GET', 'POST'], '/user/update/{id:number}', [UserController::class, 'update']);

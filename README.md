@@ -1,6 +1,6 @@
 # PlumeletPHP
 
-![](./images/plumeletphp_v0.0.3.png)
+![](./images/plumeletphp_watermark-600x314.png)
 
 Professionally developed personal PHP framework for demonstration purposes.
 
@@ -15,9 +15,21 @@ You can visit the official MIT License website at the following link: <https://o
 
 By visiting these websites and reading the information provided, you can gain a better understanding of the MIT License and how to use it effectively.
 
-## example of screenshot
+## screenshots
 
-![](./images/PlumeletPHP_mobile_view.png)
+![](./images/items_mobile_view.png)
+
+![](./images/users_mobile_view.png)
+
+![](./images/warehouses_mobile_view.png)
+
+Here's how I used ImageMagick to resize images:
+
+```shell
+convert items_mobile.png -resize 20% -quality 95  items_mobile_view.png
+convert users_mobile.png -resize 20% -quality 95  users_mobile_view.png
+convert warehouses_mobile.png -resize 20% -quality 95  warehouses_mobile_view.png
+```
 
 ## scaffolding
 

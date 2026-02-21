@@ -38,6 +38,10 @@ final class UserController extends Controller implements CrudInterface
         protected UserService $userService
     ) {}
 
+    /* --------------------------------------------------------------------- */
+    /*  INDEX  ------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+
     /**
      * index
      *
@@ -57,6 +61,10 @@ final class UserController extends Controller implements CrudInterface
             ]
         )->withStatus(200);
     }
+
+    /* --------------------------------------------------------------------- */
+    /*  PAGINATION  -------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
     /**
      * paginate
@@ -109,6 +117,56 @@ final class UserController extends Controller implements CrudInterface
             'prev'    => $page > 1 ? $page - 1 : null,
             'next'    => $page < $pages ? $page + 1 : null,
         ];
+    }
+
+    /* --------------------------------------------------------------------- */
+    /*  SEARCH  ------------------------------------------------------------ */
+    /* --------------------------------------------------------------------- */
+
+    /**
+     * search
+     *
+     * Handles search queries on users.
+     *
+     * @param  mixed $request
+     * @return ResponseInterface
+     */
+    public function search(ServerRequestInterface $request): ResponseInterface
+    {
+        $params = $request->getQueryParams();
+
+        // If there are no search parameters, fall back to regular pagination.
+        if (empty($params) and ! array_key_exists('search', $params)) {
+            return $this->paginate($request);
+        }
+
+        // Sanitize and extract the name search field text.
+        $name = User::sanitize($params['name'] ?? '', ['max_length' => 32]);
+
+        // If nothing was provided, redirect back to the pagination page.
+        if (strlen($name) < 1) {
+            return $this->paginate($request);
+        }
+
+        // Resolve pagination for the search results.
+        $page    = (int) (array_key_exists('page', $params) ? $params['page'] : 1);
+        $perPage = (int) (array_key_exists('perPage', $params) ? $params['perPage'] : 5);
+
+        // Delegate the search to the service layer.
+        $users = $this->userService->searchByName($name, $page, $perPage);
+
+        // Get the number of matching users for navigation.
+        $total = $this->userService->countByName($name);
+
+        // Build the view data to be passed to the template.
+        $viewData = [
+            'view_title' => 'List of users',
+            'datetime'   => $this->datetime->format('l'),
+            'users'      => $users,
+            'pagination' => static::pagination($page, $perPage, $total),
+        ];
+
+        return $this->render('User/paginate', $viewData)->withStatus(200);
     }
 
     /* --------------------------------------------------------------------- */

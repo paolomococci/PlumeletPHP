@@ -12,6 +12,7 @@ final class WarehouseRoutes implements RoutesInterface
     public function registerRoutes(Router $router): void
     {
         $router->get('/warehouses', [WarehouseController::class, 'paginate']);
+        $router->get('/warehouse/search', [WarehouseController::class, 'search']);
         $router->map(['GET', 'POST'], '/warehouse/new', [WarehouseController::class, 'create']);
         $router->get('/warehouse/{id:number}', [WarehouseController::class, 'read']);
         $router->map(['GET', 'POST'], '/warehouse/update/{id:number}', [WarehouseController::class, 'update']);

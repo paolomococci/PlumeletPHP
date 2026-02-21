@@ -1,8 +1,29 @@
 <?php
     use App\Backend\Models\Item;
 
-    /*  Set the page layout and pass the page title to the layout renderer. */
-    $this->layout('layout', ['title' => 'Item - Paginate']);
+    /*  Retrieve the search query if it exists, otherwise fall back to the GET value.
+    If neither is set, $search will be an empty string. */
+    $search = $search ?? ($_GET['name'] ?? '');
+
+    /*  Base URL for building pagination links that preserve the current search parameters. */
+    $baseUrl = '/item/search';
+
+    /**
+     * 
+     * Set the page layout and pass the page title to the layout renderer.
+     * 
+     * Concatenate with modern syntax using match (PHP 8+).
+     * 
+     * The match control structure, introduced in PHP 8.0, 
+     * represents a modern and more powerful alternative to switch. 
+     * It's an expression, not a simple statement, 
+     * which means it returns a value that can be assigned to a variable 
+     * or used directly.
+     */
+    $this->layout('layout', ['title' => "Item - " . match(true) {
+        $search !== '' => "Search term \"$search\" and paginate", 
+        default => 'Paginate'
+    }]);
 
     /*  Extract pagination data that was passed from the controller. */
     $current = $pagination['current'];
@@ -10,13 +31,6 @@
     $pages   = $pagination['pages'];
     $prev    = $pagination['prev'];
     $next    = $pagination['next'];
-
-    /*  Retrieve the search query if it exists, otherwise fall back to the GET value.
-    If neither is set, $search will be an empty string. */
-    $search = $search ?? ($_GET['name'] ?? '');
-
-    /*  Base URL for building pagination links that preserve the current search parameters. */
-    $baseUrl = '/item/search';
 ?>
 
 <!-- search component -->
@@ -42,7 +56,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Price</th>
-                    <th>Currency</th>
+                    <th>CUR</th>
                     <th>Description</th>
                     <th colspan="2">Actions</th>
                 </tr>

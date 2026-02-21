@@ -13,6 +13,8 @@ use InvalidArgumentException;
  */
 final class Warehouse extends Model implements ModelInterface
 {
+    // To avoid possible typing errors, the table name should be set in one place.
+    const TABLE_NAME = 'plumeletphp_db.warehouses_tbl';
 
     /**
      * __construct
@@ -32,6 +34,16 @@ final class Warehouse extends Model implements ModelInterface
         private ?string $created_at,
         private ?string $updated_at
     ) {}
+
+    /**
+     * getTableName
+     *
+     * @return string
+     */
+    public static function getTableName(): string
+    {
+        return self::TABLE_NAME;
+    }
 
     /* getters */
 

@@ -34,7 +34,7 @@ use RuntimeException;
 class WarehouseRepository extends Repository implements RepositoryInterface
 {
     // To avoid possible typing errors, the table name should be set in one place.
-    const TABLE_NAME = 'plumeletphp_db.warehouses_tbl';
+    const TABLE_NAME = Warehouse::TABLE_NAME;
 
     /** @var PDO Connection to the DB */
     protected PDO $pdo;
@@ -315,5 +315,28 @@ class WarehouseRepository extends Repository implements RepositoryInterface
         }
 
         return $warehouses;
+    }
+
+    /**
+     * countByName
+     *
+     * Returns the number of warehouses with a certain text in the name.
+     *
+     * @return int
+     */
+    public function countByName(string $name): int
+    {
+
+        $sql = static::cleanQuery("SELECT COUNT(*) FROM %s WHERE name LIKE :name", self::TABLE_NAME);
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':name', "%%{$name}%%", \PDO::PARAM_STR);
+        if (! $stmt->execute()) {
+            // The following code is designed to handle any potential errors.
+            $error = $stmt->errorInfo();
+            throw new RuntimeException('Error query COUNT: ' . $error[2]);
+        }
+
+        return (int) $stmt->fetchColumn();
     }
 }

@@ -4,8 +4,10 @@ declare (strict_types = 1); // Enforce strict type checking
 namespace App\Frontend\Services;
 
 use App\Backend\Models\Interfaces\ModelInterface;
+use App\Backend\Models\User;
 use App\Backend\Repositories\UserRepository;
 use App\Frontend\Services\Interfaces\ServiceInterface;
+use App\Util\Search;
 
 /**
  * UserService
@@ -36,8 +38,10 @@ class UserService implements ServiceInterface
      * which automatically declares and initializes class properties.
      *
      */
-    public function __construct(protected UserRepository $userRepository)
-    {}
+    public function __construct(
+        protected UserRepository $userRepository,
+        protected Search $search
+    ) {}
 
     /**
      * index
@@ -124,5 +128,28 @@ class UserService implements ServiceInterface
     public function paginate(int $page, int $perPage): array
     {
         return $this->userRepository->findAllPaginated($page, $perPage);
+    }
+
+    /**
+     * searchByName
+     *
+     * @param  mixed $name
+     * @param  mixed $page
+     * @param  mixed $perPage
+     * @return array
+     */
+    public function searchByName(string $name, int $page = 1, int $perPage = 5): array
+    {
+        return $this->search->byName(User::class, $name, $page, $perPage);
+    }
+
+    /**
+     * countByName
+     *
+     * @return int
+     */
+    public function countByName(string $name): int
+    {
+        return $this->search->countByName(User::class, $name);
     }
 }
