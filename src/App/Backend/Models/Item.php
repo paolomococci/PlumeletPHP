@@ -25,13 +25,13 @@ final class Item extends Model implements ModelInterface
      *
      */
     public function __construct(
-        private ?string $id,
-        private string $name,
-        private string $description,
-        private float $price,
-        private string $currency,
-        private ?string $created_at,
-        private ?string $updated_at
+        private ?string $id = null,
+        private ?string $name = null,
+        private ?string $description = null,
+        private ?float $price = null,
+        private ?string $currency = null,
+        private ?string $created_at = null,
+        private ?string $updated_at = null
     ) {}
 
     /**
@@ -160,7 +160,7 @@ final class Item extends Model implements ModelInterface
      */
     public function setCurrency(string $currency): void
     {
-        $this->currency = (! is_null($currency) ? static::checkVarchar(text : $currency, length: 255): '');
+        $this->currency = (! is_null($currency) ? static::checkVarchar(text : $currency, length: 3): '');
     }
 
     /**

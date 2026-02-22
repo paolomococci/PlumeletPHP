@@ -15,6 +15,58 @@ use ReflectionClass;
 abstract class Model
 {
     /**
+     * create
+     * 
+     * Creates a new instance of the calling class.
+     *
+     * @param  mixed $fields    An associative array where keys match the
+     *                          constructor parameter names.  Missing keys will be
+     *                          passed as `null`.
+     * @return static           An instance of the class that invoked this method.
+     */
+    public static function create(array $fields = []): static
+    {
+        /**
+         * Obtain a ReflectionClass object for the runtime class that called this method.
+         * `static::class` uses late‑static binding (LSB) so that subclasses get 
+         * the correct class name, not the name of this base class.
+         */
+        $reflection = new ReflectionClass(static::class);
+
+        /* Grab the constructor for that class, if one exists. */
+        $constructor = $reflection->getConstructor();
+
+        /* If the class has no constructor, simply instantiate it with no arguments. */
+        if (!$constructor) {
+            return new static();
+        }
+
+        /* Prepare an array of arguments that will be passed to the constructor. */
+        $params = [];
+        foreach ($constructor->getParameters() as $param) {
+            // Get the parameter's name.
+            $paramName = $param->getName();
+
+            /**
+             * Look for a value in the supplied `$fields` array 
+             * that matches this name.
+             * If none is found, use `null` as the placeholder. 
+             * This allows the caller to omit optional parameters 
+             * or to supply explicit nulls.
+             */
+            $params[$paramName] = $fields[$paramName] ?? null;
+        }
+
+        /**
+         * Instantiate the class, expanding the `$params` array 
+         * with the spread operator `...`.
+         * This turns the associative array into a positional 
+         * argument list matching the constructor's signature.
+         */
+        return new static(...$params);
+    }
+
+    /**
      * Validate a serial number (SERIAL data type: BIGINT UNSIGNED).
      * Some points to consider:
      * PHP 8.0 allows 64-bit signed integers. However, on 64-bit PHP, integers are still 64-bit signed, with a maximum value of 9,223,372,036,854,775,807.

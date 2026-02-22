@@ -182,15 +182,14 @@ final class WarehouseController extends Controller implements CrudInterface
     {
         if ($request->getMethod() === 'POST') {
             $parameters = $request->getParsedBody();
-            $warehouse  = new Warehouse(
-                null,
-                $parameters['name'],
-                $parameters['address'],
-                $parameters['email'],
-                $parameters['warehouseType'],
-                null,
-                null
-            );
+
+            // Build a new Warehouse instance from submitted data.
+            $warehouse = Warehouse::create();
+            $warehouse->setName(htmlspecialchars($parameters['name']));
+            $warehouse->setAddress(htmlspecialchars($parameters['address']));
+            $warehouse->setEmail(htmlspecialchars($parameters['email']));
+            $warehouse->setType(htmlspecialchars($parameters['warehouseType']));
+
             // Save the new warehouse using the service class, which expects an argument compatible with the model interface.
             $id = $this->warehouseService->create($warehouse);
 
@@ -246,15 +245,14 @@ final class WarehouseController extends Controller implements CrudInterface
         if ($request->getMethod() === 'POST') {
 
             $parameters = $request->getParsedBody();
-            $warehouse  = new Warehouse(
-                $parameters['id'],
-                $parameters['name'],
-                $parameters['address'],
-                $parameters['email'],
-                $parameters['warehouseType'],
-                $parameters['created_at'] ?? null,
-                $parameters['updated_at'] ?? null
-            );
+
+            // Build an Warehouse instance with the updated values.
+            $warehouse = Warehouse::create();
+            $warehouse->setId(htmlspecialchars($parameters['id']));
+            $warehouse->setName(htmlspecialchars($parameters['name']));
+            $warehouse->setAddress(htmlspecialchars($parameters['address']));
+            $warehouse->setEmail(htmlspecialchars($parameters['email']));
+            $warehouse->setType(htmlspecialchars($parameters['warehouseType']));
 
             // Apply the changes using the service class.
             $id = $this->warehouseService->update($warehouse);

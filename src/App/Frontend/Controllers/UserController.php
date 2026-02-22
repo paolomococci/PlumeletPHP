@@ -182,15 +182,12 @@ final class UserController extends Controller implements CrudInterface
     {
         if ($request->getMethod() === 'POST') {
             $parameters = $request->getParsedBody();
-            $user       = new User(
-                null,
-                $parameters['name'],
-                $parameters['email'],
-                $parameters['password'],
-                null,
-                null,
-                null
-            );
+
+            // Build a new User instance from submitted data.
+            $user = User::create();
+            $user->setName(htmlspecialchars($parameters['name']));
+            $user->setEmail(htmlspecialchars($parameters['email']));
+            $user->setPlainPassword(htmlspecialchars($parameters['password']));
             // Save the new user using the service class, which expects an argument compatible with the model interface.
             $id = $this->userService->create($user);
 
@@ -243,15 +240,13 @@ final class UserController extends Controller implements CrudInterface
         if ($request->getMethod() === 'POST') {
 
             $parameters = $request->getParsedBody();
-            $user       = new User(
-                $parameters['id'],
-                $parameters['name'],
-                $parameters['email'],
-                $parameters['password'],
-                null,
-                null,
-                null
-            );
+
+            // Build an User instance with the updated values.
+            $user = User::create();
+            $user->setId(htmlspecialchars($parameters['id']));
+            $user->setName(htmlspecialchars($parameters['name']));
+            $user->setEmail(htmlspecialchars($parameters['email']));
+            $user->setPlainPassword(htmlspecialchars($parameters['password']));
 
             // Apply the changes using the service class.
             $id = $this->userService->update($user);

@@ -26,13 +26,13 @@ final class Warehouse extends Model implements ModelInterface
      * @return void
      */
     public function __construct(
-        private ?string $id,
-        private string $name,
-        private string $address,
-        private string $email,
-        private string $type,
-        private ?string $created_at,
-        private ?string $updated_at
+        private ?string $id = null,
+        private ?string $name = null,
+        private ?string $address = null,
+        private ?string $email = null,
+        private ?string $type = null,
+        private ?string $created_at = null,
+        private ?string $updated_at = null
     ) {}
 
     /**

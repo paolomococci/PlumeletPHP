@@ -198,15 +198,11 @@ final class ItemController extends Controller implements CrudInterface
             $parameters = $request->getParsedBody();
 
             // Build a new Item instance from submitted data.
-            $item = new Item(
-                null,
-                $parameters['name'],
-                $parameters['description'],
-                (float) $parameters['price'],
-                $parameters['currency'],
-                null,
-                null
-            );
+            $item = Item::create();
+            $item->setName(htmlspecialchars($parameters['name']));
+            $item->setDescription(htmlspecialchars($parameters['description']));
+            $item->setPrice((float) htmlspecialchars($parameters['price']));
+            $item->setCurrency(htmlspecialchars($parameters['currency']));
 
             // Persist the new item via the service; returns the new id.
             $id = $this->itemService->create($item);
@@ -272,15 +268,12 @@ final class ItemController extends Controller implements CrudInterface
             $parameters = $request->getParsedBody();
 
             // Build an Item instance with the updated values.
-            $item = new Item(
-                $parameters['id'],
-                $parameters['name'],
-                $parameters['description'],
-                (float) $parameters['price'],
-                $parameters['currency'],
-                $parameters['created_at'] ?? null,
-                $parameters['updated_at'] ?? null
-            );
+            $item = Item::create();
+            $item->setId(htmlspecialchars($parameters['id']));
+            $item->setName(htmlspecialchars($parameters['name']));
+            $item->setDescription(htmlspecialchars($parameters['description']));
+            $item->setPrice((float) htmlspecialchars($parameters['price']));
+            $item->setCurrency(htmlspecialchars($parameters['currency']));
 
             // Persist changes via the service.
             $id = $this->itemService->update($item);

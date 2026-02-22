@@ -24,13 +24,13 @@ final class User extends Model implements ModelInterface
      *
      */
     public function __construct(
-        private ?string $id,
-        private string $name,
-        private string $email,
-        private ?string $password_plain,
-        private ?string $password_hash,
-        private ?string $created_at,
-        private ?string $updated_at
+        private ?string $id = null,
+        private ?string $name = null,
+        private ?string $email = null,
+        private ?string $password_plain = null,
+        private ?string $password_hash = null,
+        private ?string $created_at = null,
+        private ?string $updated_at = null
     ) {}
 
     /**
