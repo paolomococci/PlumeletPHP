@@ -76,7 +76,6 @@ $this->insert('Components/search', [
                         <th>Id</th>
                         <th>Name</th>
                         <th>Address</th>
-                        <th>Email</th>
                         <th>Type</th>
                         <th colspan="2"></th>
                     </tr>
@@ -86,11 +85,12 @@ $this->insert('Components/search', [
                     <?php foreach ($warehouses as $warehouse): ?>
                         <tr>
                             <td><?= $this->e($warehouse->getId() ?? '') ?></td>
-                            <td><a href="/warehouse/<?= $this->e($warehouse->getId() ?? '') ?>">
+                            <td>
+                                <a href="/warehouse/<?= $this->e($warehouse->getId() ?? '') ?>">
                                     <?= $this->e($warehouse->getName() ?? '') ?>
-                                </a></td>
+                                </a>
+                            </td>
                             <td><?= $this->e((string) $warehouse->getAddress() ?? '') ?></td>
-                            <td class="optional"><?= $this->e((string) $warehouse->getEmail() ?? '') ?></td>
                             <td><?= $this->e($warehouse->getType() ?? '') ?></td>
                             <td><a href="/warehouse/update/<?= $this->e($warehouse->getId()) ?? '' ?>">edit</a></td>
                             <td><a href="/warehouse/delete/<?= $this->e($warehouse->getId()) ?? '' ?>">del</a></td>
