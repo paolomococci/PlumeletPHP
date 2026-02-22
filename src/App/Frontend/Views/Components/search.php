@@ -90,6 +90,7 @@ $resetUrl = $resetUrl ?? '';
 
         /* Responsive tweaks for very small viewports. */
         @media (max-width:350px) {
+
             /* Reduce spacing between items on narrow screens to save horizontal real-estate. */
             .input-group {
                 gap: 6px;
