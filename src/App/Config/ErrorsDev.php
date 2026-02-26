@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1); // Enforce strict type checking
+declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Config;
 
@@ -11,15 +11,29 @@ use Throwable;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
 
+/**
+ * ErrorsDev
+ */
 final class ErrorsDev
-{
+{    
+    /**
+     * initialize
+     *
+     * @return void
+     */
     public static function initialize(): void
     {
         ini_set('display_errors', 1);
         error_reporting(E_ALL);
         set_exception_handler(fn(Throwable $th) => self::handleException($th));
     }
-
+    
+    /**
+     * handleException
+     *
+     * @param  mixed $th
+     * @return void
+     */
     public static function handleException(Throwable $th): void
     {
         http_response_code(500);

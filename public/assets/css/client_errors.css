@@ -1,0 +1,90 @@
+/* ---------------------------------------------
+            4XX – Client Error Warning message.
+------------------------------------------------ */
+:root {
+  /* Orange with opacity. */
+  --warning-bg: rgba(255, 152, 0, 0.9);
+  /* Dark gray. */
+  --warning-border: #333;
+  /* Off-white to highlight text. */
+  --warning-text: #eee;
+}
+
+.http-msg {
+  /* For ::before pseudo‑element. */
+  position: relative;
+  min-height: 80vh;
+  max-height: 90vh;
+  /* Center horizontally. */
+  width: 90%;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--warning-text);
+  font-family: system-ui, sans-serif;
+  font-size: clamp(1.5rem, 2vw, 2.5rem);
+  text-align: center;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 152, 0, 0.8),
+    #ff9800
+  );
+  border: 0.5rem solid var(--warning-border);
+  border-radius: 2.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation:
+    fadeIn 0.8s ease-out,
+    bounce 1.5s ease-out;
+  animation-fill-mode: both;
+  /* Prevents blur from coming out. */
+  overflow: hidden;
+}
+
+/* Blur behind the message. */
+.http-msg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  filter: blur(10px);
+  opacity: 0.8;
+  z-index: -1;
+}
+
+/* Bounce animation. */
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-25px);
+  }
+
+  60% {
+    transform: translateY(-12px);
+  }
+}
+
+/* Fade‑in. */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Link shown below to return to home. */
+.back-home {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}

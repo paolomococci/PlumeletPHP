@@ -4,6 +4,7 @@ declare (strict_types = 1); // Enforce strict type checking
 
 namespace App\Frontend\Controllers;
 
+use App\Frontend\Controllers\Controller;
 use DateTime;
 use Psr\Http\Message\ResponseInterface;
 
@@ -13,11 +14,21 @@ use Psr\Http\Message\ResponseInterface;
  * A class demonstrating the implementation of the inversion of control principle!
  */
 class HomeController extends Controller
-{
+{    
+    /**
+     * __construct
+     *
+     * @return void
+     */
     public function __construct(
         private DateTime $datetime
     ) {}
-
+    
+    /**
+     * index
+     *
+     * @return ResponseInterface
+     */
     public function index(): ResponseInterface
     {
         return $this->render(

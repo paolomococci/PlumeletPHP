@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1); // Enforce strict type checking
+declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Util\Handlers;
 
@@ -8,7 +8,7 @@ namespace App\Util\Handlers;
  * VarDebugHandler
  */
 final class VarDebugHandler
-{    
+{
     /**
      * varDump
      *
@@ -22,7 +22,7 @@ final class VarDebugHandler
         echo '<pre>';
         exit;
     }
-    
+
     /**
      * varExport
      *

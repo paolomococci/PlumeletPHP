@@ -48,7 +48,7 @@
                     <? endforeach; ?>
                 </tbody>
             </table>
-            <h5>today is: <?= $datetime?></h5>
+            <h5>today is: <?= $datetime ?></h5>
             <hr>
             <p><a href="/warehouse/new">add new warehouse</a></p>
         </section>
@@ -59,7 +59,7 @@
             <hr>
             <h5>No results found!</h5>
             <hr>
-            <h5>today is: <?= $datetime?></h5>
+            <h5>today is: <?= $datetime ?></h5>
             <hr>
             <p><a href="/warehouse/new">add new warehouse</a></p>
         </section>

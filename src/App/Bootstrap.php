@@ -1,18 +1,22 @@
 <?php
 
-declare (strict_types = 1); // Enforce strict type checking
+declare(strict_types=1); // Enforce strict type checking
 
 namespace App;
 
+use App\Errors\CsrfTokenException;
 use App\Errors\InternalServerError;
+use App\Frontend\Middlewares\CsrfMiddleware;
+use App\Frontend\Middlewares\SessionMiddleware;
 use App\Frontend\Routes\HomeRoutes;
 use App\Frontend\Routes\ItemRoutes;
 use App\Frontend\Routes\UserRoutes;
+use App\Frontend\Routes\WarehouseRoutes;
 use App\Frontend\Templates\Interfaces\TemplateInterface;
 use App\Frontend\Templates\RenderTemplate;
+use App\Util\Handlers\CsrfTokenHandler;
 use DI\Container;
 use DI\ContainerBuilder;
-use function DI\create;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\ServerRequest;
 use HttpSoft\Emitter\SapiEmitter;
@@ -20,6 +24,8 @@ use League\Route\Http\Exception\NotFoundException;
 use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
 use Psr\Http\Message\ResponseFactoryInterface;
+
+use function DI\create;
 
 /**
  * Bootstrap
@@ -55,13 +61,37 @@ class Bootstrap
             $this->container = $builder->build();
         }
 
-        // --------- Strategy & Router ----
+        /* ------------------- Strategy & Router ------------------- */
         $strategy = new ApplicationStrategy();
         $strategy->setContainer($this->container);
 
         $this->router = new Router();
         $this->router->setStrategy($strategy);
 
+        /* ------------------- Attach middlewares ------------------- */
+        // Session middleware (required for any session‑based feature)
+        $this->router->middleware(
+            new SessionMiddleware([
+                // cookie options - customize them here if you need something different
+                'path'       => '/',
+                'secure'     => $this->environment === 'pro',
+                'httponly'   => true,
+                'samesite'   => 'lax',
+            ])
+        );
+
+        // ------------------------------------------------------------------
+        // CSRF middleware
+        // ------------------------------------------------------------------
+        // The following lines are commented out by default.  Uncomment them
+        // if you want to enable CSRF protection for non‑idempotent requests.
+
+        $csrfMiddleware = new CsrfMiddleware(
+            $this->container->get(CsrfTokenHandler::class)
+        );
+        $this->router->middleware($csrfMiddleware);
+
+        /* ------------------- Routes ------------------- */
         // The routes are stored in these classes, which contain all authorized routes!
         // Home
         $homeRoutes = new HomeRoutes;
@@ -101,7 +131,17 @@ class Bootstrap
                 }
                 exit;
             }
+        } catch (CsrfTokenException $cte) {
+            http_response_code(403);
 
+            if ($this->environment === 'dev') {
+                throw $cte;
+            } else {
+                if ($this->appRootDir != '') {
+                    require $this->appRootDir . '/src/App/Frontend/Views/403.html';
+                }
+                exit;
+            }
         } catch (InternalServerError $ise) {
             http_response_code(500);
 
@@ -113,19 +153,17 @@ class Bootstrap
                 }
                 exit;
             }
-
         } catch (\Exception $e) {
-            http_response_code(500);
+            http_response_code(503);
 
             if ($this->environment === 'dev') {
                 throw $e;
             } else {
                 if ($this->appRootDir != '') {
-                    require $this->appRootDir . '/src/App/Frontend/Views/500.html';
+                    require $this->appRootDir . '/src/App/Frontend/Views/503.html';
                 }
                 exit;
             }
-
         }
 
         $this->emitter->emit($response);

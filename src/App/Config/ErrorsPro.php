@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1); // Enforce strict type checking
+declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Config;
 
@@ -9,15 +9,29 @@ use Monolog\Level;
 use Monolog\Logger;
 use Throwable;
 
+/**
+ * ErrorsPro
+ */
 final class ErrorsPro
-{
+{    
+    /**
+     * initialize
+     *
+     * @return void
+     */
     public static function initialize(): void
     {
         ini_set('display_errors', 0);
         // error_reporting(E_ALL); // optional
         set_exception_handler(fn(Throwable $th) => self::handleException($th));
     }
-
+    
+    /**
+     * handleException
+     *
+     * @param  mixed $th
+     * @return void
+     */
     public static function handleException(Throwable $th): void
     {
         http_response_code(500);

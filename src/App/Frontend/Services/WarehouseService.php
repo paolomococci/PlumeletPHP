@@ -1,5 +1,6 @@
 <?php
-declare (strict_types = 1); // Enforce strict type checking
+
+declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Frontend\Services;
 
@@ -7,7 +8,7 @@ use App\Backend\Models\Interfaces\ModelInterface;
 use App\Backend\Models\Warehouse;
 use App\Backend\Repositories\WarehouseRepository;
 use App\Frontend\Services\Interfaces\ServiceInterface;
-use App\Util\Search;
+use App\Util\Handlers\SearchHandler;
 
 /**
  * WarehouseService
@@ -40,7 +41,7 @@ class WarehouseService implements ServiceInterface
      */
     public function __construct(
         protected WarehouseRepository $warehouseRepository,
-        protected Search $search
+        protected SearchHandler $search
     ) {}
 
     /**

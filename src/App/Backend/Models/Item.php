@@ -1,5 +1,6 @@
 <?php
-declare (strict_types = 1); // Enforce strict type checking
+
+declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Backend\Models;
 
@@ -160,7 +161,7 @@ final class Item extends Model implements ModelInterface
      */
     public function setCurrency(string $currency): void
     {
-        $this->currency = (! is_null($currency) ? static::checkVarchar(text : $currency, length: 3): '');
+        $this->currency = (! is_null($currency) ? static::checkVarchar(text: $currency, length: 3) : '');
     }
 
     /**

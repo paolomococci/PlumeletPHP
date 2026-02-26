@@ -1,5 +1,6 @@
 <?php
-declare (strict_types = 1); // Enforce strict type checking
+
+declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Backend\Models\Enums;
 
@@ -8,12 +9,13 @@ namespace App\Backend\Models\Enums;
  *
  * The enum’s values match the `type` column in the `warehouses_tbl` table.
  */
-enum WarehouseType: string {
+enum WarehouseType: string
+{
     // Warehouse is owned by the company itself.
     case OWNED = 'owned';
-    // Warehouse belongs to a supplier.
+        // Warehouse belongs to a supplier.
     case SUPPLIER = 'supplier';
-    // Warehouse belongs to a courier.
+        // Warehouse belongs to a courier.
     case CURRIER = 'currier';
 
     /**

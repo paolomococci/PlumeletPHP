@@ -1,19 +1,20 @@
 <?php
-declare (strict_types = 1); // Enforce strict type checking
 
-namespace App\Util;
+declare(strict_types=1); // Enforce strict type checking
+
+namespace App\Util\Handlers;
 
 use App\Backend\Connections\PlumeletPhpDb;
 use PDO;
 use RuntimeException;
 
 /**
- * Search
+ * SearchHandler
  *
  * A utility class that performs name-based look-ups and counts
  * on any database entity that has a name column.
  */
-final class Search
+final class SearchHandler
 {
     /** @var PDO Connection to the DB */
     protected PDO $pdo;

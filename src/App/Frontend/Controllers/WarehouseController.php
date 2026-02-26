@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1); // Enforce strict type checking
+declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Frontend\Controllers;
 
@@ -76,7 +76,9 @@ final class WarehouseController extends Controller implements CrudInterface
     {
         // Grab the page query-string, defaults to 1
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
-        if ($page < 1) {$page = 1;}
+        if ($page < 1) {
+            $page = 1;
+        }
 
         $perPage    = 5; // configurable
         $warehouses = $this->warehouseService->paginate($page, $perPage);
@@ -297,6 +299,5 @@ final class WarehouseController extends Controller implements CrudInterface
         } else {
             throw new NotFoundException();
         }
-
     }
 }

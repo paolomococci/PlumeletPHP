@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1); // Enforce strict type checking
+declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Frontend\Controllers;
 
@@ -83,7 +83,9 @@ final class ItemController extends Controller implements CrudInterface
     {
         // Grab the page query-string, defaults to 1
         $page = (int) ($request->getQueryParams()['page'] ?? 1);
-        if ($page < 1) {$page = 1;}
+        if ($page < 1) {
+            $page = 1;
+        }
 
         // Configurable items per page.
         $perPage = 5;
@@ -193,6 +195,11 @@ final class ItemController extends Controller implements CrudInterface
      */
     public function create(ServerRequestInterface $request): ResponseInterface
     {
+        // The middleware is already part of every request!
+        // So, in any controller or view I can access it with:
+        $csrf = $request->getAttribute('csrf');
+        $token = $csrf->getToken();
+
         // POST request indicates form submission.
         if ($request->getMethod() === 'POST') {
             $parameters = $request->getParsedBody();
@@ -217,6 +224,7 @@ final class ItemController extends Controller implements CrudInterface
             [
                 'view_title' => 'New item',
                 'datetime'   => $this->datetime->format('l'),
+                'csrf_token'  => $token,
             ]
         );
     }
@@ -262,6 +270,11 @@ final class ItemController extends Controller implements CrudInterface
      */
     public function update(ServerRequestInterface $request, array $args): ResponseInterface
     {
+        // Il middleware già fa parte di ogni request!
+        // Quindi, in qualsiasi controller o vista vi si può accedere con il seguente codice:
+        $csrf = $request->getAttribute('csrf');
+        $token = $csrf->getToken();
+
         // POST indicates form submission for updating.
         if ($request->getMethod() === 'POST') {
 
@@ -296,6 +309,7 @@ final class ItemController extends Controller implements CrudInterface
                         'price'       => $item->getPrice(),
                         'currency'    => $item->getCurrency(),
                         'description' => $item->getDescription(),
+                        'csrf_token'  => $token,
                     ]
                 );
             } else {
@@ -314,16 +328,56 @@ final class ItemController extends Controller implements CrudInterface
      */
     public function delete(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        // Delegate deletion to the service layer.
-        $deleted = $this->itemService->delete($args['id']);
+        // The middleware is already part of every request!
+        // So, in any controller or view I can access it with:
+        $csrf = $request->getAttribute('csrf');
+        $token = $csrf->getToken();
 
-        if ($deleted) {
-            // After deletion, show the index page.
-            return $this->index();
+        // POST indicates form submission for deleting.
+        if ($request->getMethod() === 'POST') {
+            $parameters = $request->getParsedBody();
+
+            // Build an Item instance with the updated values.
+            $item = Item::create();
+            $item->setId(htmlspecialchars($parameters['id']));
+
+            // Persist changes via the service.
+            $deleted = $this->itemService->delete($item->getId());
+
+            // After deleted, display the updated items.
+            if ($deleted) {
+                // Gets the URI of the request just made.
+                $uri = $request->getUri();
+                // I create a new immutable object to point the browser to the index page.
+                $itemsUri = $uri->withPath('/items');
+                // After deletion, show the paginate page.
+                return $this->paginate($request->withUri($itemsUri));
+            } else {
+                // Item not found - 404
+                throw new NotFoundException();
+            }
         } else {
-            // Item not found - 404
-            throw new NotFoundException();
-        }
+            // For GET request, fetch current data to pre-populate the form.
+            $item = $this->itemService->read($args['id']);
 
+            if ($item !== null) {
+                return $this->render(
+                    'Item/delete',
+                    [
+                        'view_title'  => 'Delete item',
+                        'datetime'    => $this->datetime->format('l'),
+                        'id'          => $item->getId(),
+                        'name'        => $item->getName(),
+                        'price'       => $item->getPrice(),
+                        'currency'    => $item->getCurrency(),
+                        'description' => $item->getDescription(),
+                        'csrf_token'  => $token,
+                    ]
+                );
+            } else {
+                // 404
+                throw new NotFoundException();
+            }
+        }
     }
 }

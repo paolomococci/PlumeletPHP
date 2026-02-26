@@ -1,12 +1,13 @@
 <?php
-declare (strict_types = 1); // Enforce strict type checking
 
-namespace App\Util;
+declare(strict_types=1); // Enforce strict type checking
+
+namespace App\Util\Handlers;
 
 /**
  * Pagination
  */
-final class Pagination
+final class PaginationHandler
 {
     /**
      * __construct
@@ -24,7 +25,6 @@ final class Pagination
         if ($this->perPage < 1) {
             throw new \InvalidArgumentException('perPage >= 1');
         }
-
     }
 
     /**

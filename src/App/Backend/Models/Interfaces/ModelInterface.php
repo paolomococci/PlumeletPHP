@@ -1,5 +1,6 @@
 <?php
-declare (strict_types = 1); // Enforce strict type checking
+
+declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Backend\Models\Interfaces;
 
@@ -13,7 +14,7 @@ interface ModelInterface
      * @return string
      */
     public function getId(): string;
-    
+
     /**
      * setId
      *

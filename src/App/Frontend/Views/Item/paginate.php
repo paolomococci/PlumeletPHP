@@ -99,9 +99,9 @@ $this->insert('Components/search', [
                             <!-- Item description, shortened with the ellipsis helper. -->
                             <td><?= $this->e(Item::ellipsisPreserveWords(description: $item->getDescription(), limit: 32) ?? '') ?></td>
                             <!-- Edit link -->
-                            <td><a href="/item/update/<?= $this->e($item->getId()) ?? '' ?>">edit</a></td>
+                            <td><a href="/admin/item/update/<?= $this->e($item->getId()) ?? '' ?>">edit</a></td>
                             <!-- Delete link -->
-                            <td><a href="/item/delete/<?= $this->e($item->getId()) ?? '' ?>">del</a></td>
+                            <td><a href="/admin/item/delete/<?= $this->e($item->getId()) ?? '' ?>">del</a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -123,14 +123,14 @@ $this->insert('Components/search', [
             ?>
 
             <!-- Link to create a new item. -->
-            <p><a href="/item/new">add new item</a></p>
+            <p><a href="/admin/item/new">add new item</a></p>
         </section>
     <?php else: /* No items were found for the current search query */ ?>
         <section>
             <h3><?= $this->e($view_title) ?></h3>
             <hr class="optional">
             <h5>No results found!</h5>
-            <p><a href="/item/new">add new item</a></p>
+            <p><a href="/admin/item/new">add new item</a></p>
         </section>
     <?php endif; ?>
 </section>
