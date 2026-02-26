@@ -13,20 +13,20 @@ enum WarehouseType: string
 {
     // Warehouse is owned by the company itself.
     case OWNED = 'owned';
-        // Warehouse belongs to a supplier.
+    // Warehouse belongs to a supplier.
     case SUPPLIER = 'supplier';
-        // Warehouse belongs to a courier.
+    // Warehouse belongs to a courier.
     case CURRIER = 'currier';
 
     /**
-     * Return a human‑readable label for the enum case.
+     * Return a human-readable label for the enum case.
      *
      * This is handy when you want to display the type in a UI 
      * (e.g. in a <select> element or a table).  
      * The function uses PHP 8.0's `match` expression to
      * map the enum case to a friendly string.
      *
-     * @return string Human‑readable label.
+     * @return string Human-readable label.
      */
     public function label(): string
     {
