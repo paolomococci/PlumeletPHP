@@ -1,40 +1,119 @@
-<?php $this->layout("layout", ['title' => 'Item - Update']); ?>
+<?php
 
-<!-- Contents -->
+use App\Backend\Models\Enums\CurrencyEnum;
+
+// Normalization and default values.
+$form   = $form   ?? [];
+$errors = $errors ?? [];
+
+// Retrieve values from the form, or use empty values, to avoid undefined indices.
+$id          = $form['id']          ?? '';
+$name        = $form['name']        ?? '';
+$description = $form['description'] ?? '';
+$price       = $form['price']       ?? '';
+$currency    = $form['currency']    ?? '';
+
+// Set the layout.
+$this->layout('layout', ['title' => 'Edit Item']);
+?>
 <section>
+    <!-- ------------------------ HEADER ------------------------ -->
     <h3><?= $this->e($view_title) ?></h3>
     <h5><em id="evidence"><?= $this->e($name) ?? 'unset' ?></em></h5>
-    <hr>
-    <form class="box" method="post">
-        <div>
-            <label for="id">ID</label>
-            <input readonly type="text" name="id" id="id" value="<?= isset($id) ? $this->e($id) : 'unset' ?>">
-        </div>
-        <div>
+
+    <!-- ------------------------ FORM ------------------------ -->
+    <form method="post" action="">
+        <!-- Hidden ID – required for the update. -->
+        <input type="hidden" name="id" value="<?= $this->e($id) ?>">
+
+        <!-- Item name. -->
+        <div class="<?= !empty($errors['name']) ? 'error' : '' ?>">
             <label for="name">Name</label>
-            <input type="text" name="name" id="name" value="<?= isset($name) ? $this->e($name) : 'unset' ?>">
+            <input type="text"
+                name="name"
+                id="name"
+                value="<?= $this->e($name) ?>"
+                required>
+            <?php if (!empty($errors['name'])): ?>
+                <small class="error-msg"><?= $this->e($errors['name']) ?></small>
+            <?php endif; ?>
         </div>
-        <div>
-            <label for="price">Price</label>
-            <input type="number" step="0.01" name="price" id="price" value="<?= isset($price) ? $this->e($price) : 'unset' ?>">
-        </div>
-        <div>
-            <label for="currency">Currency</label>
-            <input type="text" name="currency" id="currency" value="<?= isset($currency) ? $this->e($currency) : 'unset' ?>">
-        </div>
-        <div>
+
+        <!-- Description -->
+        <div class="<?= !empty($errors['description']) ? 'error' : '' ?>">
             <label for="description">Description</label>
-            <textarea name="description" id="description"><?= isset($description) ? $this->e($description) : 'unset' ?></textarea>
+            <textarea name="description" id="description" required><?= $this->e($description) ?></textarea>
+            <?php if (!empty($errors['description'])): ?>
+                <small class="error-msg"><?= $this->e($errors['description']) ?></small>
+            <?php endif; ?>
         </div>
+
+        <!-- Price -->
+        <div class="<?= !empty($errors['price']) ? 'error' : '' ?>">
+            <label for="price">Price</label>
+            <input type="text"
+                name="price"
+                id="price"
+                value="<?= $this->e(number_format((float)($price ?? 0), 2, '.', '')) ?>"
+                required
+                pattern="^\d+(\.\d{2})$"
+                inputmode="decimal">
+            <?php if (!empty($errors['price'])): ?>
+                <small class="error-msg"><?= $this->e($errors['price']) ?></small>
+            <?php endif; ?>
+        </div>
+
+        <!-- Currency (datalist + noscript) -->
+        <div class="<?= !empty($errors['currency']) ? 'error' : '' ?>">
+            <label for="currency">Currency</label>
+            <input type="text"
+                name="currency"
+                id="currency"
+                list="currencyList"
+                value="<?= $this->e($currency) ?>"
+                placeholder="EUR, USD, …"
+                autocomplete="off"
+                required>
+
+            <datalist id="currencyList">
+                <?php foreach (CurrencyEnum::cases() as $case): ?>
+                    <option value="<?= $this->e($case->value) ?>"></option>
+                <?php endforeach; ?>
+            </datalist>
+
+            <noscript>
+                <select name="currency" id="currency" required>
+                    <?php foreach (CurrencyEnum::cases() as $case): ?>
+                        <?php
+                        $value        = $case->value;
+                        $label        = strtoupper($value);
+                        $selectedAttr = ($value === $currency) ? 'selected' : '';
+                        ?>
+                        <option value="<?= $this->e($value) ?>" <?= $selectedAttr ?>><?= $this->e($label) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </noscript>
+
+            <?php if (!empty($errors['currency'])): ?>
+                <small class="error-msg"><?= $this->e($errors['currency']) ?></small>
+            <?php endif; ?>
+        </div>
+
+        <!-- CSRF token -->
         <input type="hidden" name="csrf_token" value="<?= $this->e($csrf_token) ?>">
+
+        <!-- Submit button. -->
         <button type="submit">Update</button>
     </form>
-    <h5>today is: <?= $datetime ?></h5>
+
+    <!-- Info -->
+    <h5>today is: <?= $this->e($datetime) ?></h5>
     <hr>
-    <p><a href="/items">items</a></p>
+    <p><a href="/items">back to list</a></p>
 </section>
 
 <style>
+    /* Styles for the layout and appearance of the form fields. */
     #evidence {
         /* mix 90% of the original color with 10% red */
         background-color: color-mix(in srgb, var(--bg) 90%, red 10%);
@@ -50,5 +129,18 @@
         padding: 0.25rem 0.5rem;
         margin: 0.25rem;
         border-radius: 0.25rem;
+    }
+
+    /* Classes to apply red colors and borders when there are form validation errors. */
+    .error input,
+    .error textarea,
+    .error select,
+    .error small {
+        border-color: #c22;
+    }
+
+    .error-msg {
+        color: #c22;
+        font-size: 0.7rem;
     }
 </style>

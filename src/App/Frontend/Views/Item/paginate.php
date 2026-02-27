@@ -93,7 +93,8 @@ $this->insert('Components/search', [
                                 </a>
                             </td>
                             <!-- Item price (converted to string for consistency). -->
-                            <td><?= $this->e((string)$item->getPrice() ?? '') ?></td>
+                            <!-- number_format(value retrieved from the DB or zero if null, number of decimals, decimal separator, thousands separator) -->
+                            <td><?= $this->e(number_format((float)$item->getPrice() ?? 0, 2, '.', '')) ?></td>
                             <!-- Item currency (converted to string for consistency). -->
                             <td><?= $this->e((string)$item->getCurrency() ?? '') ?></td>
                             <!-- Item description, shortened with the ellipsis helper. -->

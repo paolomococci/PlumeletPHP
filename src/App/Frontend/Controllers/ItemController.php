@@ -312,48 +312,94 @@ final class ItemController extends Controller implements CrudInterface
         $csrf = $request->getAttribute('csrf');
         $token = $csrf->getToken();
 
-        // POST indicates form submission for updating.
+        // POST request indicates form submission.
         if ($request->getMethod() === 'POST') {
 
             $parameters = $request->getParsedBody();
 
-            // Build an Item instance with the updated values.
-            $item = Item::create();
-            $item->setId(htmlspecialchars($parameters['id']));
-            $item->setName(htmlspecialchars($parameters['name']));
-            $item->setDescription(htmlspecialchars($parameters['description']));
-            $item->setPrice((float) htmlspecialchars($parameters['price']));
-            $item->setCurrency(htmlspecialchars($parameters['currency']));
+            // ------------- 1. Normalization ----------
+            $id          = $parameters['id']          ?? '';
+            $name        = $parameters['name']        ?? '';
+            $description = $parameters['description'] ?? '';
+            $price       = $parameters['price']       ?? '';
+            $currency    = $parameters['currency']    ?? '';
 
-            // Persist changes via the service.
-            $id = $this->itemService->update($item);
+            // ------------- 2. Sanitization -----------
+            $id          = htmlspecialchars((string) $id,        ENT_QUOTES, 'UTF-8');
+            $name        = htmlspecialchars((string) $name,      ENT_QUOTES, 'UTF-8');
+            $description = htmlspecialchars((string) $description, ENT_QUOTES, 'UTF-8');
+            // Convert the string 'price' to a float.
+            $price       = (float) htmlspecialchars((string) $price, ENT_QUOTES, 'UTF-8');
+            // currency è lasciato “raw” per la validazione enum.
+            $currency    = (string) $currency;
 
-            // After updating, display the updated item.
-            $id = $item->getId();
-            return $this->read($request, ['id' => $id]);
-        } else {
-            // For GET request, fetch current data to pre-populate the form.
-            $item = $this->itemService->read($args['id']);
+            // ------------- 3. Enum validation ----------
+            $errors = [];
+            if (!CurrencyEnum::isValid($currency)) {
+                $errors['currency'] = 'Invalid currency!';
+            }
 
-            if ($item !== null) {
+            // If there are any errors, re-render the form.
+            if ($errors) {
                 return $this->render(
                     'Item/update',
                     [
-                        'view_title'  => 'Edit item',
+                        'view_title'  => 'Modifica articolo',
                         'datetime'    => $this->datetime->format('l'),
-                        'id'          => $item->getId(),
-                        'name'        => $item->getName(),
-                        'price'       => $item->getPrice(),
-                        'currency'    => $item->getCurrency(),
-                        'description' => $item->getDescription(),
                         'csrf_token'  => $token,
+                        'errors'      => $errors,
+                        // Passes the already cleaned values ​​so the user does not have to re-enter them.
+                        'form'        => [
+                            'id'          => $id,
+                            'name'        => $name,
+                            'description' => $description,
+                            'price'       => $price,
+                            'currency'    => $currency,
+                        ],
                     ]
                 );
-            } else {
-                // 404
-                throw new NotFoundException();
             }
+
+            // ------------- 4. Update of the Item ----------
+            $item = Item::create();
+            $item->setId($id);
+            $item->setName($name);
+            $item->setDescription($description);
+            $item->setPrice($price);
+            // Save the enum value, not the string representation.
+            $item->setCurrency(CurrencyEnum::from(strtoupper($currency))->value);
+
+            // Update the database using the service method.
+            $this->itemService->update($item);
+
+            // Redirect to the item details page.
+            return $this->redirect("/item/{$item->getId()}");
         }
+
+        // Display the form with the current values.
+        $id  = $args['id'] ?? null;
+        $item = $this->itemService->read($id);
+
+        if ($item === null) {
+            // 404
+            throw new NotFoundException();
+        }
+
+        return $this->render(
+            'Item/update',
+            [
+                'view_title'  => 'Modifica articolo',
+                'datetime'    => $this->datetime->format('l'),
+                'csrf_token'  => $token,
+                'form'        => [
+                    'id'          => $item->getId(),
+                    'name'        => $item->getName(),
+                    'description' => $item->getDescription(),
+                    'price'       => $item->getPrice(),
+                    'currency'    => $item->getCurrency(),
+                ],
+            ]
+        );
     }
 
     /**
