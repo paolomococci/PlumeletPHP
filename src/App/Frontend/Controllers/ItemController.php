@@ -4,6 +4,7 @@ declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Frontend\Controllers;
 
+use App\Backend\Models\Enums\CurrencyEnum;
 use App\Backend\Models\Item;
 use App\Frontend\Controllers\Controller;
 use App\Frontend\Controllers\Interfaces\CrudInterface;
@@ -204,17 +205,53 @@ final class ItemController extends Controller implements CrudInterface
         if ($request->getMethod() === 'POST') {
             $parameters = $request->getParsedBody();
 
-            // Build a new Item instance from submitted data.
+            // ------------- 1. Normalization ----------
+            $name        = $parameters['name']        ?? '';
+            $description = $parameters['description'] ?? '';
+            $price       = $parameters['price']       ?? '';
+            $currency    = $parameters['currency']    ?? '';
+
+            // ------------- 2. Sanitization -----------
+            $name        = htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8');
+            $description = htmlspecialchars((string) $description, ENT_QUOTES, 'UTF-8');
+            $price       = (float) htmlspecialchars((string) $price, ENT_QUOTES, 'UTF-8');
+            // Keep raw for validation.
+            $currency    = (string) $currency;
+
+            // ------------- 3. Enum validation ----------
+            if (!CurrencyEnum::isValid($currency)) {
+                // Error: does not create item, redirects form with message.
+                $errors = [
+                    'currency' => "Invalid currency!",
+                ];
+
+                return $this->render(
+                    'Item/create',
+                    [
+                        'view_title' => 'New item',
+                        'datetime'   => $this->datetime->format('l'),
+                        'csrf_token' => $token,
+                        'errors'     => $errors,
+                        // Passes the already cleaned values ​​so the user does not have to re-enter them.
+                        'form'       => [
+                            'name'        => $name,
+                            'description' => $description,
+                            'price'       => $price,
+                            'currency'    => $currency,
+                        ],
+                    ]
+                );
+            }
+
+            // ------------- 4. Creation of the Item ----------
             $item = Item::create();
-            $item->setName(htmlspecialchars($parameters['name']));
-            $item->setDescription(htmlspecialchars($parameters['description']));
-            $item->setPrice((float) htmlspecialchars($parameters['price']));
-            $item->setCurrency(htmlspecialchars($parameters['currency']));
+            $item->setName($name);
+            $item->setDescription($description);
+            $item->setPrice($price);
+            // Save the enum value, not the string representation.
+            $item->setCurrency(CurrencyEnum::from(strtoupper($currency))->value);
 
-            // Persist the new item via the service; returns the new id.
             $id = $this->itemService->create($item);
-
-            // Redirect to the newly created item’s detail page.
             return $this->redirect("/item/{$id}");
         }
 
@@ -224,7 +261,7 @@ final class ItemController extends Controller implements CrudInterface
             [
                 'view_title' => 'New item',
                 'datetime'   => $this->datetime->format('l'),
-                'csrf_token'  => $token,
+                'csrf_token' => $token,
             ]
         );
     }
@@ -270,8 +307,8 @@ final class ItemController extends Controller implements CrudInterface
      */
     public function update(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        // Il middleware già fa parte di ogni request!
-        // Quindi, in qualsiasi controller o vista vi si può accedere con il seguente codice:
+        // The middleware is already part of every request!
+        // So, in any controller or view I can access it with:
         $csrf = $request->getAttribute('csrf');
         $token = $csrf->getToken();
 
