@@ -9,7 +9,7 @@ namespace App\Backend\Models\Enums;
  *
  * The enum’s values match the `type` column in the `warehouses_tbl` table.
  */
-enum WarehouseType: string
+enum WarehouseTypeEnum: string
 {
     // Warehouse is owned by the company itself.
     case OWNED = 'owned';

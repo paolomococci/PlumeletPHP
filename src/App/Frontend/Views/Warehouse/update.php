@@ -1,6 +1,6 @@
 <?php
 
-use App\Backend\Models\Enums\WarehouseType;
+use App\Backend\Models\Enums\WarehouseTypeEnum;
 
 $this->layout("layout", ['title' => 'Warehouse - Update']);
 $selected = $parameters['warehouseType'] ?? '';
@@ -30,9 +30,9 @@ $selected = $parameters['warehouseType'] ?? '';
         <div>
             <label for="warehouseType">Type</label>
             <select name="warehouseType" id="warehouseType">
-                <option value="<?= isset($type) ? $this->e($type) : WarehouseType::OWNED->value ?>">- <?= isset($type) ? $this->e(ucfirst(strtolower($type))) : 'Choose a type' ?> -</option>
-                <!-- WarehouseType::cases(): array<WarehouseType>, Returns an array with all defined cases. -->
-                <?php foreach (WarehouseType::cases() as $case): ?>
+                <option value="<?= isset($type) ? $this->e($type) : WarehouseTypeEnum::OWNED->value ?>">- <?= isset($type) ? $this->e(ucfirst(strtolower($type))) : 'Choose a type' ?> -</option>
+                <!-- WarehouseTypeEnum::cases(): array<WarehouseTypeEnum>, Returns an array with all defined cases. -->
+                <?php foreach (WarehouseTypeEnum::cases() as $case): ?>
                     <?php
                     // The value to be saved in the database.
                     $value        = $case->value;

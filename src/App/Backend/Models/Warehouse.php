@@ -4,7 +4,7 @@ declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Backend\Models;
 
-use App\Backend\Models\Enums\WarehouseType;
+use App\Backend\Models\Enums\WarehouseTypeEnum;
 use App\Backend\Models\Interfaces\ModelInterface;
 use DateTimeImmutable;
 use InvalidArgumentException;
@@ -176,6 +176,6 @@ final class Warehouse extends Model implements ModelInterface
      */
     public function setType(string $type): void
     {
-        $this->type = WarehouseType::tryFrom($type)->value;
+        $this->type = WarehouseTypeEnum::tryFrom($type)->value;
     }
 }
