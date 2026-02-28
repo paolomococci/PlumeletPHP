@@ -100,12 +100,23 @@ enum CurrencyEnum: string
     case WST = 'WST';
     case XCD = 'XCD';
     case XPF = 'XPF';
-
+    
+    /**
+     * isValid
+     *
+     * @param  mixed $code
+     * @return bool
+     */
     public static function isValid(string $code): bool
     {
         return self::tryFrom(strtoupper($code)) !== null;
     }
-
+    
+    /**
+     * country
+     *
+     * @return string
+     */
     public function country(): string
     {
         return match($this) {

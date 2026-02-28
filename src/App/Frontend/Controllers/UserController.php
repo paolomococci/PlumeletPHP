@@ -45,6 +45,9 @@ final class UserController extends Controller implements CrudInterface
     /**
      * index
      *
+     * Handles a GET request for the root resource (e.g. /users).
+     * Delegates data retrieval to the service and renders the list view.
+     *
      * @return ResponseInterface
      */
     public function index(): ResponseInterface
@@ -52,6 +55,7 @@ final class UserController extends Controller implements CrudInterface
         // The service class can be used to retrieve the complete list of users.
         $users = $this->userService->index();
 
+        // Render the template and pass necessary data.
         return $this->render(
             'User/index',
             [
@@ -59,6 +63,7 @@ final class UserController extends Controller implements CrudInterface
                 'datetime'   => $this->datetime->format('l'),
                 'users'      => $users,
             ]
+            // HTTP 200 OK
         )->withStatus(200);
     }
 
@@ -182,26 +187,46 @@ final class UserController extends Controller implements CrudInterface
      */
     public function create(ServerRequestInterface $request): ResponseInterface
     {
+        // The middleware is already part of every request!
+        // So, in any controller or view I can access it with:
+        $csrf  = $request->getAttribute('csrf');
+        $token = $csrf->getToken();
+
+        // POST request indicates form submission.
         if ($request->getMethod() === 'POST') {
             $parameters = $request->getParsedBody();
 
-            // Build a new User instance from submitted data.
+            // ------------- 1. Normalization ----------
+            $name     = $parameters['name'] ?? '';
+            $email    = $parameters['email'] ?? '';
+            $password = $parameters['password'] ?? '';
+
+            // ------------- 2. Sanitization -----------
+            $name     = htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8');
+            $email    = htmlspecialchars((string) $email, ENT_QUOTES, 'UTF-8');
+            $password = htmlspecialchars((string) $password, ENT_QUOTES, 'UTF-8');
+
+            // ------------- 3. TODO: validation ----------
+
+            // ------------- 4. Creation of the User ----------
             $user = User::create();
-            $user->setName(htmlspecialchars($parameters['name']));
-            $user->setEmail(htmlspecialchars($parameters['email']));
-            $user->setPlainPassword(htmlspecialchars($parameters['password']));
+            $user->setName($name);
+            $user->setEmail($email);
+            $user->setPlainPassword($password);
+
             // Save the new user using the service class, which expects an argument compatible with the model interface.
             $id = $this->userService->create($user);
 
             return $this->redirect("/user/{$id}");
         }
 
-        // Returns the content of the body as a string.
+        // Render the form for creating a new user.
         return $this->render(
             'User/create',
             [
                 'view_title' => 'New user',
                 'datetime'   => $this->datetime->format('l'),
+                'csrf_token' => $token,
             ]
         );
     }

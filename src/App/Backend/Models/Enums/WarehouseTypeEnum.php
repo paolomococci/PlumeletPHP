@@ -17,6 +17,17 @@ enum WarehouseTypeEnum: string
     case SUPPLIER = 'supplier';
     // Warehouse belongs to a courier.
     case CURRIER = 'currier';
+    
+    /**
+     * isValid
+     *
+     * @param  mixed $type
+     * @return bool
+     */
+    public static function isValid(string $type): bool
+    {
+        return self::tryFrom(strtolower($type)) !== null;
+    }
 
     /**
      * Return a human-readable label for the enum case.
