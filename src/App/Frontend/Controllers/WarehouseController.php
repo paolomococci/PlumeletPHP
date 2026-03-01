@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1); // Enforce strict type checking
+declare (strict_types = 1); // Enforce strict type checking
 
 namespace App\Frontend\Controllers;
 
@@ -198,20 +198,20 @@ final class WarehouseController extends Controller implements CrudInterface
             $parameters = $request->getParsedBody();
 
             // ------------- 1. Normalization ----------
-            $name          = $parameters['name'] ?? '';
-            $address       = $parameters['address'] ?? '';
-            $email         = $parameters['email'] ?? '';
-            $warehouseType = $parameters['warehouseType'] ?? '';
+            $name    = $parameters['name'] ?? '';
+            $address = $parameters['address'] ?? '';
+            $email   = $parameters['email'] ?? '';
+            $type    = $parameters['warehouseType'] ?? '';
 
             // ------------- 2. Sanitization -----------
-            $name          = htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8');
-            $address       = htmlspecialchars((string) $address, ENT_QUOTES, 'UTF-8');
-            $email         = htmlspecialchars((string) $email, ENT_QUOTES, 'UTF-8');
-            $warehouseType = htmlspecialchars((string) $warehouseType, ENT_QUOTES, 'UTF-8');
+            $name    = htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8');
+            $address = htmlspecialchars((string) $address, ENT_QUOTES, 'UTF-8');
+            $email   = htmlspecialchars((string) $email, ENT_QUOTES, 'UTF-8');
+            $type    = htmlspecialchars((string) $type, ENT_QUOTES, 'UTF-8');
 
             // ------------- 3. warehouse type validation ----------
-            if (! WarehouseTypeEnum::isValid($warehouseType)) {
-                // Error: does not create item, redirects form with message.
+            if (! WarehouseTypeEnum::isValid($type)) {
+                // Error: does not create warehouse, redirects form with message.
                 $errors = [
                     'warehouseType' => "Invalid warehouseType!",
                 ];
@@ -219,7 +219,7 @@ final class WarehouseController extends Controller implements CrudInterface
                 return $this->render(
                     'Warehouse/create',
                     [
-                        'view_title' => 'New item',
+                        'view_title' => 'New warehouse',
                         'datetime'   => $this->datetime->format('l'),
                         'csrf_token' => $token,
                         'errors'     => $errors,
@@ -228,7 +228,7 @@ final class WarehouseController extends Controller implements CrudInterface
                             'name'          => $name,
                             'address'       => $address,
                             'email'         => $email,
-                            'warehouseType' => $warehouseType,
+                            'warehouseType' => $type,
                         ],
                     ]
                 );
@@ -239,7 +239,7 @@ final class WarehouseController extends Controller implements CrudInterface
             $warehouse->setName($name);
             $warehouse->setAddress($address);
             $warehouse->setEmail($email);
-            $warehouse->setType($warehouseType);
+            $warehouse->setType($type);
 
             // Save the new warehouse using the service class, which expects an argument compatible with the model interface.
             $id = $this->warehouseService->create($warehouse);
@@ -293,45 +293,99 @@ final class WarehouseController extends Controller implements CrudInterface
      */
     public function update(ServerRequestInterface $request, array $args): ResponseInterface
     {
+        // The middleware is already part of every request!
+        // So, in any controller or view I can access it with:
+        $csrf  = $request->getAttribute('csrf');
+        $token = $csrf->getToken();
 
+        // POST request indicates form submission.
         if ($request->getMethod() === 'POST') {
 
             $parameters = $request->getParsedBody();
 
-            // Build an Warehouse instance with the updated values.
-            $warehouse = Warehouse::create();
-            $warehouse->setId(htmlspecialchars($parameters['id']));
-            $warehouse->setName(htmlspecialchars($parameters['name']));
-            $warehouse->setAddress(htmlspecialchars($parameters['address']));
-            $warehouse->setEmail(htmlspecialchars($parameters['email']));
-            $warehouse->setType(htmlspecialchars($parameters['warehouseType']));
+            // ------------- 1. Normalization ----------
+            $id      = $parameters['id'] ?? '';
+            $name    = $parameters['name'] ?? '';
+            $address = $parameters['address'] ?? '';
+            $email   = $parameters['email'] ?? '';
+            $type    = $parameters['warehouseType'] ?? '';
 
-            // Apply the changes using the service class.
-            $id = $this->warehouseService->update($warehouse);
+            // ------------- 2. Sanitization -----------
+            $id      = htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8');
+            $name    = htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8');
+            $address = htmlspecialchars((string) $address, ENT_QUOTES, 'UTF-8');
+            // Convert the string 'email' to a float.
+            $email = htmlspecialchars((string) $email, ENT_QUOTES, 'UTF-8');
+            // type is left raw for enum validation.
+            $type = (string) $type;
 
-            $id = $warehouse->getId();
-            return $this->read($request, ['id' => $id]);
-        } else {
+            // ------------- 3. Enum validation ----------
+            $errors = [];
+            if (! WarehouseTypeEnum::isValid($type)) {
+                $errors['type'] = 'Invalid type!';
+            }
 
-            $warehouse = $this->warehouseService->read($args['id']);
-
-            if ($warehouse !== null) {
+            // If there are any errors, re-render the form.
+            if ($errors) {
                 return $this->render(
                     'Warehouse/update',
                     [
                         'view_title' => 'Edit warehouse',
                         'datetime'   => $this->datetime->format('l'),
-                        'id'         => $warehouse->getId(),
-                        'name'       => $warehouse->getName(),
-                        'address'    => $warehouse->getAddress(),
-                        'email'      => $warehouse->getEmail(),
-                        'type'       => $warehouse->getType(),
+                        'csrf_token' => $token,
+                        'errors'     => $errors,
+                        // Passes the already cleaned values ​​so the user does not have to re-enter them.
+                        'form'       => [
+                            'id'      => $id,
+                            'name'    => $name,
+                            'address' => $address,
+                            'email'   => $email,
+                            'type'    => $type,
+                        ],
                     ]
                 );
-            } else {
-                throw new NotFoundException();
             }
+
+            // ------------- 4. Update of the Warehouse ----------
+            $warehouse = Warehouse::create();
+            $warehouse->setId($id);
+            $warehouse->setName($name);
+            $warehouse->setAddress($address);
+            $warehouse->setEmail($email);
+            // Save the enum value, not the string representation.
+            $warehouse->setType(WarehouseTypeEnum::from(strtolower($type))->value);
+
+            // Update the database using the service method.
+            $this->warehouseService->update($warehouse);
+
+            // Redirect to the warehouse details page.
+            return $this->redirect("/warehouse/{$warehouse->getId()}");
         }
+
+        // Display the form with the current values.
+        $id        = $args['id'] ?? null;
+        $warehouse = $this->warehouseService->read($id);
+
+        if ($warehouse === null) {
+            // 404
+            throw new NotFoundException();
+        }
+
+        return $this->render(
+            'Warehouse/update',
+            [
+                'view_title' => 'Edit warehouse',
+                'datetime'   => $this->datetime->format('l'),
+                'csrf_token' => $token,
+                'form'       => [
+                    'id'      => $warehouse->getId(),
+                    'name'    => $warehouse->getName(),
+                    'address' => $warehouse->getAddress(),
+                    'email'   => $warehouse->getEmail(),
+                    'type'    => $warehouse->getType(),
+                ],
+            ]
+        );
     }
 
     /**

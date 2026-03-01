@@ -16,6 +16,7 @@ $currency    = $form['currency']    ?? '';
 // Set the layout.
 $this->layout('layout', ['title' => 'Edit Item']);
 ?>
+
 <section>
     <!-- ------------------------ HEADER ------------------------ -->
     <h3><?= $this->e($view_title) ?></h3>

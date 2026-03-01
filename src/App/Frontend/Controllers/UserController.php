@@ -264,41 +264,66 @@ final class UserController extends Controller implements CrudInterface
      */
     public function update(ServerRequestInterface $request, array $args): ResponseInterface
     {
+        // The middleware is already part of every request!
+        // So, in any controller or view I can access it with:
+        $csrf  = $request->getAttribute('csrf');
+        $token = $csrf->getToken();
+
+        // POST request indicates form submission.
         if ($request->getMethod() === 'POST') {
 
             $parameters = $request->getParsedBody();
 
-            // Build an User instance with the updated values.
+            // ------------- 1. Normalization ----------
+            $id       = $parameters['id'] ?? '';
+            $name     = $parameters['name'] ?? '';
+            $email    = $parameters['email'] ?? '';
+            $password = $parameters['password'] ?? '';
+
+            // ------------- 2. Sanitization -----------
+            $id    = htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8');
+            $name  = htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars((string) $email, ENT_QUOTES, 'UTF-8');
+            $password = (string) $password;
+
+            // ------------- 3. TODO: validation ----------
+
+            // ------------- 4. Update of the User ----------
             $user = User::create();
-            $user->setId(htmlspecialchars($parameters['id']));
-            $user->setName(htmlspecialchars($parameters['name']));
-            $user->setEmail(htmlspecialchars($parameters['email']));
-            $user->setPlainPassword(htmlspecialchars($parameters['password']));
+            $user->setId($id);
+            $user->setName($name);
+            $user->setEmail($email);
+            $user->setPlainPassword($password);
 
-            // Apply the changes using the service class.
-            $id = $this->userService->update($user);
+            // Update the database using the service method.
+            $this->userService->update($user);
 
-            $id = $user->getId();
-            return $this->read($request, ['id' => $id]);
-        } else {
-
-            $user = $this->userService->read($args['id']);
-
-            if ($user !== null) {
-                return $this->render(
-                    'User/update',
-                    [
-                        'view_title' => 'Edit user',
-                        'datetime'   => $this->datetime->format('l'),
-                        'id'         => $user->getId(),
-                        'name'       => $user->getName(),
-                        'email'      => $user->getEmail(),
-                    ]
-                );
-            } else {
-                throw new NotFoundException();
-            }
+            // Redirect to the user details page.
+            return $this->redirect("/user/{$user->getId()}");
         }
+
+        // Display the form with the current values.
+        $id   = $args['id'] ?? null;
+        $user = $this->userService->read($id);
+
+        if ($user === null) {
+            // 404
+            throw new NotFoundException();
+        }
+
+        return $this->render(
+            'User/update',
+            [
+                'view_title' => 'Edit user',
+                'datetime'   => $this->datetime->format('l'),
+                'csrf_token' => $token,
+                'form'       => [
+                    'id'       => $user->getId(),
+                    'name'     => $user->getName(),
+                    'email'    => $user->getEmail(),
+                ],
+            ]
+        );
     }
 
     /**

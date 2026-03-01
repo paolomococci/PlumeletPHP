@@ -2,31 +2,50 @@
 
 use App\Backend\Models\Enums\WarehouseTypeEnum;
 
+// Normalization and default values.
+$form   = $form   ?? [];
+$errors = $errors ?? [];
+
+// Retrieve values from the form, or use empty values, to avoid undefined indices.
+$id             = $form['id']       ?? '';
+$name           = $form['name']     ?? '';
+$address        = $form['address']  ?? '';
+$email          = $form['email']    ?? '';
+$selected       = $form['type']     ?? '';
+
+// Set the layout.
 $this->layout("layout", ['title' => 'Warehouse - Update']);
-$selected = $parameters['warehouseType'] ?? '';
 ?>
 
-<!-- Contents -->
 <section>
+    <!-- ------------------------ HEADER ------------------------ -->
     <h3><?= $this->e($view_title) ?></h3>
-    <hr>
-    <form method="post">
-        <div>
-            <label for="id">ID</label>
-            <input readonly type="text" name="id" id="id" value="<?= isset($id) ? $this->e($id) : 'unset' ?>">
-        </div>
+    <h5><em id="evidence"><?= $this->e($name) ?? 'unset' ?></em></h5>
+
+    <!-- ------------------------ FORM ------------------------ -->
+    <form class="box" method="post" action="">
+        <!-- Hidden ID – required for the update. -->
+        <input type="hidden" name="id" value="<?= $this->e($id) ?>">
+
+        <!-- Warehouse name. -->
         <div>
             <label for="name">Name</label>
             <input type="text" name="name" id="name" value="<?= isset($name) ? $this->e($name) : 'unset' ?>">
         </div>
+
+        <!-- Address -->
         <div>
             <label for="address">Address</label>
             <input type="text" name="address" id="address" value="<?= isset($address) ? $this->e($address) : 'unset' ?>">
         </div>
+
+        <!-- Email -->
         <div>
             <label for="email">Email</label>
             <input type="email" name="email" id="email" value="<?= isset($email) ? $this->e($email) : 'unset' ?>">
         </div>
+
+        <!-- Type -->
         <div>
             <label for="warehouseType">Type</label>
             <select name="warehouseType" id="warehouseType">
@@ -45,10 +64,73 @@ $selected = $parameters['warehouseType'] ?? '';
                     </option>
                 <?php endforeach; ?>
             </select>
+
+            <?php if (!empty($errors['type'])): ?>
+                <small class="error-msg"><?= $this->e($errors['type']) ?></small>
+            <?php endif; ?>
         </div>
-        <button type="submit">Update</button>
+
+        <!-- CSRF token -->
+        <input type="hidden" name="csrf_token" value="<?= $this->e($csrf_token) ?>">
+
+        <!-- Submit button. -->
+        <button class="btn" type="submit">Update</button>
     </form>
+
+    <!-- Info -->
     <h5>today is: <?= $datetime ?></h5>
     <hr>
     <p><a href="/warehouses">warehouses</a></p>
 </section>
+
+<style>
+    /* Styles for the layout and appearance of the form fields. */
+    #evidence {
+        /* mix 90% of the original color with 10% red */
+        background-color: color-mix(in srgb, var(--bg) 90%, red 10%);
+        padding: 0.25rem 0.5rem;
+        margin: 0.25rem;
+        border-radius: 0.25rem;
+    }
+
+    .box {
+        /* mix 95% of the original color with 5% red */
+        background-color: color-mix(in srgb, var(--bg) 95%, red 5%);
+        list-style: none;
+        padding: 0.25rem 0.5rem;
+        margin: 0.25rem;
+        border-radius: 0.25rem;
+    }
+
+    /* Classes to apply red colors and borders when there are form validation errors. */
+    .error input,
+    .error textarea,
+    .error select,
+    .error small {
+        border-color: #c22;
+    }
+
+    .error-msg {
+        color: #c22;
+        font-size: 0.7rem;
+    }
+
+    /* Button update: bright red. */
+    .btn {
+        background: linear-gradient(180deg, #f66 0%, #eee 100%);
+        transition:
+            background-position 180ms ease,
+            box-shadow 180ms ease;
+        background-size: 100% 200%;
+        background-position: top;
+        margin-top: 0.5rem;
+    }
+
+    /* hover/focus for accessibility. */
+    .btn:hover,
+    .btn:focus {
+        background-position: bottom;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        outline: none;
+    }
+</style>
