@@ -333,13 +333,54 @@ final class UserController extends Controller implements CrudInterface
      */
     public function delete(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        // Delete the user using the service class.
-        $deleted = $this->userService->delete($args['id']);
+        // The middleware is already part of every request!
+        // So, in any controller or view I can access it with:
+        $csrf = $request->getAttribute('csrf');
+        $token = $csrf->getToken();
 
-        if ($deleted) {
-            return $this->index();
+        // POST indicates form submission for deleting.
+        if ($request->getMethod() === 'POST') {
+            $parameters = $request->getParsedBody();
+
+            // Build an User instance with the updated values.
+            $user = User::create();
+            $user->setId(htmlspecialchars($parameters['id']));
+
+            // Persist changes via the service.
+            $deleted = $this->userService->delete($user->getId());
+
+            // After deleted, display the updated users.
+            if ($deleted) {
+                // Gets the URI of the request just made.
+                $uri = $request->getUri();
+                // I create a new immutable object to point the browser to the index page.
+                $usersUri = $uri->withPath('/users');
+                // After deletion, show the paginate page.
+                return $this->paginate($request->withUri($usersUri));
+            } else {
+                // User not found - 404
+                throw new NotFoundException();
+            }
         } else {
-            throw new NotFoundException();
+            // For GET request, fetch current data to pre-populate the form.
+            $user = $this->userService->read($args['id']);
+
+            if ($user !== null) {
+                return $this->render(
+                    'User/delete',
+                    [
+                        'view_title'  => 'Delete user',
+                        'datetime'    => $this->datetime->format('l'),
+                        'id'          => $user->getId(),
+                        'name'        => $user->getName(),
+                        'email'       => $user->getEmail(),
+                        'csrf_token'  => $token,
+                    ]
+                );
+            } else {
+                // 404
+                throw new NotFoundException();
+            }
         }
     }
 }

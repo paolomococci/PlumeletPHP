@@ -36,15 +36,15 @@
                             <td><?= $this->e($user->getCreatedAt()->format('d/m/Y \a\t H:i') ?? '') ?></td>
                             <td><?= $this->e($user->getUpdatedAt()->format('jS \of F Y \a\t H:i:s') ?? '') ?></td>
                             <!-- update and delete links -->
-                            <td><a style="text-decoration: none" href="/user/update/<?= $this->e($user->getId()) ?? '' ?>">edit</a></td>
-                            <td><a style="text-decoration: none" href="/user/delete/<?= $this->e($user->getId()) ?? '' ?>">del</a></td>
+                            <td><a style="text-decoration: none" href="/admin/user/update/<?= $this->e($user->getId()) ?? '' ?>">edit</a></td>
+                            <td><a style="text-decoration: none" href="/admin/user/delete/<?= $this->e($user->getId()) ?? '' ?>">del</a></td>
                         </tr>
                     <? endforeach; ?>
                 </tbody>
             </table>
             <h5>today is: <?= $datetime ?></h5>
             <hr>
-            <p><a href="/user/new">add new user</a></p>
+            <p><a href="/admin/user/new">add new user</a></p>
         </section>
     <? else: ?>
         <!-- empty/fallback section -->
@@ -55,7 +55,7 @@
             <hr>
             <h5>today is: <?= $datetime ?></h5>
             <hr>
-            <p><a href="/user/new">add new user</a></p>
+            <p><a href="/admin/user/new">add new user</a></p>
         </section>
     <? endif; ?>
 

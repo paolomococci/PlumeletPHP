@@ -134,7 +134,7 @@ final class User extends Model implements ModelInterface
      * @param  mixed $id
      * @return void
      */
-    public function setId(mixed $id): void
+    public function setId(string $id): void
     {
         $this->id = static::checkSerial($id);
     }

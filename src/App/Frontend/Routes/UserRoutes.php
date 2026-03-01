@@ -23,9 +23,15 @@ final class UserRoutes implements RoutesInterface
     {
         $router->get('/users', [UserController::class, 'paginate']);
         $router->get('/user/search', [UserController::class, 'search']);
-        $router->map(['GET', 'POST'], '/user/new', [UserController::class, 'create']);
         $router->get('/user/{id:number}', [UserController::class, 'read']);
-        $router->map(['GET', 'POST'], '/user/update/{id:number}', [UserController::class, 'update']);
-        $router->get('/user/delete/{id:number}', [UserController::class, 'delete']);
+
+        $router->group(
+            '/admin',
+            function ($router) {
+                $router->map(['GET', 'POST'], '/user/new', [UserController::class, 'create']);
+                $router->map(['GET', 'POST'], '/user/update/{id:number}', [UserController::class, 'update']);
+                $router->map(['GET', 'POST'], '/user/delete/{id:number}', [UserController::class, 'delete']);
+            }
+        );
     }
 }

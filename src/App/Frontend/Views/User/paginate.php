@@ -86,8 +86,8 @@ $this->insert('Components/search', [
                             <td><a href="/user/<?= $this->e($user->getId() ?? '') ?>">
                                     <?= $this->e($user->getName() ?? '') ?>
                                 </a></td>
-                            <td><a href="/user/update/<?= $this->e($user->getId()) ?? '' ?>">edit</a></td>
-                            <td><a href="/user/delete/<?= $this->e($user->getId()) ?? '' ?>">del</a></td>
+                            <td><a href="/admin/user/update/<?= $this->e($user->getId()) ?? '' ?>">edit</a></td>
+                            <td><a href="/admin/user/delete/<?= $this->e($user->getId()) ?? '' ?>">del</a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -108,14 +108,14 @@ $this->insert('Components/search', [
             ]);
             ?>
 
-            <p><a href="/user/new">add new user</a></p>
+            <p><a href="/admin/user/new">add new user</a></p>
         </section>
     <?php else: ?>
         <section>
             <h3><?= $this->e($view_title) ?></h3>
             <hr>
             <h5>No results found!</h5>
-            <p><a href="/user/new">add new user</a></p>
+            <p><a href="/admin/user/new">add new user</a></p>
         </section>
     <?php endif; ?>
 </section>

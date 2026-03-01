@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1); // Enforce strict type checking
+declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Frontend\Controllers;
 
@@ -395,13 +395,56 @@ final class WarehouseController extends Controller implements CrudInterface
      */
     public function delete(ServerRequestInterface $request, array $args): ResponseInterface
     {
-        // Delete the warehouse using the service class.
-        $deleted = $this->warehouseService->delete($args['id']);
+        // The middleware is already part of every request!
+        // So, in any controller or view I can access it with:
+        $csrf  = $request->getAttribute('csrf');
+        $token = $csrf->getToken();
 
-        if ($deleted) {
-            return $this->index();
+        // POST indicates form submission for deleting.
+        if ($request->getMethod() === 'POST') {
+            $parameters = $request->getParsedBody();
+
+            // Build an Warehouse instance with the updated values.
+            $warehouse = Warehouse::create();
+            $warehouse->setId(htmlspecialchars($parameters['id']));
+
+            // Persist changes via the service.
+            $deleted = $this->warehouseService->delete($warehouse->getId());
+
+            // After deleted, display the updated warehouses.
+            if ($deleted) {
+                // Gets the URI of the request just made.
+                $uri = $request->getUri();
+                // I create a new immutable object to point the browser to the index page.
+                $warehousesUri = $uri->withPath('/warehouses');
+                // After deletion, show the paginate page.
+                return $this->paginate($request->withUri($warehousesUri));
+            } else {
+                // Warehouse not found - 404
+                throw new NotFoundException();
+            }
         } else {
-            throw new NotFoundException();
+            // For GET request, fetch current data to pre-populate the form.
+            $warehouse = $this->warehouseService->read($args['id']);
+
+            if ($warehouse !== null) {
+                return $this->render(
+                    'Warehouse/delete',
+                    [
+                        'view_title' => 'Delete warehouse',
+                        'datetime'   => $this->datetime->format('l'),
+                        'id'         => $warehouse->getId(),
+                        'name'       => $warehouse->getName(),
+                        'address'    => $warehouse->getAddress(),
+                        'email'      => $warehouse->getEmail(),
+                        'type'       => $warehouse->getType(),
+                        'csrf_token' => $token,
+                    ]
+                );
+            } else {
+                // 404
+                throw new NotFoundException();
+            }
         }
     }
 }

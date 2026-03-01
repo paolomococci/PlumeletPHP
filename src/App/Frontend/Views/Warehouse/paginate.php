@@ -92,8 +92,8 @@ $this->insert('Components/search', [
                             </td>
                             <td><?= $this->e((string) $warehouse->getAddress() ?? '') ?></td>
                             <td><?= $this->e($warehouse->getType() ?? '') ?></td>
-                            <td><a href="/warehouse/update/<?= $this->e($warehouse->getId()) ?? '' ?>">edit</a></td>
-                            <td><a href="/warehouse/delete/<?= $this->e($warehouse->getId()) ?? '' ?>">del</a></td>
+                            <td><a href="/admin/warehouse/update/<?= $this->e($warehouse->getId()) ?? '' ?>">edit</a></td>
+                            <td><a href="/admin/warehouse/delete/<?= $this->e($warehouse->getId()) ?? '' ?>">del</a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -114,14 +114,14 @@ $this->insert('Components/search', [
             ]);
             ?>
 
-            <p><a href="/warehouse/new">add new warehouse</a></p>
+            <p><a href="/admin/warehouse/new">add new warehouse</a></p>
         </section>
     <?php else: ?>
         <section>
             <h3><?= $this->e($view_title) ?></h3>
             <hr>
             <h5>No results found!</h5>
-            <p><a href="/warehouse/new">add new warehouse</a></p>
+            <p><a href="/admin/warehouse/new">add new warehouse</a></p>
         </section>
     <?php endif; ?>
 </section>

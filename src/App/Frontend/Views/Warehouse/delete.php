@@ -1,12 +1,67 @@
-<?php $this->layout("layout", ['title' => 'Warehouses - delete']); ?>
+<?php $this->layout("layout", ['title' => 'Items - Confirm Delete']); ?>
 
 <!-- Contents -->
 <section>
-    <h3>Delete</h3>
+    <h3><?= $this->e($view_title) ?></h3>
+    <h5><em id="evidence"><?= $this->e($name) ?? 'unset' ?></em></h5>
     <h5>today is: <?= $datetime ?></h5>
-    <p>Lorem ipsum dolor sit amet, consectetur. Officia molestiae ratione, illum qui cupiditate repudiandae est ex ea sunt illo ad aperiam deleniti rem asperiores minus autem laborum voluptates nesciunt sequi quia, soluta voluptatibus eligendi animi maxime! Optio dolores non possimus vero earum asperiores ad hic, adipisci cum? Vero ut nostrum quae earum ducimus ad aliquam debitis molestiae voluptas consequatur sint delectus explicabo, quod esse sit iusto tempore hic aspernatur quidem qui harum et quas repellendus adipisci. Sint iure amet molestiae ipsam odit qui facilis minima dignissimos eum, praesentium maxime eaque consequuntur magni beatae illo vero rerum ad asperiores reprehenderit!</p>
     <hr>
-    <p><em>feedback:</em> <?php echo isset($message) ? $this->e($message) : 'unset' ?></p>
+    <ul class="box">
+        <li><em>id:</em> <?= isset($id) ? $this->e($id) : 'unset' ?></li>
+        <li><em>name:</em> <?= $this->e($name) ?? 'unset' ?></li>
+        <li><em>address:</em> <?= $this->e($address) ?? 'unset' ?></li>
+        <li><em>email:</em> <?= $this->e($email) ?? 'unset' ?></li>
+        <li><em>type:</em> <?= $this->e($type) ?? 'unset' ?></li>
+    </ul>
+    <form method="post">
+        <div>
+            <input readonly type="hidden" name="id" id="id" value="<?= isset($id) ? $this->e($id) : 'unset' ?>">
+        </div>
+        <!-- 
+            Hidden field for the CSRF (Cross-Site Request Forgery) token, used to prevent Cross-Site Request Forgery attacks. 
+            For security reasons, the value is escaped.
+        -->
+        <input type="hidden" name="csrf_token" value="<?= $this->e($csrf_token) ?>">
+        <button class="btn" type="submit">Delete</button>
+    </form>
     <hr>
-    <p><a href="/warehouses">warehouses</a> <a href="/products">products</a></p>
+    <p><a href="/warehouses">warehouses</a></p>
 </section>
+
+<style>
+    #evidence {
+        /* mix 80% of the original color with 20% red */
+        background-color: color-mix(in srgb, var(--bg) 80%, red 20%);
+        padding: 0.25rem 0.5rem;
+        margin: 0.25rem;
+        border-radius: 0.25rem;
+    }
+
+    .box {
+        /* mix 80% of the original color with 20% red */
+        background-color: color-mix(in srgb, var(--bg) 80%, red 20%);
+        list-style: none;
+        padding: 0.25rem 0.5rem;
+        margin: 0.25rem;
+        border-radius: 0.25rem;
+    }
+
+    /* Button delete: bright red. */
+    .btn {
+        background: linear-gradient(180deg, #f66 0%, #eee 100%);
+        transition:
+            background-position 180ms ease,
+            box-shadow 180ms ease;
+        background-size: 100% 200%;
+        background-position: top;
+        margin-top: 0.5rem;
+    }
+
+    /* hover/focus for accessibility. */
+    .btn:hover,
+    .btn:focus {
+        background-position: bottom;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        outline: none;
+    }
+</style>

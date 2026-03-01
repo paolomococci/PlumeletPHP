@@ -42,15 +42,15 @@
                             <td><?= $this->e($warehouse->getCreatedAt()->format('d/m/Y \a\t H:i') ?? '') ?></td>
                             <td><?= $this->e($warehouse->getUpdatedAt()->format('jS \of F Y \a\t H:i:s') ?? '') ?></td>
                             <!-- update and delete links -->
-                            <td><a style="text-decoration: none" href="/warehouse/update/<?= $this->e($warehouse->getId()) ?? '' ?>">edit</a></td>
-                            <td><a style="text-decoration: none" href="/warehouse/delete/<?= $this->e($warehouse->getId()) ?? '' ?>">del</a></td>
+                            <td><a style="text-decoration: none" href="/admin/warehouse/update/<?= $this->e($warehouse->getId()) ?? '' ?>">edit</a></td>
+                            <td><a style="text-decoration: none" href="/admin/warehouse/delete/<?= $this->e($warehouse->getId()) ?? '' ?>">del</a></td>
                         </tr>
                     <? endforeach; ?>
                 </tbody>
             </table>
             <h5>today is: <?= $datetime ?></h5>
             <hr>
-            <p><a href="/warehouse/new">add new warehouse</a></p>
+            <p><a href="/admin/warehouse/new">add new warehouse</a></p>
         </section>
     <? else: ?>
         <!-- empty/fallback section -->
@@ -61,7 +61,7 @@
             <hr>
             <h5>today is: <?= $datetime ?></h5>
             <hr>
-            <p><a href="/warehouse/new">add new warehouse</a></p>
+            <p><a href="/admin/warehouse/new">add new warehouse</a></p>
         </section>
     <? endif; ?>
 

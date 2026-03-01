@@ -17,6 +17,10 @@
         <div>
             <input readonly type="hidden" name="id" id="id" value="<?= isset($id) ? $this->e($id) : 'unset' ?>">
         </div>
+        <!-- 
+            Hidden field for the CSRF (Cross-Site Request Forgery) token, used to prevent Cross-Site Request Forgery attacks. 
+            For security reasons, the value is escaped.
+        -->
         <input type="hidden" name="csrf_token" value="<?= $this->e($csrf_token) ?>">
         <button class="btn" type="submit">Delete</button>
     </form>
