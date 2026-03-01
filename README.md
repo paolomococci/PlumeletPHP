@@ -19,18 +19,27 @@ By visiting these websites and reading the information provided, you can gain a 
 
 **To avoid any misunderstanding, the names and places appearing in the following screenshots are completely imaginary, invented for demonstration purposes and do not refer to anything or anyone!**
 
-![](./images/items_mobile_view.png)
-
 ![](./images/users_mobile_view.png)
 
 ![](./images/warehouses_mobile_view.png)
 
+![](./images/items_mobile_view.png)
+
+![](./images/item_read_mobile_view.png)
+
+![](./images/item_update_mobile_view.png)
+
+![](./images/item_delete_mobile_view.png)
+
 Here's how I used ImageMagick to resize images:
 
 ```shell
-convert items_mobile.png -resize 20% -quality 95  items_mobile_view.png
 convert users_mobile.png -resize 20% -quality 95  users_mobile_view.png
 convert warehouses_mobile.png -resize 20% -quality 95  warehouses_mobile_view.png
+convert items_mobile.png -resize 20% -quality 95  items_mobile_view.png
+convert item_delete_mobile_view.png -resize 20% -quality 95 item_delete_mobile_view.png
+convert item_read_mobile_view.png -resize 20% -quality 95 item_read_mobile_view.png
+convert item_update_mobile_view.png -resize 20% -quality 95 item_update_mobile_view.png
 ```
 
 ## scaffolding
