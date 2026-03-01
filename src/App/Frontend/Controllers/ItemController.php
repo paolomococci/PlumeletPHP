@@ -388,7 +388,7 @@ final class ItemController extends Controller implements CrudInterface
         return $this->render(
             'Item/update',
             [
-                'view_title'  => 'Modifica articolo',
+                'view_title'  => 'Edit item',
                 'datetime'    => $this->datetime->format('l'),
                 'csrf_token'  => $token,
                 'form'        => [
