@@ -22,7 +22,7 @@ $this->layout('layout', ['title' => 'Edit Item']);
     <h5><em id="evidence"><?= $this->e($name) ?? 'unset' ?></em></h5>
 
     <!-- ------------------------ FORM ------------------------ -->
-    <form method="post" action="">
+    <form class="box" method="post" action="">
         <!-- Hidden ID – required for the update. -->
         <input type="hidden" name="id" value="<?= $this->e($id) ?>">
 
@@ -103,7 +103,7 @@ $this->layout('layout', ['title' => 'Edit Item']);
         <input type="hidden" name="csrf_token" value="<?= $this->e($csrf_token) ?>">
 
         <!-- Submit button. -->
-        <button type="submit">Update</button>
+        <button class="btn" type="submit">Update</button>
     </form>
 
     <!-- Info -->
@@ -142,5 +142,24 @@ $this->layout('layout', ['title' => 'Edit Item']);
     .error-msg {
         color: #c22;
         font-size: 0.7rem;
+    }
+
+    /* Button update: bright red. */
+    .btn {
+        background: linear-gradient(180deg, #f66 0%, #eee 100%);
+        transition:
+            background-position 180ms ease,
+            box-shadow 180ms ease;
+        background-size: 100% 200%;
+        background-position: top;
+        margin-top: 0.5rem;
+    }
+
+    /* hover/focus for accessibility. */
+    .btn:hover,
+    .btn:focus {
+        background-position: bottom;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        outline: none;
     }
 </style>

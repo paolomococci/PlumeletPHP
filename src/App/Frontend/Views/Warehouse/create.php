@@ -119,7 +119,7 @@ $this->layout('layout', ['title' => 'Store']);
         <!-- 
             Button to submit the form to the backend. The `type="submit"` attribute indicates that the form can be submitted.
         -->
-        <button type="submit">Store</button>
+        <button class="btn" type="submit">Store</button>
     </form>
 
     <!-- Additional information. -->
@@ -152,5 +152,24 @@ $this->layout('layout', ['title' => 'Store']);
     .error-msg {
         color: #c22;
         font-size: 0.7rem;
+    }
+
+    /* Button create: bright red. */
+    .btn {
+        background: linear-gradient(180deg, #6f6 0%, #eee 100%);
+        transition:
+            background-position 180ms ease,
+            box-shadow 180ms ease;
+        background-size: 100% 200%;
+        background-position: top;
+        margin-top: 0.5rem;
+    }
+
+    /* hover/focus for accessibility. */
+    .btn:hover,
+    .btn:focus {
+        background-position: bottom;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        outline: none;
     }
 </style>
