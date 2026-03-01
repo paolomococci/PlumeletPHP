@@ -330,7 +330,7 @@ final class ItemController extends Controller implements CrudInterface
             $description = htmlspecialchars((string) $description, ENT_QUOTES, 'UTF-8');
             // Convert the string 'price' to a float.
             $price       = (float) htmlspecialchars((string) $price, ENT_QUOTES, 'UTF-8');
-            // currency è lasciato “raw” per la validazione enum.
+            // currency is left raw for enum validation.
             $currency    = (string) $currency;
 
             // ------------- 3. Enum validation ----------
@@ -344,7 +344,7 @@ final class ItemController extends Controller implements CrudInterface
                 return $this->render(
                     'Item/update',
                     [
-                        'view_title'  => 'Modifica articolo',
+                        'view_title'  => 'Edit item',
                         'datetime'    => $this->datetime->format('l'),
                         'csrf_token'  => $token,
                         'errors'      => $errors,
