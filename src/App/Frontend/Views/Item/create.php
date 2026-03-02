@@ -1,3 +1,4 @@
+<!-- Item create view -->
 <?php
 
 // Import the `CurrencyEnum` enumeration from a specific namespace. 
@@ -38,7 +39,7 @@ $this->layout('layout', ['title' => 'Store']);
     <h3><?= $this->e($view_title) ?></h3>
     <hr>
 
-    <form class="box" method="post" novalidate>
+    <form id="postForm" class="box" method="post" novalidate>
         <!-- Name -->
         <!-- Display an input field for the product name. -->
         <!-- `$this->e()` is a function used to escape data in order to prevent Cross-Site Scripting (XSS) attacks. -->
@@ -147,7 +148,7 @@ $this->layout('layout', ['title' => 'Store']);
         <!-- 
             Button to submit the form to the backend. The `type="submit"` attribute indicates that the form can be submitted.
         -->
-        <button class="btn" type="submit">Store</button>
+        <button id="postBtn" class="btn" type="submit">Store</button>
     </form>
 
     <!-- Additional information. -->
@@ -157,6 +158,15 @@ $this->layout('layout', ['title' => 'Store']);
     <!-- Display a link to return to the list of items. -->
     <p><a href="/items">back</a></p>
 </section>
+
+<!-- component that displays a modal to confirm the action to be taken -->
+<?php
+/*  Insert the reusable confirm component. */
+$this->insert('Components/confirm', [
+    // Any data to pass to the component.
+    // 'todo'   => 'TODO',
+]);
+?>
 
 <!-- CSS styles specific to this view. -->
 <style>

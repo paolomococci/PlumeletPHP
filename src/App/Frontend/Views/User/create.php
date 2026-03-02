@@ -1,4 +1,19 @@
+<!-- User create view -->
 <?php
+
+// Extract the values from the form.
+// Assign default values (empty arrays) to the `$form` and `$errors` variables if they are not already defined. 
+// This is useful for handling request errors or missing data.
+$form   = $form ?? [];
+$errors = $errors ?? [];
+
+// Perform initial setup for the form and error variables.
+// Retrieve the values submitted from the form (`$_POST`), 
+// or use empty strings as defaults if the fields are not present. 
+// This prevents `Undefined index` errors.
+$name     = $form['name'] ?? '';
+$email    = $form['email'] ?? '';
+$password = $form['password'] ?? '';
 
 // Set the page layout.
 // Load the main page layout (`layout.php`) with a dynamic title 'Store'. 
@@ -15,18 +30,42 @@ $this->layout("layout", ['title' => 'Store']);
 <section>
     <h3><?= $this->e($view_title) ?></h3>
     <hr>
-    <form class="box" method="post" novalidate>
-        <div>
+    <form id="postForm" class="box" method="post" novalidate>
+        <div class="<?= !empty($errors['name']) ? 'error' : '' ?>">
             <label for="name">Name</label>
-            <input type="text" name="name" id="name">
+            <input
+                type="text"
+                name="name"
+                id="name"
+                value="<?= $this->e($name) ?>"
+                required>
+            <?php if (!empty($errors['name'])): ?>
+                <small class="error-msg"><?= $this->e($errors['name']) ?></small>
+            <?php endif; ?>
         </div>
-        <div>
+        <div class="<?= !empty($errors['email']) ? 'error' : '' ?>">
             <label for="email">Email</label>
-            <input type="email" name="email" id="email">
+            <input
+                type="text"
+                name="email"
+                id="email"
+                value="<?= $this->e($email) ?>"
+                required>
+            <?php if (!empty($errors['email'])): ?>
+                <small class="error-msg"><?= $this->e($errors['email']) ?></small>
+            <?php endif; ?>
         </div>
-        <div>
+        <div class="<?= !empty($errors['email']) ? 'error' : '' ?>">
             <label for="password">Password</label>
-            <input type="password" name="password" id="password">
+            <input
+                type="password"
+                name="password"
+                id="password"
+                value="<?= $this->e($password) ?>"
+                required>
+            <?php if (!empty($errors['password'])): ?>
+                <small class="error-msg"><?= $this->e($errors['password']) ?></small>
+            <?php endif; ?>
         </div>
         <!-- 
             Hidden field for the CSRF (Cross-Site Request Forgery) token, used to prevent Cross-Site Request Forgery attacks. 
@@ -37,7 +76,7 @@ $this->layout("layout", ['title' => 'Store']);
         <!-- 
             Button to submit the form to the backend. The `type="submit"` attribute indicates that the form can be submitted.
         -->
-        <button class="btn" type="submit">Store</button>
+        <button id="postBtn" class="btn" type="submit">Store</button>
     </form>
     <!-- Additional information. -->
     <!-- Displays the current date (`$datetime`); `$this->e()` ensures data is properly escaped. -->
@@ -46,6 +85,15 @@ $this->layout("layout", ['title' => 'Store']);
     <!-- Display a link to return to the list of users. -->
     <p><a href="/users">back</a></p>
 </section>
+
+<!-- component that displays a modal to confirm the action to be taken -->
+<?php
+/*  Insert the reusable confirm component. */
+$this->insert('Components/confirm', [
+    // Any data to pass to the component.
+    // 'todo'   => 'TODO',
+]);
+?>
 
 <!-- CSS styles specific to this view. -->
 <style>
@@ -56,6 +104,19 @@ $this->layout("layout", ['title' => 'Store']);
         padding: 0.25rem 0.5rem;
         margin: 0.25rem;
         border-radius: 0.25rem;
+    }
+
+    /* Classes to apply red colors and borders when there are form validation errors. */
+    .error input,
+    .error textarea,
+    .error select,
+    .error small {
+        border-color: #c22;
+    }
+
+    .error-msg {
+        color: #c22;
+        font-size: 0.7rem;
     }
 
     /* Button create: bright red. */

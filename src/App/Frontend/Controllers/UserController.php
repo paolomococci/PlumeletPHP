@@ -206,7 +206,35 @@ final class UserController extends Controller implements CrudInterface
             $email    = htmlspecialchars((string) $email, ENT_QUOTES, 'UTF-8');
             $password = htmlspecialchars((string) $password, ENT_QUOTES, 'UTF-8');
 
-            // ------------- 3. TODO: validation ----------
+            // ------------- 3. Validation ----------
+            $errors = [];
+            if ($name === null || $name === '') {
+                $errors['name'] = 'Invalid name!';
+            }
+            if ($email === null || $email === '') {
+                $errors['email'] = 'Invalid email!';
+            }
+            if ($password === null || $password === '') {
+                $errors['password'] = 'Invalid password!';
+            }
+
+            // If there are any errors, re-render the form.
+            if ($errors) {
+                return $this->render(
+                    'User/create',
+                    [
+                        'view_title' => 'New user',
+                        'datetime'   => $this->datetime->format('l'),
+                        'csrf_token' => $token,
+                        'errors'     => $errors,
+                        // Passes the already cleaned values ​​so the user does not have to re-enter them.
+                        'form'       => [
+                            'name'  => $name,
+                            'email' => $email,
+                        ],
+                    ]
+                );
+            }
 
             // ------------- 4. Creation of the User ----------
             $user = User::create();
@@ -286,7 +314,32 @@ final class UserController extends Controller implements CrudInterface
             $email = htmlspecialchars((string) $email, ENT_QUOTES, 'UTF-8');
             $password = (string) $password;
 
-            // ------------- 3. TODO: validation ----------
+            // ------------- 3. Validation ----------
+            $errors = [];
+            if ($name === null || $name === '') {
+                $errors['name'] = 'Invalid name!';
+            }
+            if ($email === null || $email === '') {
+                $errors['email'] = 'Invalid email!';
+            }
+
+            // If there are any errors, re-render the form.
+            if ($errors) {
+                return $this->render(
+                    'User/update',
+                    [
+                        'view_title' => 'Edit user',
+                        'datetime'   => $this->datetime->format('l'),
+                        'csrf_token' => $token,
+                        'errors'     => $errors,
+                        // Passes the already cleaned values ​​so the user does not have to re-enter them.
+                        'form'       => [
+                            'name'  => $name,
+                            'email' => $email,
+                        ],
+                    ]
+                );
+            }
 
             // ------------- 4. Update of the User ----------
             $user = User::create();

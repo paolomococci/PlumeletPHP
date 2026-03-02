@@ -209,13 +209,23 @@ final class WarehouseController extends Controller implements CrudInterface
             $email   = htmlspecialchars((string) $email, ENT_QUOTES, 'UTF-8');
             $type    = htmlspecialchars((string) $type, ENT_QUOTES, 'UTF-8');
 
-            // ------------- 3. warehouse type validation ----------
+            // ------------- 3. Validation ----------
+            $errors = [];
+            if ($name === null || $name === '') {
+                $errors['name'] = 'Invalid name!';
+            }
+            if ($address === null || $address === '') {
+                $errors['address'] = 'Invalid address!';
+            }
+            if ($email === null || $email === '') {
+                $errors['email'] = 'Invalid email!';
+            }
             if (! WarehouseTypeEnum::isValid($type)) {
-                // Error: does not create warehouse, redirects form with message.
-                $errors = [
-                    'warehouseType' => "Invalid warehouseType!",
-                ];
+                $errors['type'] = 'Invalid type!';
+            }
 
+            // If there are any errors, re-render the form.
+            if ($errors) {
                 return $this->render(
                     'Warehouse/create',
                     [
@@ -319,8 +329,17 @@ final class WarehouseController extends Controller implements CrudInterface
             // type is left raw for enum validation.
             $type = (string) $type;
 
-            // ------------- 3. Enum validation ----------
+            // ------------- 3. Validation ----------
             $errors = [];
+            if ($name === null || $name === '') {
+                $errors['name'] = 'Invalid name!';
+            }
+            if ($address === null || $address === '') {
+                $errors['address'] = 'Invalid address!';
+            }
+            if ($email === null || $email === '') {
+                $errors['email'] = 'Invalid email!';
+            }
             if (! WarehouseTypeEnum::isValid($type)) {
                 $errors['type'] = 'Invalid type!';
             }

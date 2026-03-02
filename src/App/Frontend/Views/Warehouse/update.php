@@ -1,3 +1,4 @@
+<!-- Warehouse update view -->
 <?php
 
 use App\Backend\Models\Enums\WarehouseTypeEnum;
@@ -20,29 +21,53 @@ $this->layout("layout", ['title' => 'Warehouse - Update']);
 <section>
     <!-- ------------------------ HEADER ------------------------ -->
     <h3><?= $this->e($view_title) ?></h3>
-    <h5><em id="evidence"><?= $this->e($name) ?? 'unset' ?></em></h5>
+    <h5 style="<?= ($name === '') ? 'display:none' : '' ?>"><em id="evidence"><?= $this->e($name) ?? 'unset' ?></em></h5>
 
     <!-- ------------------------ FORM ------------------------ -->
-    <form class="box" method="post" action="">
+    <form id="postForm" class="box" method="post" action="">
         <!-- Hidden ID – required for the update. -->
         <input type="hidden" name="id" value="<?= $this->e($id) ?>">
 
         <!-- Warehouse name. -->
-        <div>
+        <div class="<?= !empty($errors['name']) ? 'error' : '' ?>">
             <label for="name">Name</label>
-            <input type="text" name="name" id="name" value="<?= isset($name) ? $this->e($name) : 'unset' ?>">
+            <input
+                type="text"
+                name="name"
+                id="name"
+                value="<?= $this->e($name) ?>"
+                required>
+            <?php if (!empty($errors['name'])): ?>
+                <small class="error-msg"><?= $this->e($errors['name']) ?></small>
+            <?php endif; ?>
         </div>
 
         <!-- Address -->
-        <div>
+        <div class="<?= !empty($errors['address']) ? 'error' : '' ?>">
             <label for="address">Address</label>
-            <input type="text" name="address" id="address" value="<?= isset($address) ? $this->e($address) : 'unset' ?>">
+            <input
+                type="text"
+                name="address"
+                id="address"
+                value="<?= $this->e($address) ?>"
+                required>
+            <?php if (!empty($errors['address'])): ?>
+                <small class="error-msg"><?= $this->e($errors['address']) ?></small>
+            <?php endif; ?>
         </div>
 
         <!-- Email -->
-        <div>
+        <div class="<?= !empty($errors['email']) ? 'error' : '' ?>">
             <label for="email">Email</label>
-            <input type="email" name="email" id="email" value="<?= isset($email) ? $this->e($email) : 'unset' ?>">
+            <input
+                type="text"
+                name="email"
+                id="email"
+                value="<?= $this->e($email) ?>"
+                required>
+            <?php if (!empty($errors['email'])): ?>
+                <small class="error-msg"><?= $this->e($errors['email']) ?></small>
+            <?php endif; ?>
         </div>
 
         <!-- Type -->
@@ -74,7 +99,7 @@ $this->layout("layout", ['title' => 'Warehouse - Update']);
         <input type="hidden" name="csrf_token" value="<?= $this->e($csrf_token) ?>">
 
         <!-- Submit button. -->
-        <button class="btn" type="submit">Update</button>
+        <button id="postBtn" class="btn" type="submit">Update</button>
     </form>
 
     <!-- Info -->
@@ -82,6 +107,15 @@ $this->layout("layout", ['title' => 'Warehouse - Update']);
     <hr>
     <p><a href="/warehouses">warehouses</a></p>
 </section>
+
+<!-- component that displays a modal to confirm the action to be taken -->
+<?php
+/*  Insert the reusable confirm component. */
+$this->insert('Components/confirm', [
+    // Any data to pass to the component.
+    // 'todo'   => 'TODO',
+]);
+?>
 
 <style>
     /* Styles for the layout and appearance of the form fields. */

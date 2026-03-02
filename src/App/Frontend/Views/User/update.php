@@ -1,4 +1,11 @@
+<!-- User update view -->
 <?php
+
+// Extract the values from the form.
+// Assign default values (empty arrays) to the `$form` and `$errors` variables if they are not already defined. 
+// This is useful for handling request errors or missing data.
+$form   = $form ?? [];
+$errors = $errors ?? [];
 
 // Retrieve values from the form, or use empty values, to avoid undefined indices.
 $id          = $form['id']      ?? '';
@@ -12,23 +19,39 @@ $this->layout("layout", ['title' => 'User - Update']);
 <section>
     <!-- ------------------------ HEADER ------------------------ -->
     <h3><?= $this->e($view_title) ?></h3>
-    <h5><em id="evidence"><?= $this->e($name) ?? 'unset' ?></em></h5>
+    <h5 style="<?= ($name === '') ? 'display:none' : '' ?>"><em id="evidence"><?= $this->e($name) ?? 'unset' ?></em></h5>
 
     <!-- ------------------------ FORM ------------------------ -->
-    <form class="box" method="post" action="">
+    <form id="postForm" class="box" method="post" action="">
         <!-- Hidden ID – required for the update. -->
         <input type="hidden" name="id" value="<?= $this->e($id) ?>">
 
         <!-- User name. -->
-        <div>
+        <div class="<?= !empty($errors['name']) ? 'error' : '' ?>">
             <label for="name">Name</label>
-            <input type="text" name="name" id="name" value="<?= isset($name) ? $this->e($name) : 'unset' ?>">
+            <input
+                type="text"
+                name="name"
+                id="name"
+                value="<?= $this->e($name) ?>"
+                required>
+            <?php if (!empty($errors['name'])): ?>
+                <small class="error-msg"><?= $this->e($errors['name']) ?></small>
+            <?php endif; ?>
         </div>
 
         <!-- Email -->
-        <div>
+        <div class="<?= !empty($errors['email']) ? 'error' : '' ?>">
             <label for="email">Email</label>
-            <input type="email" name="email" id="email" value="<?= isset($email) ? $this->e($email) : 'unset' ?>">
+            <input
+                type="text"
+                name="email"
+                id="email"
+                value="<?= $this->e($email) ?>"
+                required>
+            <?php if (!empty($errors['email'])): ?>
+                <small class="error-msg"><?= $this->e($errors['email']) ?></small>
+            <?php endif; ?>
         </div>
 
         <!-- Password -->
@@ -41,7 +64,7 @@ $this->layout("layout", ['title' => 'User - Update']);
         <input type="hidden" name="csrf_token" value="<?= $this->e($csrf_token) ?>">
 
         <!-- Submit button. -->
-        <button class="btn" type="submit">Update</button>
+        <button id="postBtn" class="btn" type="submit">Update</button>
     </form>
 
     <!-- Info -->
@@ -49,6 +72,15 @@ $this->layout("layout", ['title' => 'User - Update']);
     <hr>
     <p><a href="/users">users</a></p>
 </section>
+
+<!-- component that displays a modal to confirm the action to be taken -->
+<?php
+/*  Insert the reusable confirm component. */
+$this->insert('Components/confirm', [
+    // Any data to pass to the component.
+    // 'todo'   => 'TODO',
+]);
+?>
 
 <style>
     /* Styles for the layout and appearance of the form fields. */

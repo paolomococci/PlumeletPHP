@@ -1,3 +1,4 @@
+<!-- Item update view -->
 <?php
 
 use App\Backend\Models\Enums\CurrencyEnum;
@@ -20,10 +21,10 @@ $this->layout('layout', ['title' => 'Edit Item']);
 <section>
     <!-- ------------------------ HEADER ------------------------ -->
     <h3><?= $this->e($view_title) ?></h3>
-    <h5><em id="evidence"><?= $this->e($name) ?? 'unset' ?></em></h5>
+    <h5 style="<?= ($name === '') ? 'display:none' : '' ?>"><em id="evidence"><?= $this->e($name) ?? 'unset' ?></em></h5>
 
     <!-- ------------------------ FORM ------------------------ -->
-    <form class="box" method="post" action="">
+    <form id="postForm" class="box" method="post" action="">
         <!-- Hidden ID – required for the update. -->
         <input type="hidden" name="id" value="<?= $this->e($id) ?>">
 
@@ -104,7 +105,7 @@ $this->layout('layout', ['title' => 'Edit Item']);
         <input type="hidden" name="csrf_token" value="<?= $this->e($csrf_token) ?>">
 
         <!-- Submit button. -->
-        <button class="btn" type="submit">Update</button>
+        <button id="postBtn" class="btn" type="submit">Update</button>
     </form>
 
     <!-- Info -->
@@ -112,6 +113,15 @@ $this->layout('layout', ['title' => 'Edit Item']);
     <hr>
     <p><a href="/items">back to list</a></p>
 </section>
+
+<!-- component that displays a modal to confirm the action to be taken -->
+<?php
+/*  Insert the reusable confirm component. */
+$this->insert('Components/confirm', [
+    // Any data to pass to the component.
+    // 'todo'   => 'TODO',
+]);
+?>
 
 <style>
     /* Styles for the layout and appearance of the form fields. */

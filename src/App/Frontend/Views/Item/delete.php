@@ -1,3 +1,4 @@
+<!-- Item delete view -->
 <?php $this->layout("layout", ['title' => 'Items - Confirm Delete']); ?>
 
 <!-- Contents -->
@@ -13,7 +14,7 @@
         <li><em>currency:</em> <?= $this->e($currency) ?? 'unset' ?></li>
         <li><em>description:</em> <?= $this->e($description) ?? 'unset' ?></li>
     </ul>
-    <form method="post">
+    <form id="postForm" method="post">
         <div>
             <input readonly type="hidden" name="id" id="id" value="<?= isset($id) ? $this->e($id) : 'unset' ?>">
         </div>
@@ -22,11 +23,20 @@
             For security reasons, the value is escaped.
         -->
         <input type="hidden" name="csrf_token" value="<?= $this->e($csrf_token) ?>">
-        <button class="btn" type="submit">Delete</button>
+        <button id="postBtn" class="btn" type="submit">Delete</button>
     </form>
     <hr>
     <p><a href="/items">items</a></p>
 </section>
+
+<!-- component that displays a modal to confirm the action to be taken -->
+<?php
+/*  Insert the reusable confirm component. */
+$this->insert('Components/confirm', [
+    // Any data to pass to the component.
+    // 'todo'   => 'TODO',
+]);
+?>
 
 <style>
     #evidence {

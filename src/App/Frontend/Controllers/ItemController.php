@@ -218,13 +218,23 @@ final class ItemController extends Controller implements CrudInterface
             // Keep raw for validation.
             $currency    = (string) $currency;
 
-            // ------------- 3. Enum validation ----------
+            // ------------- 3. Firs check ----------
+            $errors = [];
+            if ($name === null || $name === '') {
+                $errors['name'] = 'Invalid name!';
+            }
+            if ($description === null || $description === '') {
+                $errors['description'] = 'Invalid description!';
+            }
+            if ($price === null || $price < 0) {
+                $errors['price'] = 'Invalid price!';
+            }
             if (!CurrencyEnum::isValid($currency)) {
-                // Error: does not create item, redirects form with message.
-                $errors = [
-                    'currency' => "Invalid currency!",
-                ];
+                $errors['currency'] = 'Invalid currency!';
+            }
 
+            // If there are any errors, re-render the form.
+            if ($errors) {
                 return $this->render(
                     'Item/create',
                     [
@@ -333,8 +343,17 @@ final class ItemController extends Controller implements CrudInterface
             // currency is left raw for enum validation.
             $currency    = (string) $currency;
 
-            // ------------- 3. Enum validation ----------
+            // ------------- 3. Validation ----------
             $errors = [];
+            if ($name === null || $name === '') {
+                $errors['name'] = 'Invalid name!';
+            }
+            if ($description === null || $description === '') {
+                $errors['description'] = 'Invalid description!';
+            }
+            if ($price === null || $price < 0) {
+                $errors['price'] = 'Invalid price!';
+            }
             if (!CurrencyEnum::isValid($currency)) {
                 $errors['currency'] = 'Invalid currency!';
             }
