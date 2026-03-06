@@ -34,7 +34,7 @@
 /*  Insert the reusable confirm component. */
 $this->insert('Components/confirm', [
     // Any data to pass to the component.
-    // 'todo'   => 'TODO',
+    'alertMsg' => 'Warning: the operation may be irreversible!',
 ]);
 ?>
 

@@ -78,7 +78,7 @@ $this->layout("layout", ['title' => 'User - Update']);
 /*  Insert the reusable confirm component. */
 $this->insert('Components/confirm', [
     // Any data to pass to the component.
-    // 'todo'   => 'TODO',
+    'alertMsg' => 'Are you sure you have entered all the updated data?',
 ]);
 ?>
 

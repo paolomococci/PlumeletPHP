@@ -1,5 +1,5 @@
 <?php
-$todo   = $todo ?? '';
+$alertMsg   = $alertMsg ?? 'This action may be irreversible.';
 ?>
 
 <div
@@ -12,9 +12,8 @@ $todo   = $todo ?? '';
     <div class="modal-backdrop"></div>
     <div class="modal-panel">
         <h5 id="modalTitle">Are you sure you want to proceed?</h5>
-        <!-- Displays whatever string is stored in $todo. -->
-        <h6><?= $this->e($todo); ?></h6>
-        <p>This action may be irreversible.</p>
+        <!-- Displays whatever string is stored in $alertMsg. -->
+        <p><?= $this->e($alertMsg); ?></p>
         <div class="modal-actions">
             <button id="cancelBtn" class="component-btn" type="button">Cancel</button>
             <button id="confirmBtn" class="component-btn-apply" type="button">Apply</button>

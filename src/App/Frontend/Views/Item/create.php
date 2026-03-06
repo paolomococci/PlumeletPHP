@@ -164,7 +164,7 @@ $this->layout('layout', ['title' => 'Store']);
 /*  Insert the reusable confirm component. */
 $this->insert('Components/confirm', [
     // Any data to pass to the component.
-    // 'todo'   => 'TODO',
+    'alertMsg' => 'Are you sure you entered the correct data?',
 ]);
 ?>
 
@@ -210,4 +210,4 @@ $this->insert('Components/confirm', [
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
         outline: none;
     }
-</style>
+</style>improved the messages shown by the modal
