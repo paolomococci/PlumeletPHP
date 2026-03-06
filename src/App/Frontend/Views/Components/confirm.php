@@ -1,5 +1,5 @@
 <?php
-$alertMsg   = $alertMsg ?? 'This action may be irreversible.';
+$alertMsg = $alertMsg ?? 'This action may be irreversible.';
 ?>
 
 <div
