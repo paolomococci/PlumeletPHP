@@ -79,6 +79,19 @@ Install `league/plates` separately, preferring a stable version:
 composer require league/plates --prefer-stable
 ```
 
+### testing with `Pest`
+
+```shell
+composer require --dev pestphp/pest phpunit/phpunit
+```
+
+and after having appropriately modified the composer.json file and added pest.php and phpunit.xml to the root of the project:
+
+```shell
+composer dump-autoload
+composer test
+```
+
 ## PHP built-in web server
 
 Now I proceed to start the built-in web server offered by PHP itself:

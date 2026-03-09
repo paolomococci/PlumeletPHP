@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PHPUnit (and thus Pest) configuration. -->
+<!-- Load Composer autoloader before tests. -->
+<!-- Enable colored output in the console. -->
+<phpunit bootstrap="vendor/autoload.php" colors="true">
+    <testsuites>
+        <!-- Define a single test suite named "App Test Suite". -->
+        <testsuite name="App Test Suite">
+            <!--
+                Directory where PHPUnit will look for test files.
+                Pest runs on top of PHPUnit, so this points to the same folder.
+            -->
+            <directory>
+                ./tests
+            </directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

@@ -8,6 +8,11 @@
             "App\\": "src/App/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Test\\": "tests/Test/"
+        }
+    },
     "authors": [
         {
             "name": "Paolo Mococci"
@@ -24,5 +29,17 @@
         "monolog/monolog": "^3.0@dev",
         "adhocore/jwt": "dev-main",
         "league/plates": "^3.6"
+    },
+    "require-dev": {
+        "pestphp/pest": "5.x-dev",
+        "phpunit/phpunit": "^13.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": false
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest"
     }
 }
