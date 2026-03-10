@@ -1,4 +1,5 @@
 <?php
+$confirmTitle = $confirmTitle ?? 'Think before you proceed.';
 $alertMsg = $alertMsg ?? 'This action may be irreversible.';
 ?>
 
@@ -11,7 +12,7 @@ $alertMsg = $alertMsg ?? 'This action may be irreversible.';
     aria-modal="true">
     <div class="modal-backdrop"></div>
     <div class="modal-panel">
-        <h5 id="modalTitle">Are you sure you want to proceed?</h5>
+        <h5 id="modalTitle"><?= $this->e($confirmTitle); ?></h5>
         <!-- Displays whatever string is stored in $alertMsg. -->
         <p><?= $this->e($alertMsg); ?></p>
         <div class="modal-actions">
@@ -59,7 +60,7 @@ $alertMsg = $alertMsg ?? 'This action may be irreversible.';
          * clamp() lets the modal adapt fluidly across devices while staying within sensible size limits.
          * 
          */
-        width:clamp(18rem, 90vw, 38rem);
+        width: clamp(18rem, 90vw, 38rem);
         background: #333;
         padding: 1.25rem;
         border-radius: 8px;

@@ -1,0 +1,157 @@
+/* ----------------------------
+  Tooltip base - dark theme
+   ---------------------------- */
+#required-field-tooltip {
+  /* Position the tooltip fixed so it can be placed anywhere on the viewport */
+  position: fixed;
+  /* Limit width to 90% of the viewport width to avoid horizontal overflow */
+  max-width: 90vw;
+  /* Let the content decide the final width (shrink to fit) */
+  width: max-content;
+  /* Provide generous inner padding for readability */
+  padding: 1.5rem 1.8rem; /* more internal space */
+  /* Dark background that matches the dark theme */
+  background: #222;
+  /* Light text color for contrast against the dark background */
+  color: #eee;
+  /* Red border to indicate an error/required status */
+  border: 2px solid #f44;
+  /* Slightly rounded corners for a modern look */
+  border-radius: 8px;
+  /* Subtle shadow to lift the tooltip off the page */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  /* System font stack for consistency across platforms */
+  font-family: system-ui, sans-serif;
+  /* Base font size - can be overridden by media queries */
+  font-size: 1rem;
+  /* Comfortable line height for multiline text */
+  line-height: 1.5;
+  /* Keep the tooltip above most other page content */
+  z-index: 9999;
+  /* Hidden by default; shown via JavaScript when needed */
+  display: none;
+}
+
+/* ----------------------------
+  Error list inside the tooltip
+   ---------------------------- */
+#required-field-tooltip .rf-tooltip-list {
+  /* Remove default list margin */
+  margin: 0;
+  /* Add left padding to align squares nicely */
+  padding-left: 0.8em; /* better square alignment */
+  /* Use custom styling rather than default squares */
+  list-style: square;
+}
+
+/* ----------------------------
+  Close button - positioned outside the content area
+   ---------------------------- */
+#required-field-tooltip .rf-tooltip-close {
+  /* Absolute positioning relative to the tooltip */
+  position: absolute;
+  /* Place the button slightly above the top edge */
+  top: -0.8rem; /* outside the top border */
+  /* Place the button slightly beyond the right edge */
+  right: -0.8rem; /* outside the right border */
+  /* Dimensions of the circular button */
+  width: 1.6rem;
+  height: 1.6rem;
+  /* Red background for visibility */
+  background: #f55; /* bright red */
+  /* White text/icon color */
+  color: #fff;
+  /* Remove default button styles */
+  border: none;
+  /* Make it a circle */
+  border-radius: 50%;
+  /* Flexbox centering of the icon/text */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Icon size */
+  font-size: 1.2rem;
+  /* Single line height ensures perfect vertical centering */
+  line-height: 1; /* no longer needed */
+  /* Pointer cursor to indicate interactivity */
+  cursor: pointer;
+  /* Slight shadow for depth */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+#required-field-tooltip .rf-tooltip-close:hover,
+#required-field-tooltip .rf-tooltip-close:focus {
+  /* Slightly lighter red on hover/focus for feedback */
+  background: #f77;
+}
+
+/* ----------------------------
+  Media queries - dynamic scaling
+   ---------------------------- */
+
+/* ---------- Smartphone (599 px) ---------- */
+@media (max-width: 599px) {
+  #required-field-tooltip {
+    /* Center vertically and horizontally */
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
+    /* Use almost full viewport width */
+    max-width: 95vw;
+    /* Smaller padding for limited space */
+    padding: 0.8rem 1rem;
+    /* Slightly smaller text for readability on small screens */
+    font-size: 0.85rem;
+  }
+}
+
+/* ---------- Tablet / palm-tablet (600-1199 px) ---------- */
+@media (min-width: 600px) and (max-width: 1199px) {
+  #required-field-tooltip {
+    /* Center vertically and horizontally */
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
+    /* Medium width for tablets */
+    max-width: 70vw;
+    /* Moderate padding */
+    padding: 1.2rem 1.5rem;
+    /* Slightly smaller than desktop font */
+    font-size: 0.95rem;
+  }
+}
+
+/* ---------- Desktop / laptop (≥ 1200 px) ---------- */
+@media (min-width: 1200px) {
+  #required-field-tooltip {
+    /* Center vertically and horizontally */
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
+    /* Narrower width but larger in pixels */
+    max-width: 50vw;
+    /* More generous padding */
+    padding: 1.8rem 2rem;
+    /* Larger text for better readability on big screens */
+    font-size: 1.1rem;
+  }
+}
+
+/* ----------------------------
+  Prevent tooltip from going outside the viewport
+   ---------------------------- */
+#required-field-tooltip[data-outside-left] {
+  left: 1rem;
+  transform: none;
+}
+#required-field-tooltip[data-outside-right] {
+  right: 1rem;
+  transform: none;
+}
+#required-field-tooltip[data-outside-top] {
+  top: 1rem;
+  transform: none;
+}
+#required-field-tooltip[data-outside-bottom] {
+  bottom: 1rem;
+  transform: none;
+}

@@ -91,7 +91,8 @@ $this->layout("layout", ['title' => 'Store']);
 /*  Insert the reusable confirm component. */
 $this->insert('Components/confirm', [
     // Any data to pass to the component.
-    'alertMsg' => 'Are you sure you entered the correct data?',
+    'confirmTitle' => 'You are about to insert a new user.',
+    'alertMsg' => 'Are you sure you entered the correct user data?',
 ]);
 ?>
 
@@ -137,4 +138,36 @@ $this->insert('Components/confirm', [
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
         outline: none;
     }
+
+    /* required fields tooltip is placed in the center of the view. */
+    .rf-tooltip {
+        position: fixed;
+        width: 90%;
+        max-width: 420px;
+        background: #fff;
+        border: 1px solid #f44;
+        color: #000;
+        padding: 1rem 1.2rem;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        z-index: 10000;
+        transform: translate(-50%, -50%);
+        /* Will be overwritten with JavaScript. */
+        display: none;
+        pointer-events: auto;
+    }
 </style>
+
+<!-- /assets/js/checkRequiredFieldTooltip.js -->
+<script type="module">
+    import { loadTooltipStyles, attachTooltip } from '/assets/js/checkRequiredFieldTooltip.js';
+
+    // Load the tooltip stylesheet.
+    loadTooltipStyles();
+
+    // Attach the tooltip to the form.
+    attachTooltip('#postForm');
+
+    // In case I need to apply the same tooltip on multiple forms:
+    // document.querySelectorAll('form').forEach(f => attachTooltip(f));
+</script>

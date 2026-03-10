@@ -40,10 +40,19 @@ convert items_mobile.png -resize 20% -quality 95  items_mobile_view.png
 convert item_delete_mobile_view.png -resize 20% -quality 95 item_delete_mobile_view.png
 convert item_read_mobile_view.png -resize 20% -quality 95 item_read_mobile_view.png
 convert item_update_mobile_view.png -resize 20% -quality 95 item_update_mobile_view.png
+convert new_item_required_field_tooltip_mobile_view.png -resize 60% -quality 95 new_item_required_field_tooltip_mobile_view.png
 convert item_new_modal_confirm_view.png -resize 60% -quality 95 item_new_modal_confirm_view.png
+convert new_user_required_field_tooltip_mobile_view.png -resize 60% -quality 95 new_user_required_field_tooltip_mobile_view.png
+convert new_warehouse_required_field_tooltip_mobile_view.png -resize 60% -quality 95 new_warehouse_required_field_tooltip_mobile_view.png
 ```
 
+![](./images/new_item_required_field_tooltip_mobile_view.png)
+
 ![](./images/item_new_modal_confirm_view.png)
+
+![](./images/new_user_required_field_tooltip_mobile_view.png)
+
+![](./images/new_warehouse_required_field_tooltip_mobile_view.png)
 
 ## scaffolding
 
