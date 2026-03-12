@@ -286,6 +286,60 @@ class UserRepository extends Repository implements RepositoryInterface
     }
 
     /**
+     * findByEmail
+     *
+     * @param  string $email
+     * @return User
+     */
+    public function findByEmail(string $email): ?User
+    {
+        // Basic sanity check.
+        if ($email === '') {
+            throw new InvalidArgumentException(
+                'Invalid e-mail for UserRepository::findByEmail, value cannot be empty!'
+            );
+        }
+
+        // RFC-5322 e-mail format validation.
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new InvalidArgumentException(
+                sprintf('Invalid e-mail format: "%s"', $email)
+            );
+        }
+
+        // Build the query
+        $sql = static::cleanQuery(
+            <<<SQL
+            SELECT * FROM %s
+            WHERE email = :email
+        SQL,
+            self::TABLE_NAME
+        );
+
+        // Execute the prepared statement.
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':email' => $email]);
+
+        // Fetch data.
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row === false) {
+            // No user with that e-mail return null
+            return null;
+        }
+
+        return new User(
+            (string) $row['id'],
+            $row['name'],
+            $row['email'],
+            null, // password_hash is usually omitted from the public API
+            $row['password_hash'],
+            $row['created_at'],
+            $row['updated_at']
+        );
+    }
+
+    /**
      * count
      *
      * Retrieve the total number of users registered in the system.
