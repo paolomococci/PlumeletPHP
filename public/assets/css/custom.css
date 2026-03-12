@@ -1,0 +1,136 @@
+/* Root variables for spacing and element heights. */
+:root {
+  --gap: 12px;
+  --height: 56px;
+}
+
+/* Box‑sizing reset for all elements. */
+* {
+  box-sizing: border-box;
+}
+
+/* Base font size for the body. */
+body {
+  font-size: 0.95rem;
+}
+
+/* Padding for the navigation container. */
+nav {
+  padding: 0.5rem;
+}
+
+/* Utility class to stretch an element to full viewport width. */
+.full-bleed {
+  width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Utility class that can be toggled for optional elements. */
+.optional {
+  display: block;
+}
+
+/* Header layout using flexbox - the main app banner. */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding: 8px;
+  height: var(--height);
+  background: var(--bg);
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+/* Central container that provides horizontal padding. */
+.container {
+  width: 100%;
+  padding: 0 16px;
+  /* Inner padding for mobile. */
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Horizontal navigation styling. */
+.horizontal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.horizontal-nav li {
+  margin-right: 20px;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  color: #ee9;
+}
+
+/* Disabled link styling. */
+a.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Responsive typography and optional element visibility. */
+@media (min-width: 360px) {
+  body {
+    font-size: 0.62rem;
+  }
+
+  .optional {
+    display: none;
+  }
+}
+
+@media (min-width: 480px) {
+  body {
+    font-size: 0.75rem;
+  }
+
+  .optional {
+    display: none;
+  }
+}
+
+@media (min-width: 840px) {
+  body {
+    font-size: 0.9rem;
+  }
+
+  .app-header {
+    padding: 12px 20px;
+    height: 72px;
+  }
+
+  .optional {
+    display: block;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    font-size: 1.25rem;
+  }
+
+  .optional {
+    display: block;
+  }
+
+  .container {
+    padding: 0;
+    /* Full viewport width on large screens. */
+    max-width: none;
+  }
+}

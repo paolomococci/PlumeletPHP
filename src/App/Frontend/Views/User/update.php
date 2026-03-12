@@ -23,7 +23,7 @@ $this->layout("layout", ['title' => 'User - Update']);
 
     <!-- ------------------------ FORM ------------------------ -->
     <form id="postForm" class="box" method="post" action="">
-        <!-- Hidden ID – required for the update. -->
+        <!-- Hidden ID - required for the update. -->
         <input type="hidden" name="id" value="<?= $this->e($id) ?>">
 
         <!-- User name. -->

@@ -25,7 +25,7 @@ $this->layout('layout', ['title' => 'Edit Item']);
 
     <!-- ------------------------ FORM ------------------------ -->
     <form id="postForm" class="box" method="post" action="">
-        <!-- Hidden ID – required for the update. -->
+        <!-- Hidden ID - required for the update. -->
         <input type="hidden" name="id" value="<?= $this->e($id) ?>">
 
         <!-- Item name. -->

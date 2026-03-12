@@ -16,7 +16,7 @@ use RuntimeException;
  *
  *   - The handler can catch *only* CSRF-related failures, leaving
  *       unrelated 500-errors untouched.
- *   - It keeps the API contract clear – the exception type tells the
+ *   - It keeps the API contract clear - the exception type tells the
  *       consumer exactly what went wrong.
  */
 final class CsrfTokenException extends RuntimeException

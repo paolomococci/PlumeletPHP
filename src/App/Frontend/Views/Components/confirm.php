@@ -76,7 +76,7 @@ $alertMsg = $alertMsg ?? 'This action may be irreversible.';
         margin-top: 1rem;
     }
 
-    /* Basic button styling – neutral, slightly rounded. */
+    /* Basic button styling - neutral, slightly rounded. */
     .component-btn {
         padding: 0.5rem 0.8rem;
         border-radius: 6px;
