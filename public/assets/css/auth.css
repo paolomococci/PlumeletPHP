@@ -1,0 +1,74 @@
+/* public/assets/css/auth.css */
+
+/* ------------------- Common auth style ---------------- */
+.login-section,
+.register-section,
+.forgot-section,
+.reset-section {
+  display: flex; /* use Flexbox for layout */
+  justify-content: center; /* center horizontally */
+  align-items: center; /* center vertically */
+  height: 80vh; /* take up 80% of the viewport height */
+}
+
+/* ------------------- Form container ------------------- */
+.auth-form {
+  width: 320px; /* fixed width for consistency */
+  background: #666; /* dark grey background */
+  padding: 2rem; /* inner spacing */
+  border-radius: 8px; /* rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* subtle drop shadow */
+  display: flex; /* Flexbox layout */
+  flex-direction: column; /* stack children vertically */
+  align-items: center; /* center children horizontally */
+}
+
+/* ------------------- Form groups (label and input) ------- */
+.form-group {
+  width: 100%; /* occupy full width of the form */
+  margin-bottom: 1rem; /* space below each group */
+  display: flex; /* Flexbox for internal layout */
+  flex-direction: column; /* stack label and input */
+  align-items: center; /* center elements horizontally */
+}
+
+/* ------------------- Input fields ---------------------- */
+.form-field {
+  width: 100%; /* full width within its container */
+  max-width: 260px; /* prevent input from becoming too wide on large screens */
+  padding: 0.5rem; /* inner padding for better click area */
+  border: 1px solid #ccc; /* light grey border */
+  border-radius: 4px; /* slightly rounded corners */
+}
+
+/* ------------------- Helper text ----------------------- */
+.text-helper {
+  text-align: center; /* center the helper text */
+  font-size: 0.9rem; /* slightly smaller than body text */
+  margin-top: 1rem; /* space above the helper */
+}
+
+.text-helper a {
+  color: #39d; /* blue link color */
+  text-decoration: none; /* no underline by default */
+}
+.text-helper a:hover {
+  text-decoration: underline; /* underline on hover for visual feedback */
+}
+
+/* ------------------- Feedback messages ----------------- */
+.feedback {
+  padding: 0.75rem 1.25rem; /* vertical and horizontal padding */
+  border-radius: 0.25rem; /* subtle rounding */
+  width: 100%; /* match the width of the form */
+}
+.feedback-danger {
+  background-color: #fdd; /* light red background for error */
+  color: #722; /* dark red text for contrast */
+  border: 1px solid #fcc; /* matching border */
+}
+.feedback-invalid {
+  color: #d34; /* red text for validation errors */
+  font-size: 0.875rem; /* smaller font for secondary messages */
+  margin-top: 0.25rem; /* small space above the message */
+}
