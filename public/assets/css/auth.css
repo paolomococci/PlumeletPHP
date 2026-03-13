@@ -36,9 +36,18 @@
 .form-field {
   width: 100%; /* full width within its container */
   max-width: 260px; /* prevent input from becoming too wide on large screens */
+  margin-top: 0.3rem; /* margin from the top label to improve its reading */
   padding: 0.5rem; /* inner padding for better click area */
   border: 1px solid #ccc; /* light grey border */
   border-radius: 4px; /* slightly rounded corners */
+}
+
+/* Checkbox container. */
+.form-check {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
 }
 
 /* ------------------- Helper text ----------------------- */
@@ -61,6 +70,12 @@
   padding: 0.75rem 1.25rem; /* vertical and horizontal padding */
   border-radius: 0.25rem; /* subtle rounding */
   width: 100%; /* match the width of the form */
+}
+
+.feedback-success {
+  background-color: #dfd;
+  color: #272;
+  border: 1px solid #cfc;
 }
 .feedback-danger {
   background-color: #fdd; /* light red background for error */
