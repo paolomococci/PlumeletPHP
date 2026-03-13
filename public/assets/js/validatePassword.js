@@ -272,12 +272,12 @@ export function initPasswordValidator(formOrSelector, opts = {}) {
         requireLower: true,     // At least one lowercase letter
         requireDigit: true,     // At least one numeric digit
         requireSpecial: true,   // At least one special character
-        customRegex: null,      // Optional user‑supplied RegExp
+        customRegex: null,      // Optional user-supplied RegExp
     };
 
     /**
      * 2. Merge defaults with any overrides supplied by the caller.
-     * The spread operator (`{...DEFAULTS, ...opts}`) creates a brand‑new
+     * The spread operator (`{...DEFAULTS, ...opts}`) creates a brand-new
      * object so the original DEFAULTS remain immutable.
      * 
      */

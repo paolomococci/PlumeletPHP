@@ -3,7 +3,7 @@
 /**
  * Global Pest configuration.
  *
- * `uses()` returns Pest's test‑case factory.
+ * `uses()` returns Pest's test-case factory.
  * `->in('tests')` tells the factory that every
  * file inside the `tests` directory should automatically
  * use the default test case class (Pest\TestCase).

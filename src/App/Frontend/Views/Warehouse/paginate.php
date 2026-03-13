@@ -2,7 +2,7 @@
 
 /**
  * If $search is already set, keep its value. Otherwise, set it to the escaped value of the 'name' GET parameter.
- * The operator `??=` (null‑coalescing assignment) means: $search = $search ?? <expression>;
+ * The operator `??=` (null-coalescing assignment) means: $search = $search ?? <expression>;
  * 
  * Retrieve the raw 'name' query string safely: 
  * filter_input(INPUT_GET, 'name', FILTER_SANITIZE_SPECIAL_CHARS)

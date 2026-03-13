@@ -66,7 +66,7 @@ final class Psr15Wrapper implements MiddlewareInterface
     ): ResponseInterface {
         /**
          * The inner middleware expects a callable $next,
-         * so we create a closure that calls the next PSR‑15 handler.
+         * so we create a closure that calls the next PSR-15 handler.
          */
         $next = fn(ServerRequestInterface $req): ResponseInterface => $handler->handle($req);
 

@@ -21,7 +21,7 @@
             --height: 56px;
         }
 
-        /* Box‑sizing reset for all elements. */
+        /* Box-sizing reset for all elements. */
         * {
             box-sizing: border-box
         }

@@ -15,7 +15,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * CsrfMiddleware 
  * 
  * This middleware protects the application from CSRF attacks by
- * validating a CSRF token on state‑changing HTTP requests (POST, PUT,
+ * validating a CSRF token on state-changing HTTP requests (POST, PUT,
  * DELETE, PATCH). It also injects the `CsrfTokenHandler` into the
  * request attributes so that downstream code can generate or read
  * tokens if needed.
@@ -55,7 +55,7 @@ class CsrfMiddleware implements MiddlewareInterface
         ServerRequestInterface $request,
         RequestHandlerInterface $handler
     ): ResponseInterface {
-        // Validate the token for non‑GET requests.
+        // Validate the token for non-GET requests.
         if (in_array($request->getMethod(), ['POST', 'PUT', 'DELETE', 'PATCH'])) {
             $this->validateToken($request);
         }

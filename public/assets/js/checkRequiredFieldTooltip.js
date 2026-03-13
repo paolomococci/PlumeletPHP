@@ -202,7 +202,7 @@ export function attachTooltip(formOrSelector, opts = {}) {
      * The function is called when the user tries to submit the form.  It
      * performs the following steps in order:
      *
-     * 1.  Ask each individual control validator to re‑evaluate its
+     * 1.  Ask each individual control validator to re-evaluate its
      *     current value.  The validator objects (`requiredCtrl`,
      *     `emailCtrl`, `pwdCtrl`) each expose a `validate()` method that
      *     mutates their internal `errors` array.
@@ -212,7 +212,7 @@ export function attachTooltip(formOrSelector, opts = {}) {
      *     the individual `errors` arrays.
      *
      * 3.  Enable or disable the form’s submit button based on whether
-     *     there are any errors.  If the array is non‑empty the button
+     *     there are any errors.  If the array is non-empty the button
      *     is disabled to prevent a bad submission.
      *
      * 4.  If there are any errors, display them in a tooltip positioned

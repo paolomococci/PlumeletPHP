@@ -12,7 +12,7 @@ use Psr\Http\Server\MiddlewareInterface;
 /**
  * SessionMiddleware
  * 
- * PSR‑15 middleware that ensures a PHP session is started.
+ * PSR-15 middleware that ensures a PHP session is started.
  * 
  */
 class SessionMiddleware implements MiddlewareInterface
@@ -93,7 +93,7 @@ class SessionMiddleware implements MiddlewareInterface
                     (bool)$cookieOptions['httponly']
                 );
                 // SameSite can be forced via the "samesite" cookie param in PHP 7.3+
-                // (pre‑7.3 you have to set it manually with setcookie())
+                // (pre-7.3 you have to set it manually with setcookie())
                 if (!empty($cookieOptions['samesite'])) {
                     ini_set('session.cookie_samesite', (string)$cookieOptions['samesite']);
                 }

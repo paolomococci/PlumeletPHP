@@ -29,6 +29,12 @@ use function DI\create;
 
 /**
  * Bootstrap
+ * 
+ * A single Bootstrap class that elegantly 
+ * orchestrates the entire application lifecycle 
+ * by centralizing configuration, 
+ * services, and middleware in a single, 
+ * conveniently predictable declarative point.
  */
 class Bootstrap
 {
@@ -69,7 +75,7 @@ class Bootstrap
         $this->router->setStrategy($strategy);
 
         /* ------------------- Attach middlewares ------------------- */
-        // Session middleware (required for any session‑based feature)
+        // Session middleware (required for any session-based feature)
         $this->router->middleware(
             new SessionMiddleware([
                 // cookie options - customize them here if you need something different
@@ -84,7 +90,7 @@ class Bootstrap
         // CSRF middleware
         // ------------------------------------------------------------------
         // The following lines are commented out by default.  Uncomment them
-        // if you want to enable CSRF protection for non‑idempotent requests.
+        // if you want to enable CSRF protection for non-idempotent requests.
 
         $csrfMiddleware = new CsrfMiddleware(
             $this->container->get(CsrfTokenHandler::class)

@@ -11,7 +11,7 @@
 }
 
 .http-msg {
-  /* For ::before pseudo‑element. */
+  /* For ::before pseudo-element. */
   position: relative;
   min-height: 80vh;
   max-height: 90vh;
@@ -71,7 +71,7 @@
   }
 }
 
-/* Fade‑in. */
+/* Fade-in. */
 @keyframes fadeIn {
   from {
     opacity: 0;
