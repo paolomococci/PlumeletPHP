@@ -194,9 +194,9 @@ final class User extends Model implements ModelInterface
      * @param  mixed $storedHash
      * @return bool
      */
-    public function checkPassword(string $plainPassword, string $storedHash): bool
+    public function checkPassword(string $plainPassword): bool
     {
-        return password_verify($plainPassword, $storedHash);
+        return password_verify($plainPassword, $this->password_hash);
     }
 
     /**
