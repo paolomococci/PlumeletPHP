@@ -44,6 +44,12 @@ nav {
   position: relative;
 }
 
+/* Makes the header span bold and forces all text to lowercase. */
+.app-header span {
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
 /* Central container that provides horizontal padding. */
 .container {
   width: 100%;
