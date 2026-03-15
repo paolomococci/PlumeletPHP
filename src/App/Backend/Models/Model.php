@@ -28,7 +28,7 @@ abstract class Model
     {
         /**
          * Obtain a ReflectionClass object for the runtime class that called this method.
-         * `static::class` uses late‑static binding (LSB) so that subclasses get 
+         * `static::class` uses late-static binding (LSB) so that subclasses get 
          * the correct class name, not the name of this base class.
          */
         $reflection = new ReflectionClass(static::class);
