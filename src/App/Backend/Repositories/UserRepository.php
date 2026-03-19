@@ -71,9 +71,9 @@ class UserRepository extends Repository implements RepositoryInterface
             );
         }
 
-        $users = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $users[] = new User(
+        // one-line fetch all rows and map them to User objects.
+        return array_map(
+            fn($row) => new User(
                 (string) $row['id'],
                 $row['name'],
                 $row['email'],
@@ -81,10 +81,9 @@ class UserRepository extends Repository implements RepositoryInterface
                 null,
                 $row['created_at'],
                 $row['updated_at']
-            );
-        }
-
-        return $users;
+            ),
+            $stmt->fetchAll(PDO::FETCH_ASSOC)
+        );
     }
 
     /**
