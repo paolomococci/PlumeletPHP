@@ -21,8 +21,6 @@ By visiting these websites and reading the information provided, you can gain a 
 
 ![](./images/users_mobile_view.png)
 
-![](./images/warehouses_mobile_view.png)
-
 ![](./images/items_mobile_view.png)
 
 ![](./images/item_read_mobile_view.png)
