@@ -615,3 +615,49 @@ SELECT @v_record_exists, @v_current_name, @v_current_address, @v_current_email, 
 -- Same query but using aliases:
 SELECT @v_record_exists AS is_record, @v_current_name AS name, @v_current_address AS address, @v_current_email AS e_mail, @v_current_type AS type;
 ```
+
+## correcting an oversight
+
+Unfortunately, in the definition of table `warehouses_tbl` I happened to write a word whose meaning did not define what I was encoding. I apologize.
+Below I list the commands I used to correct the table regarding the warehouses.
+
+First I temporarily allow values outside the list:
+
+```sql
+ALTER TABLE warehouses_tbl MODIFY COLUMN type VARCHAR(20) NOT NULL;
+```
+
+I check and remove the constraint `chk_warehouse_type`:
+
+```sql
+SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'warehouses_tbl' AND CONSTRAINT_TYPE = 'CHECK';
+ALTER TABLE warehouses_tbl DROP CONSTRAINT chk_warehouse_type;
+```
+
+I replace the incorrect value:
+
+```sql
+UPDATE warehouses_tbl SET type = 'carrier' WHERE type = 'currier';
+```
+
+I redefine the column as ENUM with the correct value:
+
+```sql
+ALTER TABLE warehouses_tbl MODIFY COLUMN type ENUM('owned','supplier','carrier') NOT NULL DEFAULT 'owned';
+```
+
+Finally, I create the new check constraint:
+
+```sql
+ALTER TABLE warehouses_tbl ADD CONSTRAINT chk_warehouse_type CHECK (type IN ('owned','supplier','carrier'));
+SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'warehouses_tbl' AND CONSTRAINT_TYPE = 'CHECK';
+```
+
+After the previous technical intervention I can verify its success:
+
+```sql
+SHOW COLUMNS FROM warehouses_tbl;
+SELECT id, name, address, email, type FROM warehouses_tbl;
+SELECT id, name, address, email, type FROM warehouses_tbl WHERE type = 'carrier';
+SELECT id, name, address, email, type FROM warehouses_tbl WHERE type <> 'carrier';
+```

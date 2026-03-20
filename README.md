@@ -21,6 +21,8 @@ By visiting these websites and reading the information provided, you can gain a 
 
 ![](./images/users_mobile_view.png)
 
+![](./images/warehouses_mobile_view.png)
+
 ![](./images/items_mobile_view.png)
 
 ![](./images/item_read_mobile_view.png)
@@ -32,12 +34,12 @@ By visiting these websites and reading the information provided, you can gain a 
 Here's how I used ImageMagick to resize images:
 
 ```shell
-convert users_mobile.png -resize 20% -quality 95  users_mobile_view.png
-convert warehouses_mobile.png -resize 20% -quality 95  warehouses_mobile_view.png
-convert items_mobile.png -resize 20% -quality 95  items_mobile_view.png
-convert item_delete_mobile_view.png -resize 20% -quality 95 item_delete_mobile_view.png
-convert item_read_mobile_view.png -resize 20% -quality 95 item_read_mobile_view.png
-convert item_update_mobile_view.png -resize 20% -quality 95 item_update_mobile_view.png
+convert users_mobile.png -resize 80% -quality 95 users_mobile_view.png
+convert warehouses_mobile.png -resize 80% -quality 95 warehouses_mobile_view.png
+convert items_mobile.png -resize 80% -quality 95 items_mobile_view.png
+convert item_delete_mobile_view.png -resize 80% -quality 95 item_delete_mobile_view.png
+convert item_read_mobile_view.png -resize 80% -quality 95 item_read_mobile_view.png
+convert item_update_mobile_view.png -resize 80% -quality 95 item_update_mobile_view.png
 convert new_item_required_field_tooltip_mobile_view.png -resize 60% -quality 95 new_item_required_field_tooltip_mobile_view.png
 convert item_new_modal_confirm_view.png -resize 60% -quality 95 item_new_modal_confirm_view.png
 convert new_user_required_field_tooltip_mobile_view.png -resize 60% -quality 95 new_user_required_field_tooltip_mobile_view.png
@@ -89,7 +91,7 @@ composer require league/plates --prefer-stable
 ### testing with `Pest`
 
 ```shell
-composer require --dev pestphp/pest phpunit/phpunit
+composer require --dev pestphp/pest phpunit/phpunit egulias/email-validator
 ```
 
 and after having appropriately modified the composer.json file and added pest.php and phpunit.xml to the root of the project:
@@ -97,6 +99,14 @@ and after having appropriately modified the composer.json file and added pest.ph
 ```shell
 composer dump-autoload
 composer test
+```
+
+### tips
+
+To see if a certain type of package is installed:
+
+```shell
+composer show --name-only | grep monolog
 ```
 
 ## PHP built-in web server
