@@ -1,5 +1,19 @@
 # tier one `plumeletphp_db`
 
+## see which version of MariaDB you are using
+
+In a simple way:
+
+```sql
+SELECT VERSION() AS version;
+```
+
+or in a slightly more verbose way:
+
+```sql
+SHOW VARIABLES LIKE 'version';
+```
+
 ## create database `plumeletphp_db`
 
 ```sql
