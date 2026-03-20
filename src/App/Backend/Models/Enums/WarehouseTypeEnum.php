@@ -15,8 +15,8 @@ enum WarehouseTypeEnum: string
     case OWNED = 'owned';
     // Warehouse belongs to a supplier.
     case SUPPLIER = 'supplier';
-    // Warehouse belongs to a courier.
-    case CURRIER = 'currier';
+    // Warehouse belongs to a carrier.
+    case CARRIER = 'carrier';
     
     /**
      * isValid
@@ -44,7 +44,7 @@ enum WarehouseTypeEnum: string
         return match ($this) {
             self::OWNED    => 'Owned Warehouse',
             self::SUPPLIER => 'Supplier Warehouse',
-            self::CURRIER  => 'Courier Warehouse',
+            self::CARRIER  => 'Carrier Warehouse',
         };
     }
 }

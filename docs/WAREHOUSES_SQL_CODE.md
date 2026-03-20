@@ -49,11 +49,11 @@ CREATE TABLE IF NOT EXISTS warehouses_tbl (
 -- This allows for the rerouting or splitting of batches before they reach their intended destination.
 -- Important: if records already exist in the table, the new field is set to its default value.
 ALTER TABLE warehouses_tbl
-    ADD COLUMN type ENUM('owned','supplier','currier') NOT NULL DEFAULT 'owned';
+    ADD COLUMN type ENUM('owned','supplier','carrier') NOT NULL DEFAULT 'owned';
 
 -- Checking the `type` field.
 -- Key benefits include: eliminating the need for validation checks in stored procedures, and enabling query optimization within the database engine.
-ALTER TABLE warehouses_tbl ADD CONSTRAINT chk_warehouse_type CHECK (type IN ('owned','supplier','currier'));
+ALTER TABLE warehouses_tbl ADD CONSTRAINT chk_warehouse_type CHECK (type IN ('owned','supplier','carrier'));
 
 -- Verify Table Contents, check that the table is clean.
 -- This query also serves as a quick sanity check that the table was created successfully and is ready for use.
@@ -107,7 +107,7 @@ CREATE PROCEDURE sp_insert_warehouse_on_warehouses_tbl
     IN  p_name VARCHAR(255),
     IN  p_address VARCHAR(255),
     IN  p_email VARCHAR(255),
-    IN  p_type ENUM('owned','supplier','currier'),
+    IN  p_type ENUM('owned','supplier','carrier'),
     OUT p_new_id BIGINT
 )
 BEGIN
@@ -246,7 +246,7 @@ CALL sp_insert_warehouse_on_warehouses_tbl(
     'Fake Crimson River Logistics',
     '7 Red Sandbar, Ember',
     'fake-crimson.river@warehouse.local',
-    'currier',
+    'carrier',
     @new_id
 );
 
@@ -255,7 +255,7 @@ CALL sp_insert_warehouse_on_warehouses_tbl(
     'Fake Aurora Northern Hub',
     '12 Frostbite Way, Glaciville',
     'fake-aurora.north@warehouse.local',
-    'currier',
+    'carrier',
     @new_id
 );
 
@@ -304,7 +304,7 @@ CREATE PROCEDURE sp_update_warehouse_on_warehouses_tbl
     -- New e-mail address.
     IN  p_email VARCHAR(255),
     -- New type.
-    IN p_type ENUM('owned','supplier','currier')
+    IN p_type ENUM('owned','supplier','carrier')
 )
 BEGIN
     -- Variable Declarations.
@@ -471,7 +471,7 @@ CREATE PROCEDURE sp_update_or_insert_warehouse_data_on_warehouses_tbl
     -- New e-mail address: If NULL, the current value will be used.
     IN p_email VARCHAR(255),
     -- New type: If NULL, the current value will be used.
-    IN p_type ENUM('owned','supplier','currier')
+    IN p_type ENUM('owned','supplier','carrier')
 )
 BEGIN
     -- 1. Confirm the existence of the record.
@@ -564,7 +564,7 @@ CALL sp_update_or_insert_warehouse_data_on_warehouses_tbl(
     'Fake Ice Water Logistics',
     '113 Ice Square, Enigma City',
     'fake-ice.archival@warehouse.local',
-    'currier'
+    'carrier'
 );
 
 -- Updating the data for an existing record.

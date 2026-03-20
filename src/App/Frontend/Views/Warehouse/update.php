@@ -80,7 +80,7 @@ $this->layout("layout", ['title' => 'Warehouse - Update']);
                     <?php
                     // The value to be saved in the database.
                     $value        = $case->value;
-                    // owned, supplier or currier
+                    // owned, supplier or carrier
                     $label        = ucfirst(strtolower($value));
                     $selectedAttr = ($value === $selected) ? 'selected' : '';
                     ?>

@@ -54,7 +54,7 @@ it('exposes all cases with correct backing values', function () use (&$enumClass
     expect($map)->toMatchArray([
         'OWNED'    => 'owned',
         'SUPPLIER' => 'supplier',
-        'CURRIER'  => 'currier',
+        'CARRIER'  => 'carrier',
     ]);
 });
 
@@ -77,7 +77,7 @@ it('validates values correctly with isValid', function () {
     expect(WarehouseTypeEnum::isValid('owned'))->toBeTrue();
     expect(WarehouseTypeEnum::isValid('OWNED'))->toBeTrue(); // method lowercases input.
     expect(WarehouseTypeEnum::isValid('supplier'))->toBeTrue();
-    expect(WarehouseTypeEnum::isValid('currier'))->toBeTrue();
+    expect(WarehouseTypeEnum::isValid('carrier'))->toBeTrue();
     expect(WarehouseTypeEnum::isValid('unknown'))->toBeFalse();
 });
 
@@ -99,7 +99,7 @@ it('iterates all cases and each case returns its label', function () {
     $expected = [
         'OWNED'    => ['value' => 'owned', 'label' => 'Owned Warehouse'],
         'SUPPLIER' => ['value' => 'supplier', 'label' => 'Supplier Warehouse'],
-        'CURRIER'  => ['value' => 'currier', 'label' => 'Courier Warehouse'],
+        'CARRIER'  => ['value' => 'carrier', 'label' => 'Carrier Warehouse'],
     ];
 
     foreach (WarehouseTypeEnum::cases() as $case) {
