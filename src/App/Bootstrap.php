@@ -8,15 +8,19 @@ use App\Errors\CsrfTokenException;
 use App\Errors\InternalServerError;
 use App\Frontend\Middlewares\CsrfMiddleware;
 use App\Frontend\Middlewares\SessionMiddleware;
-use App\Frontend\Routes\HomeRoutes;
+use App\Frontend\Routes\DashboardRoutes;
 use App\Frontend\Routes\ItemRoutes;
+use App\Frontend\Routes\LoginRoutes;
 use App\Frontend\Routes\UserRoutes;
 use App\Frontend\Routes\WarehouseRoutes;
 use App\Frontend\Templates\Interfaces\TemplateInterface;
 use App\Frontend\Templates\RenderTemplate;
 use App\Util\Handlers\CsrfTokenHandler;
+use App\Util\Interfaces\MailerInterface;
+use App\Util\Mailers\FileMailer;
 use DI\Container;
 use DI\ContainerBuilder;
+use function DI\create;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\ServerRequest;
 use HttpSoft\Emitter\SapiEmitter;
@@ -25,15 +29,13 @@ use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use function DI\create;
-
 /**
  * Bootstrap
- * 
- * A single Bootstrap class that elegantly 
- * orchestrates the entire application lifecycle 
- * by centralizing configuration, 
- * services, and middleware in a single, 
+ *
+ * A single Bootstrap class that elegantly
+ * orchestrates the entire application lifecycle
+ * by centralizing configuration,
+ * services, and middleware in a single,
  * conveniently predictable declarative point.
  */
 class Bootstrap
@@ -62,6 +64,9 @@ class Bootstrap
             $builder->addDefinitions([
                 ResponseFactoryInterface::class => create(HttpFactory::class),
                 TemplateInterface::class        => create(RenderTemplate::class),
+                // Thanks to the DI container here it is possible to indicate the 
+                // class that simulates or actually carries out the sending.
+                MailerInterface::class          => create(FileMailer::class),
             ]);
             $builder->useAttributes(true);
             $this->container = $builder->build();
@@ -79,10 +84,11 @@ class Bootstrap
         $this->router->middleware(
             new SessionMiddleware([
                 // cookie options - customize them here if you need something different
-                'path'       => '/',
-                'secure'     => $this->environment === 'pro',
-                'httponly'   => true,
-                'samesite'   => 'lax',
+                'path'     => '/',
+                'secure'   => $this->environment === 'pro',
+                'httponly' => true,
+                // reduces CSRF risk but allows normal links and redirects.
+                'samesite' => 'lax',
             ])
         );
 
@@ -100,8 +106,14 @@ class Bootstrap
         /* ------------------- Routes ------------------- */
         // The routes are stored in these classes, which contain all authorized routes!
         // Home
-        $homeRoutes = new HomeRoutes;
-        $homeRoutes->registerRoutes($this->router);
+        // $homeRoutes = new HomeRoutes;
+        // $homeRoutes->registerRoutes($this->router);
+        // Login
+        $loginRoutes = new LoginRoutes;
+        $loginRoutes->registerRoutes($this->router);
+        // Dashboard
+        $dashboardRoutes = new DashboardRoutes;
+        $dashboardRoutes->registerRoutes($this->router);
         // Item
         $itemRoutes = new ItemRoutes;
         $itemRoutes->registerRoutes($this->router);
