@@ -51,7 +51,7 @@ final class Warehouse extends Model implements ModelInterface
     /**
      * getId
      *
-     * @return int
+     * @return string
      */
     public function getId(): string
     {

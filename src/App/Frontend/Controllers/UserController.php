@@ -309,9 +309,9 @@ final class UserController extends Controller implements CrudInterface
             $password = $parameters['password'] ?? '';
 
             // ------------- 2. Sanitization -----------
-            $id    = htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8');
-            $name  = htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8');
-            $email = htmlspecialchars((string) $email, ENT_QUOTES, 'UTF-8');
+            $id       = htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8');
+            $name     = htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8');
+            $email    = htmlspecialchars((string) $email, ENT_QUOTES, 'UTF-8');
             $password = (string) $password;
 
             // ------------- 3. Validation ----------
@@ -371,9 +371,9 @@ final class UserController extends Controller implements CrudInterface
                 'datetime'   => $this->datetime->format('l'),
                 'csrf_token' => $token,
                 'form'       => [
-                    'id'       => $user->getId(),
-                    'name'     => $user->getName(),
-                    'email'    => $user->getEmail(),
+                    'id'    => $user->getId(),
+                    'name'  => $user->getName(),
+                    'email' => $user->getEmail(),
                 ],
             ]
         );
@@ -388,7 +388,7 @@ final class UserController extends Controller implements CrudInterface
     {
         // The middleware is already part of every request!
         // So, in any controller or view I can access it with:
-        $csrf = $request->getAttribute('csrf');
+        $csrf  = $request->getAttribute('csrf');
         $token = $csrf->getToken();
 
         // POST indicates form submission for deleting.
@@ -422,12 +422,12 @@ final class UserController extends Controller implements CrudInterface
                 return $this->render(
                     'User/delete',
                     [
-                        'view_title'  => 'Delete user',
-                        'datetime'    => $this->datetime->format('l'),
-                        'id'          => $user->getId(),
-                        'name'        => $user->getName(),
-                        'email'       => $user->getEmail(),
-                        'csrf_token'  => $token,
+                        'view_title' => 'Delete user',
+                        'datetime'   => $this->datetime->format('l'),
+                        'id'         => $user->getId(),
+                        'name'       => $user->getName(),
+                        'email'      => $user->getEmail(),
+                        'csrf_token' => $token,
                     ]
                 );
             } else {

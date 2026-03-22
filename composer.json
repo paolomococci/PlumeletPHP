@@ -28,7 +28,9 @@
         "filp/whoops": "^2.18",
         "monolog/monolog": "^3.0@dev",
         "adhocore/jwt": "dev-main",
-        "league/plates": "^3.6"
+        "league/plates": "^3.6",
+        "respect/validation": "2.4.x-dev",
+        "egulias/email-validator": "4.x-dev"
     },
     "require-dev": {
         "pestphp/pest": "5.x-dev",

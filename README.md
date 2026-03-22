@@ -214,3 +214,19 @@ convert -background none plumeletphp_ico.svg -resize 16x16 favicon-16.png && \
 convert favicon-16.png favicon-32.png favicon-48.png favicon-64.png favicon.ico && \
 rm favicon-16.png favicon-32.png favicon-48.png favicon-64.png
 ```
+
+## reset credentials
+
+One of the basic features of a management system is to offer the user/operator who has forgotten their password the ability to quickly restore access with renewed credentials.
+A common way to do this is to send, when prompted, a passphrase to the user's email address, which was provided during registration.
+
+During development and testing, I created a class that, instead of actually sending, writes the following message to a file in the development file system that might look something like this:
+
+```txt
+To: john.doe@example.local
+Subject: reset passphrase
+
+Your password reset passphrase: this_is_where_the_sample_passphrase_would_be_visible
+```
+
+After that, the user simply needs to type or have the browser generate a suitably complex password in the designated field and the passphrase in the next one, press Enter and proceed with the login using the new password.

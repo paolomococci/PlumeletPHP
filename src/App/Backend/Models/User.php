@@ -6,6 +6,7 @@ namespace App\Backend\Models;
 
 use App\Backend\Models\Interfaces\ModelInterface;
 use DateTimeImmutable;
+use DateTimeZone;
 use InvalidArgumentException;
 
 /**
@@ -31,7 +32,11 @@ final class User extends Model implements ModelInterface
         private ?string $password_plain = null,
         private ?string $password_hash = null,
         private ?string $created_at = null,
-        private ?string $updated_at = null
+        private ?string $updated_at = null,
+        private ?string $token_2fa_hash = null,
+        private ?string $token_2fa_expires_at = null,
+        private ?string $token_2fa_used_at = null,
+        private ?int $token_2fa_attempts = null
     ) {}
 
     /**
@@ -126,12 +131,60 @@ final class User extends Model implements ModelInterface
         return static::toDateTimeImmutable($this->updated_at);
     }
 
+    /**
+     * getHashedTwoFaToken
+     *
+     * @return string
+     */
+    public function getHashedTwoFaToken(): string
+    {
+        return $this->token_2fa_hash ?? '';
+    }
+
+    /**
+     * isTokenTwoFaExpired
+     *
+     * @return bool
+     */
+    public function isTokenTwoFaExpired(): bool
+    {
+        if ($this->token_2fa_expires_at === null) {
+            return true;
+        }
+
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        return ($this->token_2fa_expires_at < $now);
+    }
+    
+    /**
+     * getTokenTwoFaUsedAt
+     *
+     * @return null|DateTimeImmutable
+     */
+    public function getTokenTwoFaUsedAt(): ?DateTimeImmutable
+    {
+        if ($this->token_2fa_used_at === null) {
+            
+        }
+        return ($this->token_2fa_used_at === null) ? null : static::toDateTimeImmutable($this->token_2fa_used_at);
+    }
+
+    /**
+     * getTokenTwoFaAttempts
+     *
+     * @return int
+     */
+    public function getTokenTwoFaAttempts(): int
+    {
+        return ($this->token_2fa_attempts === null) ? 0 : $this->token_2fa_attempts;
+    }
+
     /* setters */
 
     /**
      * setId
      *
-     * @param  mixed $id
+     * @param  string $id
      * @return void
      */
     public function setId(string $id): void
@@ -142,7 +195,7 @@ final class User extends Model implements ModelInterface
     /**
      * setName
      *
-     * @param  mixed $name
+     * @param  string $name
      * @return void
      */
     public function setName(string $name): void
@@ -153,7 +206,7 @@ final class User extends Model implements ModelInterface
     /**
      * setEmail
      *
-     * @param  mixed $email
+     * @param  string $email
      * @return void
      */
     public function setEmail(string $email): void
@@ -168,7 +221,7 @@ final class User extends Model implements ModelInterface
     /**
      * setPlainPassword
      *
-     * @param  mixed $plainPassword
+     * @param  string $plainPassword
      * @return void
      */
     public function setPlainPassword(string $plainPassword): void
@@ -179,7 +232,7 @@ final class User extends Model implements ModelInterface
     /**
      * setHashedPassword
      *
-     * @param  mixed $plainPassword
+     * @param  string $plainPassword
      * @return void
      */
     public function setHashedPassword(string $plainPassword): void
@@ -190,8 +243,7 @@ final class User extends Model implements ModelInterface
     /**
      * checkPassword
      *
-     * @param  mixed $plainPassword
-     * @param  mixed $storedHash
+     * @param  string $plainPassword
      * @return bool
      */
     public function checkPassword(string $plainPassword): bool
@@ -202,7 +254,7 @@ final class User extends Model implements ModelInterface
     /**
      * withName
      *
-     * @param  mixed $name
+     * @param  string $name
      * @return self
      */
     public function withName(string $name): self
@@ -217,9 +269,49 @@ final class User extends Model implements ModelInterface
             updated_at: ''
         );
     }
-
+    
+    /**
+     * passwordHashWrapper
+     *
+     * @param  string $plainPassword
+     * @return string
+     */
     private function passwordHashWrapper(string $plainPassword): string
     {
         return password_hash($plainPassword, PASSWORD_BCRYPT);
+    }
+
+    /**
+     * settHashedTwoFaToken
+     *
+     * @return string
+     */
+    public function setHashedTwoFaToken(): string
+    {
+        $passphrase = bin2hex(random_bytes(16));
+        $this->token_2fa_hash = password_hash($passphrase, PASSWORD_BCRYPT);
+        return $passphrase;
+    }
+
+    /**
+     * checkHashedTwoFaToken
+     *
+     * @param  string $passphrase
+     * @return bool
+     */
+    public function checkHashedTwoFaToken(string $passphrase): bool
+    {
+        return password_verify($passphrase, $this->token_2fa_hash);
+    }
+
+    /**
+     * setTokenTwoFaAttempts
+     *
+     * @param  int $id
+     * @return void
+     */
+    public function setTokenTwoFaAttempts(int $token_2fa_attempts): void
+    {
+        $this->token_2fa_attempts = (filter_var($token_2fa_attempts, FILTER_VALIDATE_INT) !== false) ? filter_var($token_2fa_attempts, FILTER_VALIDATE_INT) : 1;
     }
 }

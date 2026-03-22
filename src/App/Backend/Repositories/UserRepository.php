@@ -7,11 +7,15 @@ namespace App\Backend\Repositories;
 use App\Backend\Connections\PlumeletPhpDb;
 use App\Backend\Models\Interfaces\ModelInterface;
 use App\Backend\Models\User;
+use App\Backend\Repositories\Helpers\UserHelper;
 use App\Backend\Repositories\Interfaces\RepositoryInterface;
 use App\Errors\InternalServerError;
+use DateTimeImmutable;
+use DateTimeZone;
 use InvalidArgumentException;
 use PDO;
 use RuntimeException;
+use Throwable;
 
 /**
  * UserRepository
@@ -34,6 +38,8 @@ use RuntimeException;
  */
 class UserRepository extends Repository implements RepositoryInterface
 {
+    use UserHelper;
+
     // To avoid possible typing errors, the table name should be set in one place.
     const TABLE_NAME = User::TABLE_NAME;
 
@@ -134,7 +140,10 @@ class UserRepository extends Repository implements RepositoryInterface
         }
 
         $sql = static::cleanQuery(<<<'SQL'
-            SELECT id, name, email, password_hash, created_at, updated_at
+            SELECT
+                id, name, email, password_hash,
+                created_at, updated_at,
+                token_2fa_expires_at, token_2fa_used_at, token_2fa_attempts
             FROM %s
             WHERE id = :id
         SQL, self::TABLE_NAME);
@@ -142,12 +151,10 @@ class UserRepository extends Repository implements RepositoryInterface
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
 
+        // Fetch data.
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (! $row) {
-            return null;
-        }
 
-        return new User(
+        return $row ? new User(
             (string) $row['id'],
             $row['name'],
             $row['email'],
@@ -155,7 +162,7 @@ class UserRepository extends Repository implements RepositoryInterface
             null,
             $row['created_at'],
             $row['updated_at']
-        );
+        ) : null;
     }
 
     /**
@@ -215,7 +222,7 @@ class UserRepository extends Repository implements RepositoryInterface
             // If the execution succeeds, commit the changes.
             $this->pdo->commit();
             // If something goes wrong, roll back the transaction and re-raise the exception.
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             $this->pdo->rollBack();
             throw $th;
         }
@@ -247,6 +254,53 @@ class UserRepository extends Repository implements RepositoryInterface
     }
 
     /**
+     * resetPassword
+     *
+     * @param  string $email
+     * @param  string $password
+     * @param  string $passphrase
+     *
+     * @return bool
+     */
+    public function resetPassword(string $email, string $password, string $passphrase): bool
+    {
+
+        $user = $this->selectByEmail($email);
+
+        // If the passphrase verification fails, it immediately returns false and does not update the user's password.
+        if (! $user->checkHashedTwoFaToken($passphrase)) {
+            return false;
+        }
+
+        $user->setHashedPassword($password);
+
+        // Create the query UPDATE to store the new password.
+        $sql = static::cleanQuery(
+            <<<SQL
+            UPDATE %s SET
+                password_hash = :password_hash,
+                token_2fa_used_at = NOW(),
+                token_2fa_attempts = 1
+            WHERE email = :email
+                AND token_2fa_expires_at > NOW()
+                AND token_2fa_attempts < 1
+        SQL,
+            self::TABLE_NAME
+        );
+
+        $now = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d H:i:s');
+
+        return static::runUpdate(
+            $this->pdo,
+            $sql,
+            [
+                ':password_hash' => $user->getHashedPassword(),
+                ':email'         => $email,
+            ]
+        ) ? true : false;
+    }
+
+    /**
      * findByName
      *
      * Retrieve one or more users based on the field name.
@@ -256,32 +310,27 @@ class UserRepository extends Repository implements RepositoryInterface
      */
     public function findByName(string $name): array
     {
-        if ($name === '') {
-            throw new InvalidArgumentException('Invalid name for UserRepository::findByName');
-        }
+        // Validate input name.
+        static::validateName($name);
 
+        // Build the SQL with the protected cleanQuery()
         $sql = static::cleanQuery(<<<'SQL'
             SELECT * FROM %s
             WHERE name LIKE CONCAT('%', :name, '%')
         SQL, self::TABLE_NAME);
 
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':name' => "%$name%"]);
+        // Execute and fetch all rows.
+        $rows = static::runSelectAll(
+            $this->pdo,
+            $sql,
+            [':name' => $name]
+        );
 
-        $users = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $users[] = new User(
-                (string) $row['id'],
-                $row['name'],
-                $row['email'],
-                null,
-                $row['password_hash'],
-                $row['created_at'],
-                $row['updated_at']
-            );
-        }
-
-        return $users;
+        // Map rows to User objects.
+        return array_map(
+            fn(array $row) => static::userFromRow($row),
+            $rows
+        );
     }
 
     /**
@@ -292,19 +341,8 @@ class UserRepository extends Repository implements RepositoryInterface
      */
     public function findByEmail(string $email): ?User
     {
-        // Basic sanity check.
-        if ($email === '') {
-            throw new InvalidArgumentException(
-                'Invalid e-mail for UserRepository::findByEmail, value cannot be empty!'
-            );
-        }
-
-        // RFC-5322 e-mail format validation.
-        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidArgumentException(
-                sprintf('Invalid e-mail format: "%s"', $email)
-            );
-        }
+        // Basic sanity check and RFC-5322 e-mail format validation.
+        static::validateEmail($email);
 
         // Build the query
         $sql = static::cleanQuery(
@@ -322,20 +360,15 @@ class UserRepository extends Repository implements RepositoryInterface
         // Fetch data.
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($row === false) {
-            // No user with that e-mail return null
-            return null;
-        }
-
-        return new User(
+        return $row ? new User(
             (string) $row['id'],
             $row['name'],
             $row['email'],
-            null, // password_hash is usually omitted from the public API
+            null, // password_hash is usually omitted from the public API.
             $row['password_hash'],
             $row['created_at'],
             $row['updated_at']
-        );
+        ) : null;
     }
 
     /**
@@ -433,5 +466,146 @@ class UserRepository extends Repository implements RepositoryInterface
         }
 
         return (int) $stmt->fetchColumn();
+    }
+
+    // Token 2-FA section
+
+    /**
+     * updateHashedTwoFaToken
+     *
+     * @param  string $email
+     * @return string
+     */
+    public function updateHashedTwoFaToken(string $email): ?string
+    {
+        // Basic sanity check and RFC-5322 e-mail format validation.
+        static::validateEmail($email);
+
+        $user       = User::create();
+        $passphrase = $user->setHashedTwoFaToken();
+
+        // Create the query UPDATE to store the 2-FA token.
+        $sql = static::cleanQuery(
+            <<<SQL
+            UPDATE %s SET
+                token_2fa_hash = :token_2fa_hash,
+                token_2fa_expires_at = NOW() + INTERVAL 5 MINUTE,
+                token_2fa_used_at = NULL,
+                token_2fa_attempts = 0
+            WHERE email = :email
+        SQL,
+            self::TABLE_NAME
+        );
+
+        return static::runUpdate(
+            $this->pdo,
+            $sql,
+            [
+                ':token_2fa_hash' => $user->getHashedTwoFaToken(),
+                ':email'          => $email,
+            ]
+        ) ? $passphrase : null;
+    }
+
+    /**
+     * selectByEmail
+     *
+     * @param  string $email
+     * @return User
+     */
+    public function selectByEmail(string $email): ?User
+    {
+        // Basic sanity check and RFC-5322 e-mail format validation.
+        static::validateEmail($email);
+
+        // Build the query
+        $sql = static::cleanQuery(
+            <<<SQL
+            SELECT
+                id,
+                name,
+                email,
+                password_hash,
+                created_at,
+                updated_at,
+                token_2fa_hash,
+                token_2fa_expires_at,
+                token_2fa_used_at,
+                token_2fa_attempts
+            FROM %s
+            WHERE email = :email
+        SQL,
+            self::TABLE_NAME
+        );
+
+        // Fetch data.
+        $row = static::runSelectRow(
+            $this->pdo,
+            $sql,
+            [':email' => $email]
+        );
+
+        return $row ? static::userFromTuple($row) : null;
+    }
+
+    /**
+     * updateOnUsedHashedTwoFaToken
+     *
+     * @param  string $email
+     * @return bool
+     */
+    public function updateOnUsedHashedTwoFaToken(string $email): ?bool
+    {
+        // Basic sanity check and RFC-5322 e-mail format validation.
+        static::validateEmail($email);
+
+        // Create the query UPDATE to store the 2-FA token.
+        $sql = static::cleanQuery(
+            <<<SQL
+            UPDATE %s SET
+                token_2fa_used_at = NOW(),
+                token_2fa_attempts = token_2fa_attempts + 1
+            WHERE email = :email
+        SQL,
+            self::TABLE_NAME
+        );
+
+        return static::runUpdate(
+            $this->pdo,
+            $sql,
+            [':email' => $email]
+        ) ? true : null;
+    }
+
+    /**
+     * selectIsUsedHashedTwoFaToken
+     *
+     * @param  string $email
+     * @return bool
+     */
+    public function selectIsUsedHashedTwoFaToken(string $email): ?bool
+    {
+        // Basic sanity check and RFC-5322 e-mail format validation.
+        static::validateEmail($email);
+
+        // Create the query UPDATE to store the 2-FA token.
+        $sql = static::cleanQuery(
+            <<<SQL
+            SELECT
+                COUNT(1) AS is_used
+            FROM %s
+            WHERE email = :email AND token_2fa_attempts > 0
+        SQL,
+            self::TABLE_NAME
+        );
+
+        // Fetch data.
+        $row = static::runSelectRow(
+            $this->pdo,
+            $sql,
+            [':email' => $email]
+        );
+
+        return $row ? $row['is_used'] === 1 : null;
     }
 }
