@@ -19,6 +19,14 @@ By visiting these websites and reading the information provided, you can gain a 
 
 **To avoid any misunderstanding, the names and places appearing in the following screenshots are completely imaginary, invented for demonstration purposes and do not refer to anything or anyone!**
 
+![](./images/register_mobile_view.png)
+
+![](./images/login_mobile_view.png)
+
+![](./images/forgot_password_mobile_view.png)
+
+![](./images/reset_password_with_passphrase_mobile_view.png)
+
 ![](./images/users_mobile_view.png)
 
 ![](./images/warehouses_mobile_view.png)
@@ -34,6 +42,10 @@ By visiting these websites and reading the information provided, you can gain a 
 Here's how I used ImageMagick to resize images:
 
 ```shell
+convert register_mobile_view.png -resize 80% -quality 95 register_mobile_view.png
+convert login_mobile_view.png -resize 80% -quality 95 login_mobile_view.png
+convert forgot_password_mobile_view.png -resize 80% -quality 95 forgot_password_mobile_view.png
+convert reset_password_with_passphrase_mobile_view.png -resize 80% -quality 95 reset_password_with_passphrase_mobile_view.png
 convert users_mobile.png -resize 80% -quality 95 users_mobile_view.png
 convert warehouses_mobile.png -resize 80% -quality 95 warehouses_mobile_view.png
 convert items_mobile.png -resize 80% -quality 95 items_mobile_view.png
