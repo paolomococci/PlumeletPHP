@@ -53,6 +53,8 @@ INSERT INTO operators_tbl (id, email, auth) VALUES (15, 'jenny.doe@example.local
 INSERT INTO operators_tbl (id, email, auth) SELECT u.id, u.email, 'admin' AS auth FROM users_tbl AS u WHERE id = 17;
 -- INSERT SELECT
 INSERT INTO operators_tbl (id, email, auth) SELECT u.id, u.email, 'employee' AS auth FROM users_tbl AS u WHERE id = 16 AND email = 'dolly.doe@example.local';
+-- INSERT SELECT
+INSERT INTO operators_tbl (id, email) SELECT u.id, u.email FROM users_tbl AS u WHERE id = 8 AND email = 'grace.doe@example.local';
 ```
 
 To verify the entries by sorting them by `auth`, using function FIELD():
@@ -61,15 +63,15 @@ To verify the entries by sorting them by `auth`, using function FIELD():
 SELECT auth, email, id FROM operators_tbl ORDER BY FIELD(auth, 'chief', 'admin', 'employee'), email;
 ```
 
-Or in the following way, using CASE:
+Or in the following way, using CASE, listing the operators in reverse order:
 
 ```SQL
 SELECT auth, id, email FROM operators_tbl ORDER BY 
     CASE auth 
-        WHEN 'chief' THEN 1 
+        WHEN 'employee' THEN 1 
         WHEN 'admin' THEN 2 
-        WHEN 'employee' THEN 3 
+        WHEN 'chief' THEN 3 
         else 4 
     END, 
-    email;
+    email DESC;
 ```
