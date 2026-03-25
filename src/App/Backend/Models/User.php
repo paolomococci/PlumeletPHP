@@ -16,6 +16,7 @@ final class User extends Model implements ModelInterface
 {
     // To avoid possible typing errors, the table name should be set in one place.
     const TABLE_NAME = 'plumeletphp_db.users_tbl';
+
     /**
      * __construct
      *
@@ -155,7 +156,7 @@ final class User extends Model implements ModelInterface
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
         return ($this->token_2fa_expires_at < $now);
     }
-    
+
     /**
      * getTokenTwoFaUsedAt
      *
@@ -164,7 +165,6 @@ final class User extends Model implements ModelInterface
     public function getTokenTwoFaUsedAt(): ?DateTimeImmutable
     {
         if ($this->token_2fa_used_at === null) {
-            
         }
         return ($this->token_2fa_used_at === null) ? null : static::toDateTimeImmutable($this->token_2fa_used_at);
     }
@@ -269,7 +269,7 @@ final class User extends Model implements ModelInterface
             updated_at: ''
         );
     }
-    
+
     /**
      * passwordHashWrapper
      *
@@ -288,7 +288,7 @@ final class User extends Model implements ModelInterface
      */
     public function setHashedTwoFaToken(): string
     {
-        $passphrase = bin2hex(random_bytes(16));
+        $passphrase           = bin2hex(random_bytes(16));
         $this->token_2fa_hash = password_hash($passphrase, PASSWORD_BCRYPT);
         return $passphrase;
     }
