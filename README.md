@@ -91,7 +91,7 @@ composer dump-autoload
 Here I will start adding the dependencies that I consider necessary for now:
 
 ```shell
-composer require guzzlehttp/psr7 httpsoft/http-emitter league/route php-di/php-di vlucas/phpdotenv filp/whoops monolog/monolog adhocore/jwt
+composer require guzzlehttp/psr7 httpsoft/http-emitter league/route php-di/php-di vlucas/phpdotenv filp/whoops monolog/monolog adhocore/jwt egulias/email-validator
 ```
 
 Install `league/plates` separately, preferring a stable version:
@@ -103,7 +103,7 @@ composer require league/plates --prefer-stable
 ### testing with `Pest`
 
 ```shell
-composer require --dev pestphp/pest phpunit/phpunit egulias/email-validator
+composer require --dev pestphp/pest phpunit/phpunit
 ```
 
 and after having appropriately modified the composer.json file and added pest.php and phpunit.xml to the root of the project:
