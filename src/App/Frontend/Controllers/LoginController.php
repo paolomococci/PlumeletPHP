@@ -107,7 +107,8 @@ final class LoginController extends Controller
             'Dashboard/index',
             [
                 'pageTitle'  => 'Welcome',
-                'userName'   => $user->getName(),
+                // User ID to the dashboard.
+                'userId'   => $user->getId(),
                 'csrf_token' => $csrfToken,
             ]
         );
