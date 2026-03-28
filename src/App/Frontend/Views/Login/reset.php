@@ -14,7 +14,6 @@ $form  = $form ?? [];
 
 // This is useful for handling request errors or missing data.
 $errors = $errors ?? [];
-// \App\Util\Handlers\VarDebugHandler::varDump($email, $form, $errors);
 
 $passphrase = $passphrase ?? ''; // TODO: For debugging only!
 ?>

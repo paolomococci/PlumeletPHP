@@ -252,7 +252,6 @@ final class LoginController extends Controller
             ]
         );
 
-        // \App\Util\Handlers\VarDebugHandler::varDump('login method');
         // Call the helper defined in the base Controller to render a template
         return $this->render(
             'Login/register',
