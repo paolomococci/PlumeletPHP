@@ -24,6 +24,11 @@ class DashboardController extends Controller
      */
     public function index(ServerRequestInterface $request): ResponseInterface
     {
+        /**
+         * 1.Grab the CSRF token that the middleware already attached.
+         */
+        $csrf      = $request->getAttribute('csrf');
+        $csrfToken = $csrf->getToken();
 
         // The middleware is already part of every request!
         // So, in any controller or view I can access it with:
@@ -34,8 +39,10 @@ class DashboardController extends Controller
         return $this->render(
             'Dashboard/index',
             [
-                'userName'   => 'unset',
-                'csrf_token' => $token,
+                'pageTitle'  => 'Dashboard',
+                // User ID to the dashboard.
+                // 'userId'     => $user->getId(),
+                'csrf_token' => $csrfToken,
             ]
         );
     }
