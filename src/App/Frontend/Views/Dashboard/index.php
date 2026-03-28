@@ -1,19 +1,39 @@
 <!-- Index dashboard view. -->
 <!-- The following instruction is used to change the base layout! -->
-<?php $this->layout('dashboard', ['title' => 'Dashboard']); ?>
+<?php
 
-<?php 
+use App\Backend\Models\Factories\OperatorFactory;
 
-$userName = $userName ?? 'friend';
+$pageTitle = $pageTitle ?? 'Dashboard';
+
+$this->layout('dashboard', ['title' => $pageTitle]);
+
 $csrfToken = $csrf_token ?? 'unset';
+$userId = $userId ?? 'unset';
+
+// Create the operator object from the user ID.
+$operator = OperatorFactory::create($userId);
+
+/**
+ * If for some strange reason a user ID that does not exist has been passed, 
+ * it destroys the session and performs a temporary redirect to the application login.
+ */
+if ($operator->getEmail() === null && $operator->getAuth() === null) {
+    session_destroy();
+    header('Location: /', true, 302);
+    exit();
+}
 ?>
 
 <!-- Centered dashboard container. -->
 <div class="dashboard-container">
     <!-- Header: shows the logged-in user. -->
     <h2 class="dashboard-header">
-        Welcome, <?= $this->e($userName) ?>!
+        Welcome, <?= $this->e($operator->getEmail()) ?>!
     </h2>
+    <p>ID: <?= $this->e($operator->getId()) ?></p>
+    <p>email: <?= $this->e($operator->getEmail()) ?></p>
+    <p>auth: <?= $this->e($operator->getRole()) ?></p>
 
     <!-- Message: tells the operator what they are using. -->
     <h5 class="dashboard-message">
