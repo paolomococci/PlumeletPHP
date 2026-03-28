@@ -11,14 +11,22 @@ $this->layout('dashboard', ['title' => $pageTitle]);
 $csrfToken = $csrf_token ?? 'unset';
 $userId = $userId ?? 'unset';
 
-// Create the operator object from the user ID.
-$operator = OperatorFactory::create($userId);
+// Possible definition of a valid operator user.
+if ($userId !== 'unset') {
+    // Creates operator object from user ID if user ID is defined.
+    $operator = OperatorFactory::create($userId);
 
-/**
- * If for some strange reason a user ID that does not exist has been passed, 
- * it destroys the session and performs a temporary redirect to the application login.
- */
-if ($operator->getEmail() === null && $operator->getAuth() === null) {
+    /**
+     * If for some strange reason a user ID that does not exist has been passed, 
+     * it destroys the session and performs a temporary redirect to the application login.
+     */
+    if ($operator->getEmail() === null && $operator->getAuth() === null) {
+        session_destroy();
+        header('Location: /', true, 302);
+        exit();
+    }
+} else {
+    // Otherwise, it destroys the session and temporarily redirects to the application's login page.
     session_destroy();
     header('Location: /', true, 302);
     exit();
