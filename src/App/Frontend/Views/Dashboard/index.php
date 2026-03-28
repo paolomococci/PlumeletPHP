@@ -11,22 +11,45 @@ $this->layout('dashboard', ['title' => $pageTitle]);
 $csrfToken = $csrf_token ?? 'unset';
 $userId = $userId ?? 'unset';
 
-// Possible definition of a valid operator user.
-if ($userId !== 'unset') {
-    // Creates operator object from user ID if user ID is defined.
-    $operator = OperatorFactory::create($userId);
+/**
+ * Returns the current session operator, 
+ * or creates one based on `$userId` (if defined), 
+ * handling session destruction and redirection 
+ * in the event of an invalid ID.
+ */
+$operator = match (isset($_SESSION['operator'])) {
+    // The operator has already been saved in the session.
+    true  => $_SESSION['operator'],
+    // In the event that, due to an error, $userId is found to be unset.
+    false => match ($userId === 'unset') {
+        true => (function () {
+            session_destroy();
+            header('Location: /', true, 302);
+            // End of request.
+            exit();
+        })(),
+        // Creates operator object from user ID if user ID is defined.
+        false => (function () use ($userId) {
+            $tempOperator = OperatorFactory::create($userId);
+            // Otherwise, it destroys the session and temporarily redirects to the application's login page.
+            if ($tempOperator->getEmail() === null && $tempOperator->getAuth() === null) {
+                session_destroy();
+                header('Location: /', true, 302);
+                // End of request.
+                exit();
+            }
+            // Saves the newly created object to the session and returns it.
+            $_SESSION['operator'] = $tempOperator;
+            return $tempOperator;
+        })(),
+    },
+};
 
-    /**
-     * If for some strange reason a user ID that does not exist has been passed, 
-     * it destroys the session and performs a temporary redirect to the application login.
-     */
-    if ($operator->getEmail() === null && $operator->getAuth() === null) {
-        session_destroy();
-        header('Location: /', true, 302);
-        exit();
-    }
-} else {
-    // Otherwise, it destroys the session and temporarily redirects to the application's login page.
+/**
+ * If for some strange reason a $userId that does not exist has been passed, 
+ * it destroys the session and performs a temporary redirect to the application login.
+ */
+if ($operator->getEmail() === null && $operator->getAuth() === null) {
     session_destroy();
     header('Location: /', true, 302);
     exit();
@@ -41,7 +64,7 @@ if ($userId !== 'unset') {
     </h2>
     <p>ID: <?= $this->e($operator->getId()) ?></p>
     <p>email: <?= $this->e($operator->getEmail()) ?></p>
-    <p>auth: <?= $this->e($operator->getRole()) ?></p>
+    <p>role: <?= $this->e($operator->getRole()) ?></p>
 
     <!-- Message: tells the operator what they are using. -->
     <h5 class="dashboard-message">
