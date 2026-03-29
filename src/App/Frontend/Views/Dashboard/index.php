@@ -70,9 +70,6 @@ if ($operator->getEmail() === null && $operator->getAuth() === null) {
     <h5 class="dashboard-message">
         You are now using the <strong>PlumeletPHP framework management system</strong>.
     </h5>
-
-    <!-- Token test for development -->
-    <h6>token: <?= $this->e($csrfToken) ?></h6>
 </div>
 
 <!-- Inline styles - you can move this to a CSS file if you prefer -->
