@@ -66,7 +66,7 @@ $error = $error ?? '';
             <label class="form-check-label" for="remember">Remember me</label>
         </div>
 
-        <button type="submit" class="btn">Log in</button>
+        <button type="submit" class="btn">Login</button>
 
         <!-- Helper links -->
         <div class="text-helper">
