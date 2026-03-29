@@ -13,7 +13,7 @@ $name        = $form['name']    ?? '';
 $email       = $form['email']   ?? '';
 
 // Set the layout.
-$this->layout("layout", ['title' => 'User - Update']);
+$this->layout('layout', ['title' => 'User - Update']);
 ?>
 
 <section>

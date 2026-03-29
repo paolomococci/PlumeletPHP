@@ -1,4 +1,4 @@
-<?php $this->layout("layout", ['title' => 'Home']); ?>
+<?php $this->layout('layout', ['title' => 'Home']); ?>
 
 <!-- Contents -->
 <section>
