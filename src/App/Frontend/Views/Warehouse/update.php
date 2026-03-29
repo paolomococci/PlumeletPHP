@@ -15,7 +15,7 @@ $email          = $form['email']    ?? '';
 $selected       = $form['type']     ?? '';
 
 // Set the layout.
-$this->layout('layout', ['title' => 'Warehouse - Update']);
+$this->layout('dashboard', ['title' => 'Warehouse - Update']);
 ?>
 
 <section>

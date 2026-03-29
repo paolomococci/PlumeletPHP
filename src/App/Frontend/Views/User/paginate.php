@@ -40,7 +40,7 @@ $baseUrl = '/user/search';
  * which means it returns a value that can be assigned to a variable 
  * or used directly.
  */
-$this->layout('layout', ['title' => "User - " . match (true) {
+$this->layout('dashboard', ['title' => "User - " . match (true) {
     $search !== '' => "Search term \"$search\" and paginate",
     default => 'Paginate'
 }]);

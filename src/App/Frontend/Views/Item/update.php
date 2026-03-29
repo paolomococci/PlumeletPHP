@@ -15,7 +15,7 @@ $price       = $form['price']       ?? '';
 $currency    = $form['currency']    ?? '';
 
 // Set the layout.
-$this->layout('layout', ['title' => 'Edit Item']);
+$this->layout('dashboard', ['title' => 'Edit Item']);
 ?>
 
 <section>

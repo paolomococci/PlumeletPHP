@@ -1,4 +1,4 @@
-<? $this->layout('layout', ['title' => 'Warehouse - Index']) ?>
+<? $this->layout('dashboard', ['title' => 'Warehouse - Index']) ?>
 
 <!-- Contents -->
 <section>

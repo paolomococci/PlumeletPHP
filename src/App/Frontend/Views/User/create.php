@@ -18,7 +18,7 @@ $password = $form['password'] ?? '';
 // Set the page layout.
 // Load the main page layout (`layout.php`) with a dynamic title 'Store'. 
 // This is common in mature frameworks.
-$this->layout('layout', ['title' => 'Store']);
+$this->layout('dashboard', ['title' => 'Store']);
 ?>
 
 <!-- User create view -->
