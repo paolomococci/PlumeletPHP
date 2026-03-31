@@ -55,6 +55,8 @@ INSERT INTO operators_tbl (id, email, auth) SELECT u.id, u.email, 'admin' AS aut
 INSERT INTO operators_tbl (id, email, auth) SELECT u.id, u.email, 'employee' AS auth FROM users_tbl AS u WHERE id = 16 AND email = 'dolly.doe@example.local';
 -- INSERT SELECT
 INSERT INTO operators_tbl (id, email) SELECT u.id, u.email FROM users_tbl AS u WHERE id = 8 AND email = 'grace.doe@example.local';
+-- UPDATE
+UPDATE operators_tbl SET auth = 'chief' WHERE id = 4;
 ```
 
 To verify the entries by sorting them by `auth`, using function FIELD():
@@ -74,4 +76,31 @@ SELECT auth, id, email FROM operators_tbl ORDER BY
         else 4 
     END, 
     email DESC;
+```
+
+An example of a left join to display user permissions, if any:
+
+```sql
+SELECT 
+    u.id,
+    u.name,
+    u.email,
+    o.auth
+FROM users_tbl AS u
+LEFT JOIN operators_tbl AS o
+    ON u.id = o.id;
+```
+
+An example of a left join to display a user's permission type, if any:
+
+```sql
+SELECT 
+    u.id,
+    u.name,
+    u.email,
+    o.auth
+FROM users_tbl AS u
+LEFT JOIN operators_tbl AS o
+    ON u.id = o.id
+    WHERE u.id = 4;
 ```
