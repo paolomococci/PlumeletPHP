@@ -152,9 +152,8 @@ class OperatorRepository extends Repository
     public function updateAuth(Operator $operator): ?Operator
     {
         $sql = static::cleanQuery(<<<'SQL'
-            UPDATE
+            UPDATE %s 
                 SET auth = :auth
-            FROM %s
             WHERE id = :id
         SQL, self::OPERATORS_TABLE_NAME);
 
@@ -165,7 +164,7 @@ class OperatorRepository extends Repository
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
                 ':id'   => $operator->getId(),
-                ':auth' => $operator->getAuth(),
+                ':auth' => $operator->getAuth()->value,
             ]);
             // If the execution succeeds, commit the changes.
             $this->pdo->commit();
