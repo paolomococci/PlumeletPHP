@@ -88,8 +88,11 @@ SELECT
     o.auth
 FROM users_tbl AS u
 LEFT JOIN operators_tbl AS o
-    ON u.id = o.id;
+    ON u.id = o.id
+    ORDER BY FIELD(o.auth, 'employee', 'admin', 'chief'), u.email;
 ```
+
+sorting users in reverse order by privileges and email.
 
 An example of a left join to display a user's permission type, if any:
 
