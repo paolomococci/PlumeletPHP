@@ -1,5 +1,5 @@
 <!-- User delete view -->
-<?php $this->layout('dashboard', ['title' => 'Items - Confirm Delete']); ?>
+<?php $this->layout('dashboard', ['title' => 'User - Confirm Delete']); ?>
 
 <!-- Contents -->
 <section>

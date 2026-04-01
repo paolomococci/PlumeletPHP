@@ -1,5 +1,5 @@
 <!-- Item delete view -->
-<?php $this->layout('dashboard', ['title' => 'Items - Confirm Delete']); ?>
+<?php $this->layout('dashboard', ['title' => 'Item - Confirm Delete']); ?>
 
 <!-- Contents -->
 <section>

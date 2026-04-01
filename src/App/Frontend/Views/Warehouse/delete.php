@@ -1,5 +1,5 @@
 <!-- Warehouse delete view -->
-<?php $this->layout('dashboard', ['title' => 'Items - Confirm Delete']); ?>
+<?php $this->layout('dashboard', ['title' => 'Warehouse - Confirm Delete']); ?>
 
 <!-- Contents -->
 <section>
