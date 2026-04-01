@@ -27,17 +27,25 @@ By visiting these websites and reading the information provided, you can gain a 
 
 ![](./images/reset_password_with_passphrase_mobile_view.png)
 
-![](./images/users_mobile_view.png)
+![](./images/dashboard_mobile_view.png)
 
-![](./images/warehouses_mobile_view.png)
+![](./images/items_paginate_mobile_view.png)
 
-![](./images/items_mobile_view.png)
+![](./images/users_paginate_mobile_view.png)
 
-![](./images/item_read_mobile_view.png)
+![](./images/warehouses_paginate_mobile_view.png)
 
-![](./images/item_update_mobile_view.png)
+![](./images/search_user_mobile_view.png)
 
-![](./images/item_delete_mobile_view.png)
+![](./images/user_read_mobile_view.png)
+
+![](./images/user_update_mobile_view.png)
+
+![](./images/user_delete_mobile_view.png)
+
+![](./images/user_confirm_delete_mobile_view.png)
+
+![](./images/new_user_mobile_view.png)
 
 Here's how I used ImageMagick to resize images:
 
@@ -46,25 +54,17 @@ convert register_mobile_view.png -resize 80% -quality 95 register_mobile_view.pn
 convert login_mobile_view.png -resize 80% -quality 95 login_mobile_view.png
 convert forgot_password_mobile_view.png -resize 80% -quality 95 forgot_password_mobile_view.png
 convert reset_password_with_passphrase_mobile_view.png -resize 80% -quality 95 reset_password_with_passphrase_mobile_view.png
-convert users_mobile.png -resize 80% -quality 95 users_mobile_view.png
-convert warehouses_mobile.png -resize 80% -quality 95 warehouses_mobile_view.png
-convert items_mobile.png -resize 80% -quality 95 items_mobile_view.png
-convert item_delete_mobile_view.png -resize 80% -quality 95 item_delete_mobile_view.png
-convert item_read_mobile_view.png -resize 80% -quality 95 item_read_mobile_view.png
-convert item_update_mobile_view.png -resize 80% -quality 95 item_update_mobile_view.png
-convert new_item_required_field_tooltip_mobile_view.png -resize 60% -quality 95 new_item_required_field_tooltip_mobile_view.png
-convert item_new_modal_confirm_view.png -resize 60% -quality 95 item_new_modal_confirm_view.png
-convert new_user_required_field_tooltip_mobile_view.png -resize 60% -quality 95 new_user_required_field_tooltip_mobile_view.png
-convert new_warehouse_required_field_tooltip_mobile_view.png -resize 60% -quality 95 new_warehouse_required_field_tooltip_mobile_view.png
+convert dashboard_mobile_view.png -resize 80% -quality 95 dashboard_mobile_view.png
+convert items_paginate_mobile_view.png -resize 80% -quality 95 items_paginate_mobile_view.png
+convert users_paginate_mobile_view.png -resize 80% -quality 95 users_paginate_mobile_view.png
+convert warehouses_paginate_mobile_view.png -resize 80% -quality 95 warehouses_paginate_mobile_view.png
+convert search_user_mobile_view.png -resize 80% -quality 95 search_user_mobile_view.png
+convert user_read_mobile_view.png -resize 80% -quality 95 user_read_mobile_view.png
+convert user_update_mobile_view.png -resize 80% -quality 95 user_update_mobile_view.png
+convert user_delete_mobile_view.png -resize 80% -quality 95 user_delete_mobile_view.png
+convert user_confirm_delete_mobile_view.png -resize 80% -quality 95 user_confirm_delete_mobile_view.png
+convert new_user_mobile_view.png -resize 80% -quality 95 new_user_mobile_view.png
 ```
-
-![](./images/new_item_required_field_tooltip_mobile_view.png)
-
-![](./images/item_new_modal_confirm_view.png)
-
-![](./images/new_user_required_field_tooltip_mobile_view.png)
-
-![](./images/new_warehouse_required_field_tooltip_mobile_view.png)
 
 ## scaffolding
 
