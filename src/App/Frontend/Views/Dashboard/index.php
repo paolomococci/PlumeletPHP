@@ -59,12 +59,12 @@ if ($operator->getEmail() === null && $operator->getAuth() === null) {
 <!-- Centered dashboard container. -->
 <div class="dashboard-container">
     <!-- Header: shows the logged-in user. -->
-    <h2 class="dashboard-header">
-        Welcome, <?= $this->e($operator->getEmail()) ?>!
-    </h2>
-    <p>ID: <?= $this->e($operator->getId()) ?></p>
-    <p>email: <?= $this->e($operator->getEmail()) ?></p>
-    <p>role: <?= $this->e($operator->getRole()) ?></p>
+    <h6 class="dashboard-header">
+        Welcome, <?= $this->e($operator->getEmail()) ?? '' ?>!
+    </h6>
+    <h5>ID: <?= $this->e($operator->getId()) ?? '' ?></h5>
+    <p>email: <?= $this->e($operator->getEmail()) ?? '' ?></p>
+    <p>role: <?= $this->e($operator->getRole()) ?? '' ?></p>
 
     <!-- Message: tells the operator what they are using. -->
     <h5 class="dashboard-message">
@@ -91,7 +91,7 @@ if ($operator->getEmail() === null && $operator->getAuth() === null) {
 
     .dashboard-header {
         margin-bottom: 1rem;
-        font-size: 2rem;
+        font-size: 1rem;
         color: #235;
     }
 

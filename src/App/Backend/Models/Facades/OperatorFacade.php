@@ -25,7 +25,7 @@ class OperatorFacade
      * createByUserId
      *
      * @param  string $userId
-     * @return Operator
+     * @return null|Operator
      */
     public function createByUserId(string $userId): ?Operator
     {
@@ -34,10 +34,21 @@ class OperatorFacade
     }
     
     /**
+     * createWithRole
+     *
+     * @param  Operator $operator
+     * @return null|Operator
+     */
+    public function createWithRole(Operator $operator): ?Operator {
+        // Delegates entirely to the service.
+        return $this->operatorService->createWithRole($operator);
+    }
+    
+    /**
      * readById
      *
      * @param  string $operatorId
-     * @return Operator
+     * @return null|Operator
      */
     public function readById(string $operatorId): ?Operator
     {

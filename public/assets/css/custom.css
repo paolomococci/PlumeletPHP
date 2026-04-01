@@ -89,6 +89,19 @@ a.disabled {
   cursor: not-allowed;
 }
 
+/* The style given to the registered operator's email and view title. */
+.logged-operator,
+.view-title {
+  font-size: smaller;
+}
+
+/* Operator role. */
+.operator-role {
+  color: #678;
+  font-size: 0.6rem;
+  margin-left: 1rem;
+}
+
 /* Responsive typography and optional element visibility. */
 @media (min-width: 360px) {
   body {

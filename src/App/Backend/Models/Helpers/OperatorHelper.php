@@ -65,11 +65,22 @@ trait OperatorHelper
      */
     public function createByUserId(string $userId): ?self
     {
-        // $this->operatorService->createByUserId($userId);
-        // return $this->read();
         $this->ensureFacade();
 
         $created = $this->operatorFacade->createByUserId($userId);
+        return $created ? $created->hydrate($created) : null;
+    }
+
+    /**
+     * createWithRole
+     *
+     * @return null|self
+     */
+    public function createWithRole(): ?self
+    {
+        $this->ensureFacade();
+
+        $created = $this->operatorFacade->createWithRole($this);
         return $created ? $created->hydrate($created) : null;
     }
 
@@ -120,6 +131,24 @@ trait OperatorHelper
         $this->hydrate($storedOperator);
 
         return $this;
+    }
+    
+    /**
+     * exists
+     *
+     * @return bool
+     */
+    public function exists(): bool {
+        if ($this->id === null) {
+            throw new InvalidArgumentException('Cannot read an operator without an valid id.');
+        }
+
+        $storedOperator = $this->operatorFacade->readById($this->id);
+        if ($storedOperator === null) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

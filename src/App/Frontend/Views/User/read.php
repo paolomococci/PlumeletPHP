@@ -10,6 +10,7 @@
         <li><em>id:</em> <?= isset($id) ? $this->e($id) : 'unset' ?></li>
         <li><em>name:</em> <?= $this->e($name) ?? 'unset' ?></li>
         <li><em>email:</em> <?= $this->e($email) ?? 'unset' ?></li>
+        <li><em>role:</em> <?= $this->e($role) ?? 'unset' ?></li>
     </ul>
     <hr>
     <p><a href="/users">users</a></p>

@@ -7,6 +7,7 @@ namespace App;
 use App\Errors\CsrfTokenException;
 use App\Errors\InternalServerError;
 use App\Frontend\Middlewares\CsrfMiddleware;
+use App\Frontend\Middlewares\OperatorMiddleware;
 use App\Frontend\Middlewares\SessionMiddleware;
 use App\Frontend\Routes\DashboardRoutes;
 use App\Frontend\Routes\ItemRoutes;
@@ -24,7 +25,9 @@ use function DI\create;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\ServerRequest;
 use HttpSoft\Emitter\SapiEmitter;
+use League\Route\Http\Exception\ForbiddenException;
 use League\Route\Http\Exception\NotFoundException;
+use League\Route\Http\Exception\UnauthorizedException;
 use League\Route\Router;
 use League\Route\Strategy\ApplicationStrategy;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -64,7 +67,7 @@ class Bootstrap
             $builder->addDefinitions([
                 ResponseFactoryInterface::class => create(HttpFactory::class),
                 TemplateInterface::class        => create(RenderTemplate::class),
-                // Thanks to the DI container here it is possible to indicate the 
+                // Thanks to the DI container here it is possible to indicate the
                 // class that simulates or actually carries out the sending.
                 MailerInterface::class          => create(FileMailer::class),
             ]);
@@ -103,11 +106,16 @@ class Bootstrap
         );
         $this->router->middleware($csrfMiddleware);
 
+        // ------------------------------------------------------------------
+        // Operator middleware
+        // ------------------------------------------------------------------
+        $operatorMiddleware = new OperatorMiddleware(
+            $this->container->get(OperatorMiddleware::class)
+        );
+        $this->router->middleware($operatorMiddleware);
+
         /* ------------------- Routes ------------------- */
         // The routes are stored in these classes, which contain all authorized routes!
-        // Home
-        // $homeRoutes = new HomeRoutes;
-        // $homeRoutes->registerRoutes($this->router);
         // Login
         $loginRoutes = new LoginRoutes;
         $loginRoutes->registerRoutes($this->router);
@@ -149,14 +157,25 @@ class Bootstrap
                 }
                 exit;
             }
-        } catch (CsrfTokenException $cte) {
+        } catch (CsrfTokenException | ForbiddenException $e) {
             http_response_code(403);
 
             if ($this->environment === 'dev') {
-                throw $cte;
+                throw $e;
             } else {
                 if ($this->appRootDir != '') {
                     require $this->appRootDir . '/src/App/Frontend/Views/403.html';
+                }
+                exit;
+            }
+        } catch (UnauthorizedException $ue) {
+            http_response_code(401);
+
+            if ($this->environment === 'dev') {
+                throw $ue;
+            } else {
+                if ($this->appRootDir != '') {
+                    require $this->appRootDir . '/src/App/Frontend/Views/401.html';
                 }
                 exit;
             }

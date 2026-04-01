@@ -71,6 +71,43 @@ class OperatorRepository extends Repository
     }
 
     /**
+     * createWithRole
+     *
+     * @param  Operator $operator
+     * @return Operator
+     */
+    public function createWithRole(Operator $operator): ?Operator
+    {
+        $sql = static::cleanQuery(<<<'SQL'
+            INSERT INTO %s (id, email, auth)
+            SELECT u.id, u.email, :role AS auth FROM %s AS u WHERE id = :id AND email = :email
+        SQL, self::OPERATORS_TABLE_NAME, self::USERS_TABLE_NAME);
+
+        try {
+            // Start the transaction.
+            $this->pdo->beginTransaction();
+            // parametrized SQL for create data to the database
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':id'    => $operator->getId(),
+                ':email' => $operator->getEmail(),
+                ':role'  => $operator->getRole() ?? 'employee',
+            ]);
+
+            // If the execution succeeds, commit the changes.
+            $this->pdo->commit();
+        } catch (PDOException $pe) {
+            if ($this->pdo->inTransaction()) {
+                // If something goes wrong, roll back the transaction and re-raise the exception.
+                $this->pdo->rollBack();
+            }
+            return null;
+        }
+
+        return $this->read((string) $this->pdo->lastInsertId());
+    }
+
+    /**
      * read
      *
      * @param  string $id
@@ -153,7 +190,7 @@ class OperatorRepository extends Repository
     {
         $sql = static::cleanQuery(<<<'SQL'
             UPDATE %s 
-                SET auth = :auth
+                SET auth = :role
             WHERE id = :id
         SQL, self::OPERATORS_TABLE_NAME);
 
@@ -164,7 +201,7 @@ class OperatorRepository extends Repository
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
                 ':id'   => $operator->getId(),
-                ':auth' => $operator->getAuth()->value,
+                ':role' => $operator->getRole(),
             ]);
             // If the execution succeeds, commit the changes.
             $this->pdo->commit();

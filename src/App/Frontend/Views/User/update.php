@@ -1,6 +1,8 @@
 <!-- User update view -->
 <?php
 
+use App\Backend\Models\Enums\AuthEnum;
+
 // Extract the values from the form.
 // Assign default values (empty arrays) to the `$form` and `$errors` variables if they are not already defined. 
 // This is useful for handling request errors or missing data.
@@ -11,6 +13,7 @@ $errors = $errors ?? [];
 $id          = $form['id']      ?? '';
 $name        = $form['name']    ?? '';
 $email       = $form['email']   ?? '';
+$role        = $form['role']    ?? '';
 
 // Set the layout.
 $this->layout('dashboard', ['title' => 'User - Update']);
@@ -58,6 +61,29 @@ $this->layout('dashboard', ['title' => 'User - Update']);
         <div>
             <label for="password">Password</label>
             <input type="password" name="password" id="password">
+        </div>
+
+        <!-- Role -->
+        <div>
+            <label for="userRole">Role</label>
+            <select name="userRole" id="userRole">
+                <?php foreach (AuthEnum::cases() as $case): ?>
+                    <?php
+                    // The value to be saved in the database.
+                    $value        = $case->value;
+                    // employee, admin or chief
+                    $label        = ucfirst(strtolower($value));
+                    $selectedAttr = ($value === $selected) ? 'selected' : '';
+                    ?>
+                    <option value="<?= $this->e($value) ?>" <?= $this->e($selectedAttr) ?>>
+                        <?= $this->e($label) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <?php if (!empty($errors['role'])): ?>
+                <small class="error-msg"><?= $this->e($errors['role']) ?></small>
+            <?php endif; ?>
         </div>
 
         <!-- CSRF token -->

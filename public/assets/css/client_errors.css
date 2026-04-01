@@ -83,7 +83,7 @@
 }
 
 /* Link shown below to return to home. */
-.back-home {
+.go-back {
   display: flex;
   justify-content: center;
   margin: 0;

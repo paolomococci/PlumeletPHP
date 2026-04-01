@@ -4,9 +4,12 @@ declare(strict_types=1); // Enforce strict type checking
 
 namespace App\Frontend\Controllers;
 
+use App\Backend\Models\Enums\AuthEnum;
+use App\Backend\Models\Operator;
 use App\Backend\Models\User;
 use App\Frontend\Controllers\Controller;
 use App\Frontend\Controllers\Interfaces\CrudInterface;
+use App\Frontend\Services\OperatorService;
 use App\Frontend\Services\UserService;
 use DateTime;
 use League\Route\Http\Exception\NotFoundException;
@@ -35,7 +38,8 @@ final class UserController extends Controller implements CrudInterface
      */
     public function __construct(
         private DateTime $datetime,
-        protected UserService $userService
+        protected UserService $userService,
+        protected OperatorService $operatorService
     ) {}
 
     /* --------------------------------------------------------------------- */
@@ -267,7 +271,8 @@ final class UserController extends Controller implements CrudInterface
     public function read(ServerRequestInterface $request, array $args): ResponseInterface
     {
         // Retrieve a specific user using the service class.
-        $user = $this->userService->read($args['id']);
+        $user     = $this->userService->read($args['id']);
+        $operator = $this->operatorService->read($args['id']) ?? new Operator();
 
         if ($user !== null) {
             return $this->render(
@@ -278,6 +283,7 @@ final class UserController extends Controller implements CrudInterface
                     'id'         => $user->getId(),
                     'name'       => $user->getName(),
                     'email'      => $user->getEmail(),
+                    'role'       => $operator->getRole() ?? 'unset',
                 ]
             )->withStatus(200);
         } else {
@@ -307,12 +313,14 @@ final class UserController extends Controller implements CrudInterface
             $name     = $parameters['name'] ?? '';
             $email    = $parameters['email'] ?? '';
             $password = $parameters['password'] ?? '';
+            $role     = $parameters['userRole'] ?? '';
 
             // ------------- 2. Sanitization -----------
             $id       = htmlspecialchars((string) $id, ENT_QUOTES, 'UTF-8');
             $name     = htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8');
             $email    = htmlspecialchars((string) $email, ENT_QUOTES, 'UTF-8');
             $password = (string) $password;
+            $role     = htmlspecialchars((string) $role, ENT_QUOTES, 'UTF-8');
 
             // ------------- 3. Validation ----------
             $errors = [];
@@ -321,6 +329,9 @@ final class UserController extends Controller implements CrudInterface
             }
             if ($email === null || $email === '') {
                 $errors['email'] = 'Invalid email!';
+            }
+            if (! AuthEnum::isValid($role)) {
+                $errors['role'] = 'Invalid role!';
             }
 
             // If there are any errors, re-render the form.
@@ -336,21 +347,37 @@ final class UserController extends Controller implements CrudInterface
                         'form'       => [
                             'name'  => $name,
                             'email' => $email,
+                            'userRole' => $role,
                         ],
                     ]
                 );
             }
 
-            // ------------- 4. Update of the User ----------
+            // ------------- 4. Update of the User/Operator ----------
             $user = User::create();
             $user->setId($id);
             $user->setName($name);
             $user->setEmail($email);
             $user->setPlainPassword($password);
+            $operator = new Operator();
+            // Sets the object properties in fluent style.
+            $operator->setId($id)->setEmail($email)->setRole($role);
+            // When I need to modify operator data in the database, it is essential to set the object's facade itself!
+            // That is, a fully functional object.
+            $operator->setFacade();
 
             // Update the database using the service method.
             $this->userService->update($user);
+            // Check if the user is already registered as an operator.
+            if ($operator->exists()) {
+                // Update data in the database using fluent syntax only if the user is already registered as an operator.
+                $operator->updateEmail()->updateAuth();
 
+            } else {
+                // Set user data in the operator table using fluent syntax only if the user is not already registered as an operator.
+                $operator->createWithRole();
+            }
+            
             // Redirect to the user details page.
             return $this->redirect("/user/{$user->getId()}");
         }
@@ -358,6 +385,7 @@ final class UserController extends Controller implements CrudInterface
         // Display the form with the current values.
         $id   = $args['id'] ?? null;
         $user = $this->userService->read($id);
+        $operator = $this->operatorService->read($args['id']) ?? new Operator();
 
         if ($user === null) {
             // 404
@@ -374,6 +402,7 @@ final class UserController extends Controller implements CrudInterface
                     'id'    => $user->getId(),
                     'name'  => $user->getName(),
                     'email' => $user->getEmail(),
+                    'role'  => $operator->getRole() ?? 'unset',
                 ],
             ]
         );

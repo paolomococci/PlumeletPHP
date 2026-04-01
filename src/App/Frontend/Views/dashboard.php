@@ -23,8 +23,12 @@
 <body id="app" class="full-bleed">
     <!-- 1) Header - visible only on larger viewports due to .optional -->
     <header class="app-header" role="banner">
+        <h6 class="logged-operator">
+            <?= $this->e($_SESSION['operator']?->getEmail() ?? 'guest') ?>
+            <em class="operator-role">(<?= $this->e($_SESSION['operator']?->getRole() ?? '') ?>)</em>
+        </h6>
         <!-- Page title rendered inside the header. -->
-        <span><?= $this->e($title) ?></span>
+        <h6><span class="view-title"><?= $this->e($title) ?></span></h6>
     </header>
 
 

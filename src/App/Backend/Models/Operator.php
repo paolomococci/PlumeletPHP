@@ -132,6 +132,18 @@ final class Operator
     }
 
     /**
+     * setRole
+     *
+     * @param  string $role
+     * @return self
+     */
+    public function setRole(string $role): self
+    {
+        $this->auth = AuthEnum::tryFrom($role);
+        return $this;
+    }
+
+    /**
      * -------------------- from object to array ----
      */
 

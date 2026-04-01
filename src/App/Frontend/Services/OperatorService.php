@@ -40,6 +40,16 @@ class OperatorService
 
         return $this->operatorRepository->create($operator);
     }
+    
+    /**
+     * createWithRole
+     *
+     * @param  Operator $operator
+     * @return null|Operator
+     */
+    public function createWithRole(Operator $operator): ?Operator {
+        return $this->operatorRepository->createWithRole($operator);
+    }
 
     /**
      * readById
