@@ -1,5 +1,10 @@
 # tier one `plumeletphp_db`
 
+```shell
+systemctl status mariadb
+mariadb --user=developer_username --password --pager
+```
+
 ## see which version of MariaDB you are using
 
 In a simple way:
