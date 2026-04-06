@@ -145,3 +145,12 @@ DROP USER IF EXISTS 'old_developer_username'@'192.168.XXX.XXX';
 FLUSH PRIVILEGES;
 SELECT `user`, `host`, `Grant_priv`, `Super_priv` FROM `mysql`.`user` ORDER BY `user` DESC;
 ```
+
+To get both general and specific information about the current database connection in use:
+
+```sql
+SHOW VARIABLES LIKE 'max_connections';
+SHOW STATUS LIKE 'Threads_connected';
+SHOW PROCESSLIST;
+SELECT CURRENT_USER();
+```
