@@ -88,7 +88,7 @@
   Media queries - dynamic scaling
    ---------------------------- */
 
-/* ---------- Smartphone (599 px) ---------- */
+/* ---------- Smartphone (599 px) ---------- */
 @media (max-width: 599px) {
   #required-field-tooltip {
     /* Center vertically and horizontally */
@@ -104,7 +104,7 @@
   }
 }
 
-/* ---------- Tablet / palm-tablet (600-1199 px) ---------- */
+/* ---------- Tablet / palm-tablet (600-1199 px) ---------- */
 @media (min-width: 600px) and (max-width: 1199px) {
   #required-field-tooltip {
     /* Center vertically and horizontally */
@@ -120,7 +120,7 @@
   }
 }
 
-/* ---------- Desktop / laptop (≥ 1200 px) ---------- */
+/* ---------- Desktop / laptop (≥ 1200 px) ---------- */
 @media (min-width: 1200px) {
   #required-field-tooltip {
     /* Center vertically and horizontally */

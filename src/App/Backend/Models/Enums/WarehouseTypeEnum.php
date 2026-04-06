@@ -34,7 +34,7 @@ enum WarehouseTypeEnum: string
      *
      * This is handy when you want to display the type in a UI 
      * (e.g. in a <select> element or a table).  
-     * The function uses PHP 8.0's `match` expression to
+     * The function uses PHP 8.0's `match` expression to
      * map the enum case to a friendly string.
      *
      * @return string Human-readable label.

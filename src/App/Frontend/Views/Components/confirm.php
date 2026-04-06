@@ -48,13 +48,13 @@ $alertMsg = $alertMsg ?? 'This action may be irreversible.';
     /* The panel is styled dark-themed, rounded, and has a drop-shadow. */
     .modal-panel {
         position: relative;
-        /* margin: 6vh auto vertically centres the panel 6 vh from the top, horizontally centered. */
+        /* margin: 6vh auto vertically centres the panel 6 vh from the top, horizontally centered. */
         margin: 6vh auto;
         /**
          * Responsive:
          * 
          * 18rem, the minimum width the element can shrink to;
-         * 90vw, the preferred width, calculated as 90 % of the viewport’s width;
+         * 90vw, the preferred width, calculated as 90 % of the viewport’s width;
          * 38rem, the maximum width an element can have.
          * 
          * clamp() lets the modal adapt fluidly across devices while staying within sensible size limits.

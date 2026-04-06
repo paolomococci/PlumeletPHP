@@ -62,7 +62,7 @@ $resetUrl = $resetUrl ?? '';
             display: flex;
             /* Vertically center all flex items (input and buttons). */
             align-items: center;
-            /* Add a small horizontal space between items - 8 px is a decent default. */
+            /* Add a small horizontal space between items - 8 px is a decent default. */
             gap: 8px;
             /* Prevent the items from wrapping onto a new line, even on narrow screens. */
             flex-wrap: nowrap;

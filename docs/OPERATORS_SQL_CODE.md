@@ -49,11 +49,11 @@ Example of adding an operator:
 ```sql
 -- INSERT
 INSERT INTO operators_tbl (id, email, auth) VALUES (15, 'jenny.doe@example.local', 'chief');
--- INSERT SELECT
+-- INSERT SELECT
 INSERT INTO operators_tbl (id, email, auth) SELECT u.id, u.email, 'admin' AS auth FROM users_tbl AS u WHERE id = 17;
--- INSERT SELECT
+-- INSERT SELECT
 INSERT INTO operators_tbl (id, email, auth) SELECT u.id, u.email, 'employee' AS auth FROM users_tbl AS u WHERE id = 16 AND email = 'dolly.doe@example.local';
--- INSERT SELECT
+-- INSERT SELECT
 INSERT INTO operators_tbl (id, email) SELECT u.id, u.email FROM users_tbl AS u WHERE id = 8 AND email = 'grace.doe@example.local';
 -- UPDATE
 UPDATE operators_tbl SET auth = 'chief' WHERE id = 4;

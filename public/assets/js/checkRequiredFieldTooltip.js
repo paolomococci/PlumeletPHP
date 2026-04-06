@@ -156,7 +156,7 @@ function showTooltip(form, errors) {
         tooltip.style.transform = 'translate(-50%, 0)';
     }
 
-    // Auto-hide after 5 sec, unless the user fixes the form earlier.
+    // Auto-hide after 5 sec, unless the user fixes the form earlier.
     if (!tooltip.dataset.timeout) {
         tooltip.dataset.timeout = setTimeout(hideTooltip, 5000);
     }
