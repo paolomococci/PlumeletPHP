@@ -26,7 +26,7 @@ final class FileMailer implements MailerInterface
      *
      * Ensures that the directory used for storing mail
      * files exists. If it doesn't, it is created with
-     * recursive permission flags 0755.
+     * recursive permission flags 0775.
      *
      * @return void
      */
@@ -35,7 +35,7 @@ final class FileMailer implements MailerInterface
         // Create the folder if it doesn't already exist.
         if (! is_dir($this->mailsDir)) {
             // Only the owner can write; everyone else can read & enter the directory.
-            mkdir($this->mailsDir, 0755, true);
+            mkdir($this->mailsDir, 0775, true);
         }
     }
 
