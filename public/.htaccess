@@ -1,1 +1,18 @@
-FallbackResource index.php
+<IfModule mod_rewrite.c>
+    # Enable the rewrite engine.
+    RewriteEngine On
+
+    # Optional: set a base path if your site lives in a sub-folder.
+    RewriteBase /
+
+    # To avoid infinite rewrite cycles.
+    # If the request is already for /index.php, stop rewriting.
+    RewriteCond %{REQUEST_URI} !^/index\.php$
+
+    # Only rewrite when the target does not exist physically.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Rewrite everything else to index.php
+    RewriteRule ^.*$ index.php [L,QSA]
+</IfModule>
