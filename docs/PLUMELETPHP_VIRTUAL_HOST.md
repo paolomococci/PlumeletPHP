@@ -118,6 +118,7 @@ composer clear-cache
 composer install
 chown --recursive developer_username:apache .
 chmod -R 755 /var/www/html/plumeletphp/
+chmod -R 775 /var/www/html/plumeletphp/stores/
 chmod -R 644 /var/www/html/plumeletphp/*.php
 sudo restorecon -Rv /var/www/html/plumeletphp/
 sudo systemctl restart httpd
