@@ -101,6 +101,46 @@ And finally, once you've finished your development session and stopped the virtu
 quit
 ```
 
+## setup of vscode
+
+Edit sftp.json like this:
+
+```json
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "name": "virtual-machine-name",
+    "username": "developer_username",
+    "privateKeyPath": "/home/developer_username/.ssh/id_rsa",
+    "passphrase": "developer_passphrase",
+    "host": "192.168.XXX.XXX",
+    "remotePath": "/var/www/html",
+    "port": 22,
+    "connectTimeout": 20000,
+    "uploadOnSave": true,
+    "watcher": {
+        "files": "dist/*.{js,css}",
+        "autoUpload": false,
+        "autoDelete": false
+    },
+    "syncOption": {
+        "delete": true,
+        "update": false
+    },
+    "ignore": [
+        ".vscode",
+        ".howto",
+        ".setup",
+        ".git",
+        ".DS_Store",
+        "TEMP",
+        "nbproject",
+        "probe.http"
+    ]
+}
+```
+
+**Naturally, the correct values of your IP address of interest must be inserted in place of the Xs.**
+
 ## scaffolding
 
 Here's a series of useful shell commands for scaffolding the project:
