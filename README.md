@@ -66,6 +66,41 @@ convert user_confirm_delete_mobile_view.png -resize 80% -quality 95 user_confirm
 convert new_user_mobile_view.png -resize 80% -quality 95 new_user_mobile_view.png
 ```
 
+## virtual machine
+
+Assuming you want to use `libvirt` as an open-source API, daemon, and management tool as your virtualization platform, given its support for numerous hypervisors, the following commands would be useful:
+
+```shell
+su -
+virsh
+```
+
+After that, if the virtual network does not start by default:
+
+```shell
+net-list
+net-start default
+list --all
+start virtual-machine-name
+dominfo virtual-machine-name
+domifaddr virtual-machine-name
+```
+
+Otherwise, more simply:
+
+```shell
+list --all
+start virtual-machine-name
+dominfo virtual-machine-name
+domifaddr virtual-machine-name
+```
+
+And finally, once you've finished your development session and stopped the virtual machine from within it, you can finish with the following command:
+
+```shell
+quit
+```
+
 ## scaffolding
 
 Here's a series of useful shell commands for scaffolding the project:
