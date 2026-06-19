@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS users_tbl (
     -- `name VARCHAR(255)` stores the user's name as a variable-length string up to 255 characters.
     -- `NOT NULL` ensures that every row must contain a name.
     name VARCHAR(255) NOT NULL,
-    -- `email VARCHAR(255)` holds the user’s email address.
+    -- `email VARCHAR(255)` holds the user's email address.
     -- `NOT NULL` guarantees that every user record has an email.
     email VARCHAR(255) NOT NULL,
     -- Password Hash.
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS users_tbl (
     -- `NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP` sets the value to the current timestamp on insert and updates it automatically whenever the row changes.
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     -- Primary Key Constraint
-    -- Declares `id` as the table’s primary key, ensuring uniqueness and indexing.
+    -- Declares `id` as the table's primary key, ensuring uniqueness and indexing.
     PRIMARY KEY (id),
     -- Unique Email Constraint.
     -- `UNIQUE KEY ux_email (email)` creates a unique index on the `email` column, preventing duplicate email addresses across rows.
@@ -85,7 +85,7 @@ DELIMITER $$
   -- Procedure Header
   -- Defines a stored procedure named `sp_insert_user_on_users_tbl`.
   CREATE PROCEDURE sp_insert_user_on_users_tbl (
-      -- It accepts three input parameters (`p_name`, `p_email`, `p_password_hash`) and returns the newly inserted user’s ID via the output parameter `p_new_id`.
+      -- It accepts three input parameters (`p_name`, `p_email`, `p_password_hash`) and returns the newly inserted user's ID via the output parameter `p_new_id`.
       IN p_name VARCHAR(255),
       IN p_email VARCHAR(255),
       IN p_password_hash VARCHAR(255),
@@ -149,7 +149,7 @@ DELIMITER $$
 
       -- Email Uniqueness Check (Block 2)
       -- Queries the `users_tbl` table to determine if the supplied email is already in use.
-      -- If a duplicate exists, the procedure signals a “duplicate email” error.
+      -- If a duplicate exists, the procedure signals a "duplicate email" error.
       SELECT COUNT(*) INTO v_email_exists
       FROM users_tbl
       WHERE email = p_email;

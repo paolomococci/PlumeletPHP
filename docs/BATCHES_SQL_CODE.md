@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS batches_tbl (
     CONSTRAINT fk_batch_item FOREIGN KEY (fk_item)
         REFERENCES items_tbl(id) ON DELETE CASCADE,
     -- Primary Key Constraint
-    -- Declares `id` as the table’s primary key, ensuring uniqueness and indexing.
+    -- Declares `id` as the table's primary key, ensuring uniqueness and indexing.
     PRIMARY KEY (id)
 );
 

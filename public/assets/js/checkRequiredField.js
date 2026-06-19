@@ -46,7 +46,7 @@ function getFieldLabel(el) {
 }
 
 /**
- * Determines whether a single element is “empty”.
+ * Determines whether a single element is "empty".
  * Handles special cases for checkboxes, radios, files, dates, etc.
  *
  * @param {HTMLElement} el

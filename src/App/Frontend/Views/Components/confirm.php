@@ -54,7 +54,7 @@ $alertMsg = $alertMsg ?? 'This action may be irreversible.';
          * Responsive:
          * 
          * 18rem, the minimum width the element can shrink to;
-         * 90vw, the preferred width, calculated as 90 % of the viewport’s width;
+         * 90vw, the preferred width, calculated as 90 % of the viewport's width;
          * 38rem, the maximum width an element can have.
          * 
          * clamp() lets the modal adapt fluidly across devices while staying within sensible size limits.
@@ -86,7 +86,7 @@ $alertMsg = $alertMsg ?? 'This action may be irreversible.';
 </style>
 
 <script>
-    /* Grab the primary UI elements that we’ll interact with. */
+    /* Grab the primary UI elements that we'll interact with. */
 
     // The button that opens the modal.
     const postBtn = document.getElementById("postBtn");

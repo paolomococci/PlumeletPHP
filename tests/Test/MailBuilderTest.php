@@ -11,7 +11,7 @@ use App\Util\Mailers\MailBuilder;
 use Test\Helpers\InMemoryMailerHelper;
 
 /**
- * 2. Generate a deterministic “pass-phrase” that will be used in the
+ * 2. Generate a deterministic "pass-phrase" that will be used in the
  *    body of the mail. Declaring it outside the closure keeps the test body clean.
  */
 $passphrase = bin2hex(random_bytes(16));
@@ -28,7 +28,7 @@ it('builds a Mail instance via a fluent API and delegates to the injected mailer
     $mailer = new InMemoryMailerHelper();
 
     /**
-     * Use MailBuilder’s fluent API to populate a Mail instance
+     * Use MailBuilder's fluent API to populate a Mail instance
      * and call send(). The builder will delegate to our in-memory mailer.
      */
     MailBuilder::create($mailer)

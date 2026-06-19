@@ -75,7 +75,7 @@ class CsrfMiddleware implements MiddlewareInterface
      * 1. Extract the token from the request body or headers.  
      * 2. Ask the injected `CsrfTokenHandler` to validate it.  
      * 3. Throw a CsrfTokenException if the token is invalid
-     *    (the application’s exception middleware or error handler
+     *    (the application's exception middleware or error handler
      *    should catch this and respond appropriately).
      *
      * @param ServerRequestInterface $request The request containing the token.

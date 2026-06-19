@@ -7,7 +7,7 @@ namespace App\Backend\Models\Enums;
 /**
  * Backed enum representing the type of a warehouse.
  *
- * The enum’s values match the `type` column in the `warehouses_tbl` table.
+ * The enum's values match the `type` column in the `warehouses_tbl` table.
  */
 enum WarehouseTypeEnum: string
 {

@@ -48,7 +48,7 @@ final class LoginController extends Controller
         $csrfToken = $csrf->getToken();
 
         /**
-         * 2. If it’s not a POST request we just display the login form.
+         * 2. If it's not a POST request we just display the login form.
          */
         if ($request->getMethod() !== 'POST') {
             return $this->renderLogin($csrfToken);

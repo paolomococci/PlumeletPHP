@@ -17,7 +17,7 @@
  */
 
 /* ----------  Default-value handling --------------------- */
-// If `$prev` is not supplied, treat it as “no previous page”.
+// If `$prev` is not supplied, treat it as "no previous page".
 $prev    = $prev ?? null;
 // Likewise for the next page.
 $next    = $next ?? null;
@@ -29,7 +29,7 @@ $pages   = $pages ?? '';
 $baseUrl = $baseUrl ?? '';
 // Current search filter.
 $search  = $search ?? '';
-// Current “items per page” setting.
+// Current "items per page" setting.
 $perPage = $perPage ?? '';
 
 /*  Parameters that must always be present in the pagination links.
@@ -50,7 +50,7 @@ function linkPage($page, $baseUrl, $searchParams)
 <nav class="pagination">
     <ul class="horizontal-list">
         <?php if ($prev !== null): ?>
-            <!-- Render a “Prev” link only if a previous page exists. -->
+            <!-- Render a "Prev" link only if a previous page exists. -->
             <li><a href="<?= $this->e(linkPage($prev, $baseUrl, $searchParams)) ?>">Prev</a></li>
         <?php endif; ?>
 
@@ -58,7 +58,7 @@ function linkPage($page, $baseUrl, $searchParams)
             <!-- Each numbered link points to its own page but keeps `$search`
                 and `$perPage` from `$searchParams`. -->
             <li>
-                <!-- Apply a “disabled” class when the link refers to the
+                <!-- Apply a "disabled" class when the link refers to the
                     current page. This prevents clicking on the current
                     page number. -->
                 <a href="<?= $this->e(linkPage($i, $baseUrl, $searchParams)) ?>"
@@ -71,7 +71,7 @@ function linkPage($page, $baseUrl, $searchParams)
         <?php endfor; ?>
 
         <?php if ($next !== null): ?>
-            <!-- Render a “Next” link only if a next page exists. -->
+            <!-- Render a "Next" link only if a next page exists. -->
             <li><a href="<?= $this->e(linkPage($next, $baseUrl, $searchParams)) ?>">Next</a></li>
         <?php endif; ?>
     </ul>
@@ -86,7 +86,7 @@ function linkPage($page, $baseUrl, $searchParams)
         align-items: center;
         /* Distribute remaining space between the first and last item. */
         justify-content: space-between;
-        /* Remove default list styling so the list appears “inline”. */
+        /* Remove default list styling so the list appears "inline". */
         list-style: none;
         /* Reset padding/margin to avoid unwanted gaps. */
         padding: 0;
@@ -107,7 +107,7 @@ function linkPage($page, $baseUrl, $searchParams)
         color: #999;
         /* No underline - keeps the control looking like plain text. */
         text-decoration: none;
-        /* Cursor shows “not-allowed” to signal non-clickable. */
+        /* Cursor shows "not-allowed" to signal non-clickable. */
         cursor: not-allowed;
     }
 </style>

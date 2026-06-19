@@ -42,14 +42,14 @@ function getDescription(el) {
     // Handle the edge case where the element is falsy (e.g., `null`, `undefined`). 
     // In that situation it return a generic placeholder.
     if (!el) return 'Unnamed field';
-    // Try to use the element’s ID first.
+    // Try to use the element's ID first.
     const id = el.id;
     if (id) {
         // If an associated `<label>` exists, use its text content.
         const label = document.querySelector(`label[for="${id}"]`);
         if (label) return label.textContent.trim();
     }
-    // Fallback to the element’s `name` attribute or the ID again.
+    // Fallback to the element's `name` attribute or the ID again.
     return el.name || id || 'Unnamed field';
 }
 
@@ -89,7 +89,7 @@ function getTooltip() {
         // Initially hide the tooltip; it will be shown only when needed.
         tooltip.style.display = 'none';
 
-        // Close button → hide the tooltip when clicked.
+        // Close button -> hide the tooltip when clicked.
         tooltip
             .querySelector(`.${TOOLTIP_CLOSE}`)
             .addEventListener('click', hideTooltip);
@@ -119,7 +119,7 @@ function showTooltip(form, errors) {
     list.innerHTML = '';
     errors.forEach(err => {
         const li = document.createElement('li');
-        // Remove leading dash if present (our validators sometimes prepend “- ”).
+        // Remove leading dash if present (our validators sometimes prepend "- ").
         li.textContent = err.replace(/^-\s*/, '');
         list.appendChild(li);
     });
@@ -211,7 +211,7 @@ export function attachTooltip(formOrSelector, opts = {}) {
      *     flat array (`allErrors`).  The spread syntax is used to concatenate
      *     the individual `errors` arrays.
      *
-     * 3.  Enable or disable the form’s submit button based on whether
+     * 3.  Enable or disable the form's submit button based on whether
      *     there are any errors.  If the array is non-empty the button
      *     is disabled to prevent a bad submission.
      *

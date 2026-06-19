@@ -5,7 +5,7 @@
  *
  * This partial renders a search form and a small JavaScript snippet that
  * handles the reset button.  It is used by various list pages (e.g. items,
- * users, etc.) to provide a quick “search by name” capability.
+ * users, etc.) to provide a quick "search by name" capability.
  *
  * @var string $action    The URL to which the form will be submitted.
  * @var string $search    The current value that should be pre-filled in the

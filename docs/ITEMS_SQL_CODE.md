@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS items_tbl (
     -- `name VARCHAR(255)` stores the item's name as a variable-length string up to 255 characters.
     -- `NOT NULL` ensures that every row must contain a name.
     name VARCHAR(255) NOT NULL,
-    -- `description VARCHAR(255)` holds the item’s description address.
+    -- `description VARCHAR(255)` holds the item's description address.
     -- `NOT NULL` guarantees that every item record has an description.
     description VARCHAR(1020) NOT NULL,
     -- Unit price.
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS items_tbl (
     -- `NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP` sets the value to the current timestamp on insert and updates it automatically whenever the row changes.
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     -- Primary Key Constraint
-    -- Declares `id` as the table’s primary key, ensuring uniqueness and indexing.
+    -- Declares `id` as the table's primary key, ensuring uniqueness and indexing.
     PRIMARY KEY (id),
     -- Unique Name Constraint.
     -- `UNIQUE KEY ux_name (name)` creates a unique index on the `name` column, preventing duplicate name addresses across rows.
@@ -272,7 +272,7 @@ DELIMITER $$
   -- Procedure Header
   -- Defines a stored procedure named `sp_insert_item_on_items_tbl`.
   CREATE PROCEDURE sp_insert_item_on_items_tbl (
-      -- It accepts four input parameters (`p_name`, `p_description`, `p_price`, `p_currency`) and returns the newly inserted item’s ID via the output parameter `p_new_id`.
+      -- It accepts four input parameters (`p_name`, `p_description`, `p_price`, `p_currency`) and returns the newly inserted item's ID via the output parameter `p_new_id`.
       IN  p_name VARCHAR(255),
       IN  p_description VARCHAR(1020),
       IN  p_price DECIMAL(10,2),
@@ -336,7 +336,7 @@ DELIMITER $$
         FROM items_tbl
         WHERE TRIM(LOWER(name)) = TRIM(LOWER(p_name));
 
-      -- If a duplicate exists, the procedure signals a “duplicate name” error.
+      -- If a duplicate exists, the procedure signals a "duplicate name" error.
       IF v_name_exists > 0 THEN
         SET v_err_msg = 'Name already registered';
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_err_msg;

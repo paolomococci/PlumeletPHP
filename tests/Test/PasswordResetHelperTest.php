@@ -58,7 +58,7 @@ it('generates a 32-character hex pass-phrase, builds the body, and sends the mai
 
     /**
      * We should have captured a mail - the builder delegated to our
-     * in-memory mailer.  If it’s still null something went wrong.
+     * in-memory mailer.  If it's still null something went wrong.
      */
     expect($mailer->sentMail)->not->toBeNull();
 

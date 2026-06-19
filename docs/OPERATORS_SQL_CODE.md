@@ -30,7 +30,7 @@ WHERE
 CREATE TABLE IF NOT EXISTS operators_tbl (
     -- `id BIGINT` derived from table users_tbl
     id BIGINT UNSIGNED NOT NULL,
-    -- `email VARCHAR(255)` holds the user’s email address
+    -- `email VARCHAR(255)` holds the user's email address
     email VARCHAR(255) NOT NULL,
     -- `auth`
     auth ENUM('admin','chief','employee') NOT NULL DEFAULT 'employee',

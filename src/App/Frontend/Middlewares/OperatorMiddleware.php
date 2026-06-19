@@ -205,7 +205,7 @@ final class OperatorMiddleware implements MiddlewareInterface
         $operator = $_SESSION['operator'] ?? null;
 
         // The operator must be an object of type 'App\Backend\Models\Operator'.
-        // If it isn’t or it isn’t present the user is not authenticated.
+        // If it isn't or it isn't present the user is not authenticated.
         if (! $operator instanceof Operator) {
             throw new UnauthorizedException('Authentication required.');
         }

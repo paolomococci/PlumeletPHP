@@ -5,12 +5,12 @@
  * Tiny helper that validates every `<input type="email">` inside a form.
  *
  * Features:
- *   • Optional enforcement of the `required` attribute.
- *   • Native HTML5 validation when available.
- *   • Fallback regex validation for browsers that lack `checkValidity`.
- *   • Caches the list of email inputs after the first run.
- *   • Adds `aria-invalid="true"` to invalid fields (accessibility).
- *   • Exposes errors globally via `window.emailValidationErrors`.
+ *   - Optional enforcement of the `required` attribute.
+ *   - Native HTML5 validation when available.
+ *   - Fallback regex validation for browsers that lack `checkValidity`.
+ *   - Caches the list of email inputs after the first run.
+ *   - Adds `aria-invalid="true"` to invalid fields (accessibility).
+ *   - Exposes errors globally via `window.emailValidationErrors`.
  *
  * Usage:
  *   import { initEmailValidator } from '/assets/js/validateEmail.js';

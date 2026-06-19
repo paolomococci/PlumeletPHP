@@ -3,13 +3,13 @@
  *
  * Validates all <input type="password"> elements inside a form.
  * Features:
- *   • Default strict rules (min length, upper/lower/digit/special) with
+ *   - Default strict rules (min length, upper/lower/digit/special) with
  *     configurable thresholds.
- *   • Optional `customRegex` that, when supplied, overrides the default
+ *   - Optional `customRegex` that, when supplied, overrides the default
  *     rule set.
- *   • Caches the list of password inputs after the first run.
- *   • Adds `aria-invalid="true"` to invalid fields (accessibility).
- *   • Exposes errors globally via `window.passwordValidationErrors`.
+ *   - Caches the list of password inputs after the first run.
+ *   - Adds `aria-invalid="true"` to invalid fields (accessibility).
+ *   - Exposes errors globally via `window.passwordValidationErrors`.
  *
  * Usage:
  *   import { initPasswordValidator } from '/assets/js/validatePassword.js';
@@ -84,11 +84,11 @@ function getFieldDescription(el) {
  *
  *   3. When no custom regex is supplied, we apply the default rule set
  *       which is configurable via the `options` object:
- *       • Minimum length.
- *       • At least one uppercase letter (if `requireUpper`).
- *       • At least one lowercase letter (if `requireLower`).
- *       • At least one digit (if `requireDigit`).
- *       • At least one special character (if `requireSpecial`).
+ *       - Minimum length.
+ *       - At least one uppercase letter (if `requireUpper`).
+ *       - At least one lowercase letter (if `requireLower`).
+ *       - At least one digit (if `requireDigit`).
+ *       - At least one special character (if `requireSpecial`).
  *
  * The function finally returns an object that signals overall validity
  * and carries any collected error messages.

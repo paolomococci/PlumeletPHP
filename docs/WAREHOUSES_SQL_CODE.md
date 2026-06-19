@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS warehouses_tbl (
     -- Physical address of the warehouse, must be non-null
     address VARCHAR(255) NOT NULL,
     -- Record Email of warehouse.
-    -- `email VARCHAR(255)` holds the warehouse’s email address.
+    -- `email VARCHAR(255)` holds the warehouse's email address.
     -- `NOT NULL` guarantees that every warehouse record has an email.
     email VARCHAR(255) NOT NULL,
     -- Record Creation Timestamp.
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS warehouses_tbl (
     -- `NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP` sets the value to the current timestamp on insert and updates it automatically whenever the row changes.
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     -- Primary Key Constraint
-    -- Declares `id` as the table’s primary key, ensuring uniqueness and indexing.
+    -- Declares `id` as the table's primary key, ensuring uniqueness and indexing.
     PRIMARY KEY (id),
     -- Unique Email Constraint.
     -- `UNIQUE KEY ux_email (email)` creates a unique index on the `email` column, preventing duplicate email addresses across rows.
@@ -103,7 +103,7 @@ DELIMITER $$
 CREATE PROCEDURE sp_insert_warehouse_on_warehouses_tbl
 (
     -- It accepts three input parameters (`p_name`, `p_address`, `p_email`)
-    -- and returns the newly inserted warehouse’s ID via the output parameter `p_new_id`.
+    -- and returns the newly inserted warehouse's ID via the output parameter `p_new_id`.
     IN  p_name VARCHAR(255),
     IN  p_address VARCHAR(255),
     IN  p_email VARCHAR(255),
@@ -169,7 +169,7 @@ BEGIN
 
     -- Address Uniqueness Check
     -- Queries the `warehouses_tbl` table to determine if the supplied address is already in use.
-    -- If a duplicate exists, the procedure signals a “duplicate address” error.
+    -- If a duplicate exists, the procedure signals a "duplicate address" error.
     SELECT COUNT(*) INTO v_address_exists
     FROM warehouses_tbl
     WHERE address = p_address;
@@ -180,7 +180,7 @@ BEGIN
 
     -- Email Uniqueness Check
     -- Queries the `warehouses_tbl` table to determine if the supplied email is already in use.
-    -- If a duplicate exists, the procedure signals a “duplicate email” error.
+    -- If a duplicate exists, the procedure signals a "duplicate email" error.
     SELECT COUNT(*) INTO v_email_exists
     FROM warehouses_tbl
     WHERE email = p_email;
