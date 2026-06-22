@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1); // Enforce strict type checking
+declare (strict_types = 1); // Enforce strict type checking
 
 namespace App\Backend\Models;
 
@@ -16,7 +16,7 @@ abstract class Model
 {
     /**
      * create
-     * 
+     *
      * Creates a new instance of the calling class.
      *
      * @param  mixed $fields    An associative array where keys match the
@@ -28,7 +28,7 @@ abstract class Model
     {
         /**
          * Obtain a ReflectionClass object for the runtime class that called this method.
-         * `static::class` uses late-static binding (LSB) so that subclasses get 
+         * `static::class` uses late-static binding (LSB) so that subclasses get
          * the correct class name, not the name of this base class.
          */
         $reflection = new ReflectionClass(static::class);
@@ -37,7 +37,7 @@ abstract class Model
         $constructor = $reflection->getConstructor();
 
         /* If the class has no constructor, simply instantiate it with no arguments. */
-        if (!$constructor) {
+        if (! $constructor) {
             return new static();
         }
 
@@ -48,19 +48,19 @@ abstract class Model
             $paramName = $param->getName();
 
             /**
-             * Look for a value in the supplied `$fields` array 
+             * Look for a value in the supplied `$fields` array
              * that matches this name.
-             * If none is found, use `null` as the placeholder. 
-             * This allows the caller to omit optional parameters 
+             * If none is found, use `null` as the placeholder.
+             * This allows the caller to omit optional parameters
              * or to supply explicit nulls.
              */
             $params[$paramName] = $fields[$paramName] ?? null;
         }
 
         /**
-         * Instantiate the class, expanding the `$params` array 
+         * Instantiate the class, expanding the `$params` array
          * with the spread operator `...`.
-         * This turns the associative array into a positional 
+         * This turns the associative array into a positional
          * argument list matching the constructor's signature.
          */
         return new static(...$params);
@@ -400,22 +400,22 @@ abstract class Model
             $value = $data[$paramName] ?? null;
 
             $value = $paramType && $value !== null
-                /**
-                 * Match Benefits:
-                 * - more Concise;
-                 * - more performing than switches;
-                 * - returns a value directly;
-                 * - type-safe.
-                 * 
-                 */
+            /**
+             * Match Benefits:
+             * - more Concise;
+             * - more performing than switches;
+             * - returns a value directly;
+             * - type-safe.
+             *
+             */
                 ? match ($paramType->getName()) {
-                    'int'    => is_numeric($value) ? (int) $value : null,
-                    'float'  => is_numeric($value) ? (float) $value : null,
-                    'bool'   => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
-                    'string' => (string) $value,
-                    'array'  => is_array($value) ? $value : null,
-                    default  => $value
-                }
+                'int'    => is_numeric($value) ? (int) $value : null,
+                'float'  => is_numeric($value) ? (float) $value : null,
+                'bool'   => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+                'string' => (string) $value,
+                'array'  => is_array($value) ? $value : null,
+                default  => $value
+            }
                 : $value;
 
             $mappedParams[$paramName] = $value;
@@ -426,7 +426,7 @@ abstract class Model
 
     /**
      * ellipsisPreserveWords (UTF-8 safe)
-     * 
+     *
      * If the string is longer than $limit, an ellipsis (…) is appended.
      *
      * @param  string $description
@@ -437,7 +437,9 @@ abstract class Model
     {
         // Check if the description length is within the limit.
         // If it is, return the original string unchanged.
-        if (mb_strlen($description) <= $limit) return $description;
+        if (mb_strlen($description) <= $limit) {
+            return $description;
+        }
 
         // Take a substring of the description up to the specified limit.
         $substr = mb_substr($description, 0, $limit);

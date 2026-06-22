@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1); // Enforce strict type checking
+declare (strict_types = 1); // Enforce strict type checking
 
 namespace App\Backend\Models;
 
@@ -37,7 +37,7 @@ final class User extends Model implements ModelInterface
         private ?string $token_2fa_hash = null,
         private ?string $token_2fa_expires_at = null,
         private ?string $token_2fa_used_at = null,
-        private ?int $token_2fa_attempts = null
+        private ?int    $token_2fa_attempts = null
     ) {}
 
     /**
@@ -95,7 +95,7 @@ final class User extends Model implements ModelInterface
     /**
      * getPlainPassword
      *
-     * @return string
+     * @return boolean
      */
     public function isPlainPasswordEmpty(): bool
     {
@@ -166,7 +166,7 @@ final class User extends Model implements ModelInterface
     {
         if ($this->token_2fa_used_at === null) {
         }
-        return ($this->token_2fa_used_at === null) ? null : static::toDateTimeImmutable($this->token_2fa_used_at);
+        return ($this->token_2fa_used_at === null) ? null: static::toDateTimeImmutable($this->token_2fa_used_at);
     }
 
     /**
@@ -307,7 +307,7 @@ final class User extends Model implements ModelInterface
     /**
      * setTokenTwoFaAttempts
      *
-     * @param  int $id
+     * @param  mixed $token_2fa_attempts
      * @return void
      */
     public function setTokenTwoFaAttempts(int $token_2fa_attempts): void

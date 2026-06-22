@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1); // Enforce strict type checking
+declare (strict_types = 1); // Enforce strict type checking
 
 namespace App\Backend\Models;
 
@@ -29,7 +29,7 @@ final class Item extends Model implements ModelInterface
         private ?string $id = null,
         private ?string $name = null,
         private ?string $description = null,
-        private ?float $price = null,
+        private ?float  $price = null,
         private ?string $currency = null,
         private ?string $created_at = null,
         private ?string $updated_at = null
@@ -122,7 +122,7 @@ final class Item extends Model implements ModelInterface
     /**
      * setId
      *
-     * @param  mixed $name
+     * @param  mixed $id
      * @return void
      */
     public function setId(string $id): void
@@ -156,12 +156,12 @@ final class Item extends Model implements ModelInterface
     /**
      * setCurrency
      *
-     * @param  mixed $name
+     * @param  mixed $currency
      * @return void
      */
     public function setCurrency(string $currency): void
     {
-        $this->currency = (! is_null($currency) ? static::checkVarchar(text: $currency, length: 3) : '');
+        $this->currency = (! is_null($currency) ? static::checkVarchar(text : $currency, length: 3): '');
     }
 
     /**

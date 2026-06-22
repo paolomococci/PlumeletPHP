@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1); // Enforce strict type checking
+declare (strict_types = 1); // Enforce strict type checking
 
 namespace App\Backend\Models;
 
@@ -26,9 +26,9 @@ final class Operator
      */
     public function __construct(
         // The identifier will be identical to that of the user, in practice a foreign key.
-        private ?string $id = null,
-        private ?string $email = null,
-        private ?AuthEnum $auth = null
+        private ?string     $id = null,
+        private ?string     $email = null,
+        private ?AuthEnum   $auth = null
     ) {}
 
     /**
@@ -77,7 +77,7 @@ final class Operator
 
     /**
      * getRole
-     * 
+     *
      * Role is the value of the authorization enum.
      *
      * @return null|string
