@@ -101,54 +101,225 @@ And finally, once you've finished your development session and stopped the virtu
 quit
 ```
 
+## on-premise provisioning
+
+### directory creation
+
+```shell
+ssh developer_username@192.168.XXX.XXX
+su -
+cd /var/www/html/
+mkdir -p plumeletphp.local/public
+nano index.php
+```
+
+If it is not already present, I edit a simple index to use as a placeholder that informs about the executive environment:
+
+```php
+<? phpinfo(INFO_ALL);
+```
+
+I copy the placeholder inside the public directory:
+
+```shell
+cp index.php plumeletphp.local/public/
+chown --recursive developer_username:apache plumeletphp.local/
+cd ~
+```
+
+### parameter for generate keys:
+
+Here is just an example of the parameters to keep on hand:
+
+```text
+[national_acronym]
+[state]
+[city]
+plumeletphp.local
+plumeletphp.local
+plumeletphp.local
+[webmaster@localhost]
+```
+
+It is obvious that the first three parameters must be appropriately valued.
+
+Therefore I can proceed with the generation of the self-signed certificate without the passphrase thanks to the `-nodes` flag:
+
+```shell
+ls -al /etc/ssl/
+openssl req -new -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/plumeletphp.local.key -out /etc/ssl/certs/plumeletphp.local.crt
+ls -al /etc/ssl/private/
+ls -al /etc/ssl/certs/
+```
+
+### file `/etc/httpd/conf.d/plumeletphp.local.conf`
+
+```shell
+nano /etc/httpd/conf.d/plumeletphp.local.conf
+```
+
+```xml
+<VirtualHost *:80>
+        ServerAdmin webmaster@localhost
+        ServerName plumeletphp.local
+        ServerAlias www.plumeletphp.local
+        DocumentRoot /var/www/html/plumeletphp.local/public
+        Redirect permanent "/" "https://plumeletphp.local/"
+</VirtualHost>
+
+<VirtualHost *:443>
+        ServerAdmin webmaster@localhost
+        ServerName plumeletphp.local
+        ServerAlias www.plumeletphp.local
+        DocumentRoot /var/www/html/plumeletphp.local/public
+
+        <Directory /var/www/html/plumeletphp.local/public>
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride All
+                Require all granted
+                DirectoryIndex index.php
+        </Directory>
+
+        SSLEngine on
+
+        SSLCertificateFile /etc/ssl/certs/plumeletphp.local.crt
+        SSLCertificateKeyFile /etc/ssl/private/plumeletphp.local.key
+
+        ErrorLog /var/log/httpd/plumeletphp_error_log
+
+        <FilesMatch "\.(cgi|shtml|phtml|php)$">
+                SSLOptions +StdEnvVars
+        </FilesMatch>
+</VirtualHost>
+```
+
+### environment setup
+
+With developer user credentials:
+
+```shell
+apachectl configtest
+systemctl reload httpd
+systemctl status httpd --no-pager
+```
+
+If I encounter any problems I can investigate with the following command:
+
+```shell
+tail -n 5 /var/log/httpd/plumeletphp_error_log
+```
+
+If you receive reports about file permission issues, you can proceed with the following commands:
+
+```shell
+chmod -R 755 /var/www/html/plumeletphp.local/public/
+chmod -R 644 /var/www/html/plumeletphp.local/public/*.php
+restorecon -Rv /var/www/html/plumeletphp.local/
+systemctl restart httpd
+systemctl status httpd --no-pager
+exit
+```
+
+## setup of `/etc/hosts` on the host used for development
+
+I edit the following configuration file:
+
+```shell
+nano /etc/hosts
+```
+
+and I add this line:
+
+```txt
+192.168.XXX.XXX         plumeletphp.local       www.plumeletphp.local           # PlumeletPHP
+```
+
+**Obviously, the correct values of your IP address of interest must be inserted in place of the Xs.**
+
 ## setup of vscode
 
 Edit sftp.json like this:
 
 ```json
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "name": "virtual-machine-name",
-    "username": "developer_username",
-    "privateKeyPath": "/home/developer_username/.ssh/id_rsa",
-    "passphrase": "developer_passphrase",
-    "host": "192.168.XXX.XXX",
-    "remotePath": "/var/www/html",
-    "port": 22,
-    "connectTimeout": 20000,
-    "uploadOnSave": true,
-    "watcher": {
-        "files": "dist/*.{js,css}",
-        "autoUpload": false,
-        "autoDelete": false
-    },
-    "syncOption": {
-        "delete": true,
-        "update": false
-    },
-    "ignore": [
-        ".vscode",
-        ".howto",
-        ".setup",
-        ".git",
-        ".DS_Store",
-        "TEMP",
-        "nbproject",
-        "probe.http"
-    ]
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "name": "plumeletphp.local",
+  "username": "developer_username",
+  "privateKeyPath": "/home/developer_username/.ssh/id_rsa",
+  "passphrase": "developer_passphrase",
+  "host": "192.168.XXX.XXX",
+  "remotePath": "/var/www/html/plumeletphp.local",
+  "port": 22,
+  "connectTimeout": 20000,
+  "uploadOnSave": true,
+  "watcher": {
+    "files": "dist/*.{js,css}",
+    "autoUpload": false,
+    "autoDelete": false
+  },
+  "syncOption": {
+    "delete": true,
+    "update": false
+  },
+  "ignore": [
+    ".vscode",
+    ".howto",
+    ".setup",
+    ".git",
+    ".DS_Store",
+    "*.rest",
+    "*.sql",
+    "TEMP",
+    "nbproject",
+    "probe.http",
+    "README.md"
+  ]
 }
 ```
 
-**Naturally, the correct values of your IP address of interest must be inserted in place of the Xs.**
+**Please note, you will need to remember to set the `username`, `privateKeyPath`, `passphrase` and `host` fields appropriately.**
+
+**Again, the correct values of your IP address of interest must be inserted in place of the Xs.**
+
+Edit settings.json like this:
+
+```json
+{
+  "cSpell.language": "en,it,la",
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "tailwindCSS.includeLanguages": {
+    "html": "html",
+    "javascript": "javascript",
+    "css": "css"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "intelephense.diagnostics.undefinedMethods": false,
+  "cSpell.words": [],
+  "editor.defaultColorDecorators": "auto",
+  "editor.colorDecoratorsLimit": 5000
+}
+```
 
 ## scaffolding
 
-Here's a series of useful shell commands for scaffolding the project:
+Here are a few useful shell commands to create the project structure for use via SSH on the host hosting the web application, using the developer's credentials:
 
 ```shell
-mkdir PlumeletPHP && cd PlumeletPHP
+cd /var/www/html/plumeletphp.local/
+mkdir -p src/App
+composer --version
 composer init --help
-composer init --verbose --name=plumeletphp/app --description="demo framework" --type=project --license=MIT --autoload=src/App
+composer init --no-interaction \
+    --name=plumeletphp/app \
+    --description="demo framework" \
+    --type=project \
+    --license=MIT \
+    --autoload=src/App/
+chown --recursive developer_username:apache .
 ```
 
 If you make changes to the composer.json file, remember to correct them and then regenerate autoloading.
@@ -159,6 +330,46 @@ Now is the time to regenerate the autoloading:
 
 ```shell
 composer dump-autoload
+```
+
+### autoload check
+
+Before continuing, it would be a good idea to check that autoload is working correctly.
+
+If you want, you could start by creating the Hello class in `src/App`:
+
+```php
+<?php
+
+namespace Plumeletphp\App;
+
+class Hello
+{
+    public function hello(): string
+    {
+        return "Autoload works fine!";
+    }
+}
+```
+
+To then edit the `autoload_check.php` file in the root of the project:
+
+```php
+<?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+use Plumeletphp\App\Hello;
+
+$hello = new Hello;
+
+echo $hello->hello() . PHP_EOL;
+```
+
+Finally, the actual verification will be done from the shell:
+
+```shell
+php autoload_check.php
 ```
 
 ## packages
