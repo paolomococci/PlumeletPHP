@@ -400,11 +400,96 @@ composer require league/plates --prefer-stable
 composer require --dev pestphp/pest phpunit/phpunit
 ```
 
-and after having appropriately modified the composer.json file and added pest.php and phpunit.xml to the root of the project:
+### make `tests` directory
+
+```shell
+mkdir -p tests/Test
+touch tests/Test/SampleTest.php
+chown --recursive developer_username:apache .
+chmod -R 755 ./tests/
+chmod -R 644 ./tests/Test/*.php
+```
+
+Edit `tests/Test/SampleTest.php` like this:
+
+```php
+<?php
+
+declare(strict_types=1); // Enforce strict type checking
+
+/**
+ * Adds two integers and returns an integer.
+ *
+ * @param integer $a
+ * @param integer $b
+ * @return integer
+ */
+function add(int $a, int $b): int
+{
+    return $a + $b;
+}
+
+/**
+ * Reverses a string using PHP's built-in `strrev()` function.
+ *
+ * @param string $str
+ * @return string
+ */
+function reverse(string $str): string
+{
+    return strrev($str);
+}
+
+test('add() returns a sum of integers', function () {
+    // Expect add(1, 2) to equal 3.
+    expect(add(1, 2))->toBe(3);
+    // Expect add(3, -3) to equal 0.
+    expect(add(3, -3))->toBe(0);
+    // Expect add(4, -5) to equal -1.
+    expect(add(4, -5))->toBe(-1);
+});
+
+test('reverse() returns a reversed string', function () {
+    // Expect reverse("desserts") to equal "stressed".
+    expect(reverse("desserts"))->toBe("stressed");
+    // Expect reverse("PHP") to equal "PHP".
+    expect(reverse("PHP"))->toBe("PHP");
+});
+```
+
+Now I added these lines:
+
+```json
+    "autoload-dev": {
+        "psr-4": {
+            "Plumeletphp\\Test\\": "tests/Test/"
+        }
+    },
+```
+
+after autoload section and this lines:
+
+```json
+    ,
+    "scripts": {
+        "test": "vendor/bin/pest"
+    }
+```
+
+at the end of `composer.json` file.
+
+Add `pest.php` and `phpunit.xml` to the root of the project:
 
 ```shell
 composer dump-autoload
 composer test
+```
+
+or, more simply:
+
+```shell
+ls -l vendor/bin/pest
+vendor/bin/pest
 ```
 
 ### tips

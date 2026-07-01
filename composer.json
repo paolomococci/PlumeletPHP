@@ -5,12 +5,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "App\\": "src/App/"
+            "Plumeletphp\\App\\": "src/App/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Test\\": "tests/Test/"
+            "Plumeletphp\\Test\\": "tests/Test/"
         }
     },
     "authors": [
