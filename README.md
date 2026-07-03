@@ -571,14 +571,20 @@ And, after each change, the cycle repeats:
 git status
 git add .
 git commit -m "further adjustments"
+git log -3
 git tag -a v0.0.1 -m "further adjustments"
-git log
-git checkout draft
-git merge --no-ff wip -m "merge wip into draft"
-git checkout staging
-git merge --no-ff draft -m "merge draft into staging"
-git checkout main
-git merge --no-ff staging -m "merge staging into main"
+git branch --list
+```
+
+Once the changes have been verified as working, the other branches of the repository can also be updated in cascade:
+
+```shell
+git checkout draft && \
+git merge --no-ff wip -m "merge wip into draft" && \
+git checkout staging && \
+git merge --no-ff draft -m "merge draft into staging" && \
+git checkout main && \
+git merge --no-ff staging -m "merge staging into main" && \
 git checkout wip
 ```
 
