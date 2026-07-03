@@ -1,7 +1,17 @@
-/* Root variables for spacing and element heights. */
+/* Root variables, min-max values for all fluid properties. */
 :root {
-  --gap: 12px;
-  --height: 56px;
+  /* Typography */
+  --fs-min: 0.62rem;
+  --fs-max: 1.25rem;
+  --fs-fluid: calc(0.48rem + 0.96vw);
+
+  /* Header */
+  --header-padd-min: 8px;
+  --header-padd-max: 20px;
+  --header-padd-fluid: calc(0.5rem + 1vw);
+  --header-height-min: 56px;
+  --header-height-max: 72px;
+  --header-height-fluid: calc(3.5rem + 0.8vw);
 }
 
 /* Box-sizing reset for all elements. */
@@ -9,9 +19,8 @@
   box-sizing: border-box;
 }
 
-/* Base font size for the body. */
 body {
-  font-size: 0.95rem;
+  font-size: clamp(var(--fs-min), var(--fs-fluid), var(--fs-max));
 }
 
 /* Padding for the navigation container. */
@@ -19,7 +28,19 @@ nav {
   padding: 0.5rem;
 }
 
-/* Utility class to stretch an element to full viewport width. */
+a {
+  text-decoration: none;
+}
+a:hover {
+  color: #ee9;
+}
+a.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  color: #999;
+  cursor: not-allowed;
+}
+
 .full-bleed {
   width: 100vw;
   margin-left: 50%;
@@ -37,8 +58,16 @@ nav {
   align-items: center;
   justify-content: space-between;
   gap: var(--gap);
-  padding: 8px;
-  height: var(--height);
+  padding: clamp(
+    var(--header-padd-min),
+    var(--header-padd-fluid),
+    var(--header-padd-max)
+  );
+  height: clamp(
+    var(--header-height-min),
+    var(--header-height-fluid),
+    var(--header-height-max)
+  );
   background: var(--bg);
   border-bottom: 1px solid #eee;
   position: relative;
@@ -54,7 +83,6 @@ nav {
 .container {
   width: 100%;
   padding: 0 16px;
-  /* Inner padding for mobile. */
   margin: 0 auto;
   box-sizing: border-box;
 }
@@ -73,22 +101,6 @@ nav {
   margin-right: 20px;
 }
 
-a {
-  text-decoration: none;
-}
-
-a:hover {
-  color: #ee9;
-}
-
-/* Disabled link styling. */
-a.disabled {
-  pointer-events: none;
-  opacity: 0.5;
-  color: #999;
-  cursor: not-allowed;
-}
-
 /* The style given to the registered operator's email and view title. */
 .logged-operator,
 .view-title {
@@ -102,54 +114,14 @@ a.disabled {
   margin-left: 1rem;
 }
 
-/* Responsive typography and optional element visibility. */
-@media (min-width: 360px) {
-  body {
-    font-size: 0.62rem;
-  }
-
+/* Keeps the old media query only for whether or not to display the `optional` class. */
+@media (max-width: 839px) {
   .optional {
     display: none;
   }
 }
-
-@media (min-width: 480px) {
-  body {
-    font-size: 0.75rem;
-  }
-
-  .optional {
-    display: none;
-  }
-}
-
 @media (min-width: 840px) {
-  body {
-    font-size: 0.9rem;
-  }
-
-  .app-header {
-    padding: 12px 20px;
-    height: 72px;
-  }
-
   .optional {
     display: block;
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    font-size: 1.25rem;
-  }
-
-  .optional {
-    display: block;
-  }
-
-  .container {
-    padding: 0;
-    /* Full viewport width on large screens. */
-    max-width: none;
   }
 }
