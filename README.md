@@ -500,6 +500,14 @@ To see if a certain type of package is installed:
 composer show --name-only | grep monolog
 ```
 
+The following setting in `.vscode/settings.json` prevents any plugin from interfering with the pure CSS syntax:
+
+```json
+  "files.associations": {
+    "*.tw.css": "tailwindcss"
+  }
+```
+
 ## PHP built-in web server
 
 Now I proceed to start the built-in web server offered by PHP itself:
