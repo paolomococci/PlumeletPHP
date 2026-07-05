@@ -1,5 +1,10 @@
 .vscode/
 .notes/
+.tests/
 vendor/
 stores/
-.env
+stubs/
+*.pdf
+*.env
+*.log
+*.cache
