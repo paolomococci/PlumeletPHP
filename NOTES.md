@@ -69,3 +69,7 @@ DROP USER IF EXISTS 'developer_username'@'192.168.1.0/24';
 FLUSH PRIVILEGES;
 SELECT `user`, `host`, `password`, `Grant_priv`, `Super_priv` FROM `mysql`.`user` ORDER BY `user` DESC;
 ```
+
+## permitted routes
+
+First of all, I must emphasize that in order for a management route to be accessible, it is necessary to create a class of type `routes`, add it to the `Bootstrap` class in the designated section, and add the `path` to the `OperatorMiddleware` class within the appropriate constant that defines the permissions granted to users.
