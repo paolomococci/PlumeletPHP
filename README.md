@@ -1,6 +1,6 @@
 # PlumeletPHP
 
-![](./images/plumeletphp_italian_colors_1200x627.png)
+![](./images/plumeletphp_italian_colors_1200x627.svg)
 
 Professionally developed personal PHP framework for demonstration purposes.
 
